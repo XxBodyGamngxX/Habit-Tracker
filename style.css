@@ -1799,6 +1799,13 @@ body.dark-theme .habit-card.card-slate {
     color: var(--color-text-tertiary);
 }
 
+.video-number {
+    font-size: var(--font-size-xs);
+    color: var(--color-text-tertiary);
+    font-weight: 600;
+    min-width: 24px;
+}
+
 .video-checkbox {
     width: 20px;
     height: 20px;

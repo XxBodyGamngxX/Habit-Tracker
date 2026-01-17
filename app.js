@@ -1553,6 +1553,7 @@ class ProductivityHub {
                     <div class="video-list">
                         ${playlist.videos.map((video, idx) => `
                             <div class="video-item ${video.completed ? 'completed' : ''}">
+                                <div class="video-number">${idx + 1}.</div>
                                 <div class="video-checkbox" onclick="app.toggleVideo('${playlist.id}', '${video.id}')">
                                     ${video.completed ? `
                                         <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
