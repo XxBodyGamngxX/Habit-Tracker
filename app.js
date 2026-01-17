@@ -951,7 +951,21 @@ class ProductivityHub {
             } else {
                 return closest;
             }
-        }, null)?.element;
+        }, null);
+
+        if (!closest) {
+            return null;
+        }
+
+        const box = closest.element.getBoundingClientRect();
+        // Determine if we should place after the closest element
+        // If in grid view (or generally), if cursor is to the right of center, we tend to want to insert after.
+        // We use a threshold to be safe.
+        if (x > box.left + box.width / 2) {
+            return closest.element.nextElementSibling;
+        }
+
+        return closest.element;
     }
 
     reorderTasks(newOrderIds) {
@@ -1289,7 +1303,8 @@ class ProductivityHub {
         }
 
         // Update page title
-        document.title = `${display} - Pomodoro Timer`;
+        // Update page title
+        document.title = "Bishr's Hub";
     }
 
     openPomodoroSettings() {
