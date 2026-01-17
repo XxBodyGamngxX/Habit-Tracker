@@ -1,0 +1,1387 @@
+// ============================================
+// PRODUCTIVITY HUB - UNIFIED APPLICATION
+// ============================================
+
+class ProductivityHub {
+    constructor() {
+        this.currentPage = 'habits';
+        this.habits = this.loadData('habits') || [];
+        this.tasks = this.loadData('tasks') || [];
+        this.pomodoroSettings = this.loadData('pomodoroSettings') || {
+            workDuration: 25,
+            shortBreakDuration: 5,
+            longBreakDuration: 15
+        };
+        this.pomodoroStats = this.loadData('pomodoroStats') || {
+            sessionsToday: 0,
+            totalFocusTime: 0,
+            currentStreak: 0,
+            lastSessionDate: null
+        };
+        this.pomodoroTimer = null;
+        this.pomodoroTimeLeft = this.pomodoroSettings.workDuration * 60;
+        this.pomodoroTotalTime = this.pomodoroSettings.workDuration * 60;
+        this.pomodoroMode = 'work';
+        this.pomodoroIsRunning = false;
+        this.currentTaskFilter = 'pending';
+
+        this.init();
+    }
+
+    init() {
+        this.applyTheme();
+        this.setupEventListeners();
+        this.renderPage(this.currentPage);
+        this.checkPomodoroStats();
+    }
+
+    // ============================================
+    // THEME & NAVIGATION
+    // ============================================
+
+    applyTheme() {
+        const theme = localStorage.getItem('theme') || 'light';
+        if (theme === 'dark') {
+            document.body.classList.add('dark-theme');
+        }
+    }
+
+    toggleTheme() {
+        document.body.classList.toggle('dark-theme');
+        const isDark = document.body.classList.contains('dark-theme');
+        localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    }
+
+    setupEventListeners() {
+        // Theme toggle
+        document.getElementById('themeToggle').addEventListener('click', () => this.toggleTheme());
+
+        // Navigation
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const page = e.target.dataset.page;
+                this.switchPage(page);
+            });
+        });
+
+        // Habit Modal
+        document.getElementById('closeHabitModal').addEventListener('click', () => this.closeModal('habitModal'));
+        document.getElementById('cancelHabitBtn').addEventListener('click', () => this.closeModal('habitModal'));
+        document.getElementById('habitForm').addEventListener('submit', (e) => this.handleHabitSubmit(e));
+
+        // Task Modal
+        document.getElementById('closeTaskModal').addEventListener('click', () => this.closeModal('taskModal'));
+        document.getElementById('cancelTaskBtn').addEventListener('click', () => this.closeModal('taskModal'));
+        document.getElementById('taskForm').addEventListener('submit', (e) => this.handleTaskSubmit(e));
+
+        // Pomodoro Settings Modal
+        document.getElementById('closePomodoroSettings').addEventListener('click', () => this.closeModal('pomodoroSettingsModal'));
+        document.getElementById('cancelPomodoroSettings').addEventListener('click', () => this.closeModal('pomodoroSettingsModal'));
+        document.getElementById('pomodoroSettingsForm').addEventListener('submit', (e) => this.handlePomodoroSettingsSubmit(e));
+
+        // Close modals on backdrop click
+        document.querySelectorAll('.modal-backdrop').forEach(backdrop => {
+            backdrop.addEventListener('click', (e) => {
+                const modal = e.target.closest('.modal');
+                if (modal) {
+                    this.closeModal(modal.id);
+                }
+            });
+        });
+    }
+
+    switchPage(page) {
+        this.currentPage = page;
+
+        // Update nav links
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.classList.remove('active');
+            if (link.dataset.page === page) {
+                link.classList.add('active');
+            }
+        });
+
+        this.renderPage(page);
+    }
+
+    renderPage(page) {
+        const content = document.getElementById('pageContent');
+
+        switch (page) {
+            case 'habits':
+                content.innerHTML = this.getHabitsPageHTML();
+                this.setupHabitsEventListeners();
+                this.renderHabits();
+                this.updateHabitsStats();
+                break;
+            case 'todo':
+                content.innerHTML = this.getTodoPageHTML();
+                this.setupTodoEventListeners();
+                this.renderTasks();
+                this.updateTodoStats();
+                break;
+            case 'pomodoro':
+                content.innerHTML = this.getPomodoroPageHTML();
+                this.setupPomodoroEventListeners();
+                this.updatePomodoroDisplay();
+                this.updatePomodoroStats();
+                break;
+        }
+    }
+
+    // ============================================
+    // HABITS PAGE
+    // ============================================
+
+    getHabitsPageHTML() {
+        return `
+            <header class="app-header">
+                <div class="header-content">
+                    <div class="brand-text">
+                        <h1 class="brand-title">Habits</h1>
+                        <p class="brand-subtitle">Build better, daily</p>
+                    </div>
+                    <div class="header-actions">
+                        <button class="btn-primary" id="addHabitBtn">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                <path d="M10 4V16M4 10H16" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                            </svg>
+                            <span>New Habit</span>
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <main class="app-main">
+                <section class="stats-section">
+                    <div class="stat-card">
+                        <div class="stat-icon stat-icon-blue">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill="currentColor" />
+                            </svg>
+                        </div>
+                        <div class="stat-content">
+                            <p class="stat-label">Active Habits</p>
+                            <p class="stat-value" id="activeHabitsCount">0</p>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon stat-icon-green">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                <path d="M22 11.08V12C21.9988 14.1564 21.3005 16.2547 20.0093 17.9818C18.7182 19.7088 16.9033 20.9725 14.8354 21.5839C12.7674 22.1953 10.5573 22.1219 8.53447 21.3746C6.51168 20.6273 4.78465 19.2461 3.61096 17.4371C2.43727 15.628 1.87979 13.4881 2.02168 11.3363C2.16356 9.18455 2.99721 7.13631 4.39828 5.49706C5.79935 3.85781 7.69279 2.71537 9.79619 2.24013C11.8996 1.7649 14.1003 1.98232 16.07 2.85999" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                                <path d="M22 4L12 14.01L9 11.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                        </div>
+                        <div class="stat-content">
+                            <p class="stat-label">Completed Today</p>
+                            <p class="stat-value" id="completedTodayCount">0</p>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon stat-icon-orange">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                <path d="M13 2L3 14H12L11 22L21 10H12L13 2Z" fill="currentColor" />
+                            </svg>
+                        </div>
+                        <div class="stat-content">
+                            <p class="stat-label">Current Streak</p>
+                            <p class="stat-value" id="currentStreak">0</p>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="habits-section">
+                    <div class="section-header">
+                        <h2 class="section-title">Your Habits</h2>
+                        <div class="view-controls">
+                            <button class="view-btn active" id="gridViewBtn" data-view="grid" title="Grid view">
+                                <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                                    <rect x="2" y="2" width="6" height="6" rx="1.5" fill="currentColor" />
+                                    <rect x="10" y="2" width="6" height="6" rx="1.5" fill="currentColor" />
+                                    <rect x="2" y="10" width="6" height="6" rx="1.5" fill="currentColor" />
+                                    <rect x="10" y="10" width="6" height="6" rx="1.5" fill="currentColor" />
+                                </svg>
+                            </button>
+                            <button class="view-btn" id="listViewBtn" data-view="list" title="List view">
+                                <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                                    <rect x="2" y="3" width="14" height="3" rx="1.5" fill="currentColor" />
+                                    <rect x="2" y="8" width="14" height="3" rx="1.5" fill="currentColor" />
+                                    <rect x="2" y="13" width="14" height="3" rx="1.5" fill="currentColor" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="emptyState" class="empty-state" style="display: none;">
+                        <div class="empty-icon">
+                            <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+                                <circle cx="40" cy="40" r="38" stroke="currentColor" stroke-width="2" stroke-dasharray="8 8" opacity="0.2" />
+                                <path d="M40 25V55M25 40H55" stroke="currentColor" stroke-width="3" stroke-linecap="round" opacity="0.3" />
+                            </svg>
+                        </div>
+                        <h3 class="empty-title">No habits yet</h3>
+                        <p class="empty-description">Start building better routines by creating your first habit.</p>
+                        <button class="btn-secondary" onclick="app.openModal('habitModal')">
+                            Create Your First Habit
+                        </button>
+                    </div>
+
+                    <div id="habitsGrid" class="habits-grid"></div>
+                </section>
+            </main>
+        `;
+    }
+
+    setupHabitsEventListeners() {
+        const addBtn = document.getElementById('addHabitBtn');
+        if (addBtn) {
+            addBtn.addEventListener('click', () => this.openModal('habitModal'));
+        }
+
+        const gridViewBtn = document.getElementById('gridViewBtn');
+        const listViewBtn = document.getElementById('listViewBtn');
+
+        if (gridViewBtn) {
+            gridViewBtn.addEventListener('click', () => this.switchHabitView('grid'));
+        }
+        if (listViewBtn) {
+            listViewBtn.addEventListener('click', () => this.switchHabitView('list'));
+        }
+
+        this.setupDragAndDrop();
+    }
+
+    switchHabitView(view) {
+        const habitsGrid = document.getElementById('habitsGrid');
+        const gridViewBtn = document.getElementById('gridViewBtn');
+        const listViewBtn = document.getElementById('listViewBtn');
+
+        if (view === 'list') {
+            habitsGrid.classList.add('list-view');
+            gridViewBtn.classList.remove('active');
+            listViewBtn.classList.add('active');
+        } else {
+            habitsGrid.classList.remove('list-view');
+            gridViewBtn.classList.add('active');
+            listViewBtn.classList.remove('active');
+        }
+    }
+
+    setupDragAndDrop() {
+        const grid = document.getElementById('habitsGrid');
+        if (!grid) return;
+
+        let draggedItem = null;
+
+        grid.addEventListener('dragstart', (e) => {
+            const card = e.target.closest('.habit-card');
+            if (card) {
+                draggedItem = card;
+                e.dataTransfer.effectAllowed = 'move';
+                e.dataTransfer.setData('text/plain', card.dataset.id);
+                setTimeout(() => card.classList.add('dragging'), 0);
+            }
+        });
+
+        grid.addEventListener('dragend', (e) => {
+            const card = e.target.closest('.habit-card');
+            if (card) {
+                card.classList.remove('dragging');
+                draggedItem = null;
+            }
+        });
+
+        grid.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            const afterElement = this.getDragAfterElement(grid, e.clientY, e.clientX);
+            const draggable = document.querySelector('.dragging');
+            if (afterElement == null) {
+                grid.appendChild(draggable);
+            } else {
+                grid.insertBefore(draggable, afterElement);
+            }
+        });
+
+        grid.addEventListener('drop', (e) => {
+            e.preventDefault();
+            const newOrder = [...grid.querySelectorAll('.habit-card')].map(card => card.dataset.id);
+            this.reorderHabits(newOrder);
+        });
+    }
+
+    getDragAfterElement(container, y, x) {
+        const draggableElements = [...container.querySelectorAll('.habit-card:not(.dragging)')];
+
+        return draggableElements.reduce((closest, child) => {
+            const box = child.getBoundingClientRect();
+            const distance = Math.hypot(
+                x - (box.left + box.width / 2),
+                y - (box.top + box.height / 2)
+            );
+
+            if (closest === null || distance < closest.distance) {
+                return { distance: distance, element: child };
+            } else {
+                return closest;
+            }
+        }, null)?.element;
+    }
+
+    reorderHabits(newOrder) {
+        const newHabits = [];
+        newOrder.forEach(id => {
+            const habit = this.habits.find(h => h.id === id);
+            if (habit) {
+                newHabits.push(habit);
+            }
+        });
+        this.habits = newHabits;
+        this.saveData('habits', this.habits);
+    }
+
+    renderHabits() {
+        const habitsGrid = document.getElementById('habitsGrid');
+        const emptyState = document.getElementById('emptyState');
+
+        if (this.habits.length === 0) {
+            habitsGrid.innerHTML = '';
+            emptyState.style.display = 'block';
+            return;
+        }
+
+        emptyState.style.display = 'none';
+        habitsGrid.innerHTML = this.habits.map(habit => this.getHabitCardHTML(habit)).join('');
+    }
+
+    getHabitCardHTML(habit) {
+        const days = habit.days || 21;
+        const completedDays = habit.progress.filter(Boolean).length;
+        const progressPercent = Math.round((completedDays / days) * 100);
+        const priority = habit.priority || 'low';
+        const isCompleted = completedDays === days;
+        const cardColor = habit.cardColor || 'default';
+
+        return `
+            <div class="habit-card${cardColor !== 'default' ? ' card-' + cardColor : ''}" draggable="true" data-id="${habit.id}">
+                <div class="habit-header">
+                    <div class="habit-info">
+                        <h3 class="habit-name">${this.escapeHtml(habit.name)}</h3>
+                        <div class="habit-meta">
+                            <span class="priority-badge ${priority}">
+                                <span class="priority-dot"></span>
+                                ${priority}
+                            </span>
+                            <span>•</span>
+                            <span>${days} days</span>
+                            ${isCompleted ? '<span>•</span><span>✓ Completed</span>' : ''}
+                        </div>
+                    </div>
+                    <div class="habit-actions">
+                        <button class="icon-btn" onclick="app.editHabit('${habit.id}')" title="Edit habit">
+                            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                                <path d="M8.25 3H3C2.44772 3 2 3.44772 2 4V15C2 15.5523 2.44772 16 3 16H14C14.5523 16 15 15.5523 15 15V9.75" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                                <path d="M13.5 2.25L15.75 4.5M16.5 3.75L10.5 9.75L8.25 10.5L9 8.25L15 2.25C15.4142 1.83579 16.0858 1.83579 16.5 2.25C16.9142 2.66421 16.9142 3.33579 16.5 3.75Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+                        <button class="icon-btn delete" onclick="app.deleteHabit('${habit.id}')" title="Delete habit">
+                            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                                <path d="M3.75 4.5H14.25M7.5 8.25V12.75M10.5 8.25V12.75M13.5 4.5V14.25C13.5 14.6642 13.1642 15 12.75 15H5.25C4.83579 15 4.5 14.6642 4.5 14.25V4.5M6.75 4.5V3C6.75 2.58579 7.08579 2.25 7.5 2.25H10.5C10.9142 2.25 11.25 2.58579 11.25 3V4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                ${isCompleted ? `
+                    <div class="completion-badge">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                            <path d="M13.3333 4L6 11.3333L2.66667 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        <span>Habit Completed!</span>
+                    </div>
+                ` : ''}
+
+                <div class="progress-grid">
+                    ${habit.progress.map((isDone, dayIdx) => `
+                        <div 
+                            class="day-cell ${isDone ? 'completed' : ''}" 
+                            onclick="app.toggleDay('${habit.id}', ${dayIdx})"
+                            title="Day ${dayIdx + 1}"
+                        >
+                            ${dayIdx + 1}
+                        </div>
+                    `).join('')}
+                </div>
+
+                <div class="progress-section">
+                    <div class="progress-header">
+                        <span class="progress-label">Progress</span>
+                        <span class="progress-stats">${completedDays}/${days} • ${progressPercent}%</span>
+                    </div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar" style="width: ${progressPercent}%"></div>
+                    </div>
+                </div>
+
+                ${isCompleted ? `
+                    <button class="btn-reset" onclick="app.resetHabit('${habit.id}')">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="display: inline-block; vertical-align: middle; margin-right: 6px;">
+                            <path d="M2 8C2 4.68629 4.68629 2 8 2C11.3137 2 14 4.68629 14 8C14 11.3137 11.3137 14 8 14C6.11438 14 4.44349 13.0602 3.38734 11.6458" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                            <path d="M2 11V8H5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        Reset Progress
+                    </button>
+                ` : ''}
+            </div>
+        `;
+    }
+
+    handleHabitSubmit(e) {
+        e.preventDefault();
+
+        const id = document.getElementById('habitId').value;
+        const name = document.getElementById('habitName').value.trim();
+        const days = parseInt(document.getElementById('habitDays').value) || 21;
+        const priority = document.querySelector('input[name="priority"]:checked')?.value || 'low';
+        const cardColor = document.querySelector('input[name="cardColor"]:checked')?.value || 'default';
+
+        if (id) {
+            // Edit existing
+            this.habits = this.habits.map(h => {
+                if (h.id === id) {
+                    let newProgress = h.progress;
+                    if (days !== h.days) {
+                        newProgress = Array(days).fill(false);
+                        for (let i = 0; i < Math.min(h.progress.length, days); i++) {
+                            newProgress[i] = h.progress[i];
+                        }
+                    }
+                    return { ...h, name, priority, days, cardColor, progress: newProgress };
+                }
+                return h;
+            });
+        } else {
+            // Create new
+            const newHabit = {
+                id: Date.now().toString(),
+                name,
+                priority,
+                days,
+                cardColor,
+                createdAt: new Date().toISOString(),
+                progress: Array(days).fill(false)
+            };
+            this.habits.push(newHabit);
+        }
+
+        this.saveData('habits', this.habits);
+        this.renderHabits();
+        this.updateHabitsStats();
+        this.closeModal('habitModal');
+    }
+
+    editHabit(id) {
+        const habit = this.habits.find(h => h.id === id);
+        if (!habit) return;
+
+        document.getElementById('habitModalTitle').textContent = 'Edit Habit';
+        document.getElementById('habitSubmitBtnText').textContent = 'Save Changes';
+        document.getElementById('habitId').value = habit.id;
+        document.getElementById('habitName').value = habit.name;
+        document.getElementById('habitDays').value = habit.days || 21;
+
+        const priority = habit.priority || 'low';
+        document.querySelectorAll('input[name="priority"]').forEach(radio => {
+            radio.checked = radio.value === priority;
+        });
+
+        const cardColor = habit.cardColor || 'default';
+        document.querySelectorAll('input[name="cardColor"]').forEach(radio => {
+            radio.checked = radio.value === cardColor;
+        });
+
+        this.openModal('habitModal', false);
+    }
+
+    deleteHabit(id) {
+        if (confirm('Are you sure you want to delete this habit?')) {
+            this.habits = this.habits.filter(h => h.id !== id);
+            this.saveData('habits', this.habits);
+            this.renderHabits();
+            this.updateHabitsStats();
+        }
+    }
+
+    resetHabit(id) {
+        this.habits = this.habits.map(h => {
+            if (h.id === id) {
+                const days = h.days || 21;
+                return { ...h, progress: Array(days).fill(false) };
+            }
+            return h;
+        });
+        this.saveData('habits', this.habits);
+        this.renderHabits();
+        this.updateHabitsStats();
+    }
+
+    toggleDay(habitId, dayIndex) {
+        this.habits = this.habits.map(h => {
+            if (h.id === habitId) {
+                const newProgress = [...h.progress];
+                newProgress[dayIndex] = !newProgress[dayIndex];
+                return { ...h, progress: newProgress };
+            }
+            return h;
+        });
+        this.saveData('habits', this.habits);
+        this.renderHabits();
+        this.updateHabitsStats();
+    }
+
+    updateHabitsStats() {
+        const activeHabitsCount = document.getElementById('activeHabitsCount');
+        const completedTodayCount = document.getElementById('completedTodayCount');
+        const currentStreak = document.getElementById('currentStreak');
+
+        if (activeHabitsCount) activeHabitsCount.textContent = this.habits.length;
+
+        if (completedTodayCount) {
+            const completedToday = this.habits.filter(h => h.progress.some(Boolean)).length;
+            completedTodayCount.textContent = completedToday;
+        }
+
+        if (currentStreak) {
+            const streak = this.habits.filter(h => {
+                const days = h.days || 21;
+                const completedDays = h.progress.filter(Boolean).length;
+                return completedDays === days;
+            }).length;
+            currentStreak.textContent = streak;
+        }
+    }
+
+    // ============================================
+    // TO-DO LIST PAGE
+    // ============================================
+
+    getTodoPageHTML() {
+        return `
+            <header class="app-header">
+                <div class="header-content">
+                    <div class="brand-text">
+                        <h1 class="brand-title">To-Do List</h1>
+                        <p class="brand-subtitle">Stay organized, get things done</p>
+                    </div>
+                    <div class="header-actions">
+                        <button class="btn-primary" id="addTaskBtn">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                <path d="M10 4V16M4 10H16" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                            </svg>
+                            <span>New Task</span>
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <main class="app-main">
+                <section class="stats-section">
+                    <div class="stat-card">
+                        <div class="stat-icon stat-icon-blue">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                <path d="M9 11L12 14L22 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                <path d="M21 12V19C21 20.1 20.1 21 19 21H5C3.9 21 3 20.1 3 19V5C3 3.9 3.9 3 5 3H16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                        </div>
+                        <div class="stat-content">
+                            <p class="stat-label">Total Tasks</p>
+                            <p class="stat-value" id="totalTasksCount">0</p>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon stat-icon-green">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                <path d="M22 11.08V12C21.9988 14.1564 21.3005 16.2547 20.0093 17.9818C18.7182 19.7088 16.9033 20.9725 14.8354 21.5839C12.7674 22.1953 10.5573 22.1219 8.53447 21.3746C6.51168 20.6273 4.78465 19.2461 3.61096 17.4371C2.43727 15.628 1.87979 13.4881 2.02168 11.3363C2.16356 9.18455 2.99721 7.13631 4.39828 5.49706C5.79935 3.85781 7.69279 2.71537 9.79619 2.24013C11.8996 1.7649 14.1003 1.98232 16.07 2.85999" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                                <path d="M22 4L12 14.01L9 11.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                        </div>
+                        <div class="stat-content">
+                            <p class="stat-label">Completed</p>
+                            <p class="stat-value" id="completedTasksCount">0</p>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon stat-icon-orange">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" />
+                                <path d="M12 6V12L16 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                        </div>
+                        <div class="stat-content">
+                            <p class="stat-label">Pending</p>
+                            <p class="stat-value" id="pendingTasksCount">0</p>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="tasks-section">
+                    <div class="section-header">
+                        <h2 class="section-title">Your Tasks</h2>
+                        <div class="controls-wrapper" style="display: flex; gap: 12px; align-items: center;">
+                            <!-- View Switches -->
+                            <div class="view-controls">
+                                <button class="view-btn active" id="taskListViewBtn" data-view="list" title="List view">
+                                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                                        <rect x="2" y="3" width="14" height="3" rx="1.5" fill="currentColor" />
+                                        <rect x="2" y="8" width="14" height="3" rx="1.5" fill="currentColor" />
+                                        <rect x="2" y="13" width="14" height="3" rx="1.5" fill="currentColor" />
+                                    </svg>
+                                </button>
+                                <button class="view-btn" id="taskGridViewBtn" data-view="grid" title="Grid view">
+                                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                                        <rect x="2" y="2" width="6" height="6" rx="1.5" fill="currentColor" />
+                                        <rect x="10" y="2" width="6" height="6" rx="1.5" fill="currentColor" />
+                                        <rect x="2" y="10" width="6" height="6" rx="1.5" fill="currentColor" />
+                                        <rect x="10" y="10" width="6" height="6" rx="1.5" fill="currentColor" />
+                                    </svg>
+                                </button>
+                            </div>
+
+                            <!-- Sort -->
+                            <select id="taskSortSelect" class="sort-select">
+                                <option value="default">Sort by...</option>
+                                <option value="priority-high">Priority (High to Low)</option>
+                                <option value="priority-low">Priority (Low to High)</option>
+                            </select>
+
+                            <!-- Filters -->
+                            <div class="filter-controls">
+                                <button class="filter-btn active" data-filter="pending">Pending</button>
+                                <button class="filter-btn" data-filter="completed">Completed</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="tasksList" class="tasks-list"></div>
+                    
+                    <div id="emptyTasksState" class="empty-state" style="display: none;">
+                        <div class="empty-icon clickable" id="emptyStateAddBtn">
+                            <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+                                <rect x="15" y="15" width="50" height="50" rx="8" stroke="currentColor" stroke-width="2" stroke-dasharray="8 8" opacity="0.2" />
+                                <path d="M40 30V50M30 40H50" stroke="currentColor" stroke-width="3" stroke-linecap="round" opacity="0.3" class="plus-path"/>
+                            </svg>
+                        </div>
+                        <h3 class="empty-title">Come on, Create your first task!</h3>
+                    </div>
+
+                    <div id="emptyCompletedState" class="empty-state" style="display: none;">
+                        <h3 class="empty-title">Come on, Finish your first task!</h3>
+                    </div>
+                </section>
+            </main>
+        `;
+    }
+
+    setupTodoEventListeners() {
+        const addBtn = document.getElementById('addTaskBtn');
+        if (addBtn) {
+            addBtn.addEventListener('click', () => this.openModal('taskModal'));
+        }
+
+        const emptyStateAddBtn = document.getElementById('emptyStateAddBtn');
+        if (emptyStateAddBtn) {
+            emptyStateAddBtn.addEventListener('click', () => this.openModal('taskModal'));
+        }
+
+        const taskGridViewBtn = document.getElementById('taskGridViewBtn');
+        const taskListViewBtn = document.getElementById('taskListViewBtn');
+
+        if (taskGridViewBtn) {
+            taskGridViewBtn.addEventListener('click', () => this.switchTaskView('grid'));
+        }
+        if (taskListViewBtn) {
+            taskListViewBtn.addEventListener('click', () => this.switchTaskView('list'));
+        }
+
+        const sortSelect = document.getElementById('taskSortSelect');
+        if (sortSelect) {
+            sortSelect.addEventListener('change', (e) => this.sortTasks(e.target.value));
+        }
+
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => this.filterTasks(e.target.dataset.filter));
+        });
+
+        this.setupTaskDragAndDrop();
+    }
+
+    filterTasks(filter) {
+        this.currentTaskFilter = filter;
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.classList.remove('active');
+            if (btn.dataset.filter === filter) {
+                btn.classList.add('active');
+            }
+        });
+        this.renderTasks(filter);
+    }
+
+    renderTasks(filter = 'pending') {
+        const tasksList = document.getElementById('tasksList');
+        const emptyTasksState = document.getElementById('emptyTasksState');
+        const emptyCompletedState = document.getElementById('emptyCompletedState');
+
+        let filteredTasks = this.tasks;
+        if (filter === 'pending') {
+            filteredTasks = this.tasks.filter(t => !t.completed);
+        } else if (filter === 'completed') {
+            filteredTasks = this.tasks.filter(t => t.completed);
+        }
+
+        // Hide all empty states first
+        if (emptyTasksState) emptyTasksState.style.display = 'none';
+        if (emptyCompletedState) emptyCompletedState.style.display = 'none';
+
+        if (filteredTasks.length === 0) {
+            tasksList.innerHTML = '';
+            if (filter === 'completed') {
+                if (emptyCompletedState) emptyCompletedState.style.display = 'block';
+            } else {
+                if (emptyTasksState) emptyTasksState.style.display = 'block';
+            }
+            return;
+        }
+
+        tasksList.innerHTML = filteredTasks.map(task => this.getTaskItemHTML(task)).join('');
+    }
+
+    getTaskItemHTML(task) {
+        const dueDate = new Date(task.dueDate);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        dueDate.setHours(0, 0, 0, 0);
+
+        let dueDateClass = '';
+        let dueDateText = this.formatDate(task.dueDate);
+
+        if (dueDate < today && !task.completed) {
+            dueDateClass = 'overdue';
+            dueDateText = '⚠️ Overdue - ' + dueDateText;
+        } else if (dueDate.getTime() === today.getTime() && !task.completed) {
+            dueDateClass = 'today';
+            dueDateText = '📅 Due Today';
+        }
+
+        const priority = task.priority || 'low';
+
+        return `
+            <div class="task-item ${task.completed ? 'completed' : ''}" draggable="true" data-id="${task.id}">
+                <div class="task-checkbox ${task.completed ? 'checked' : ''}" onclick="app.toggleTask('${task.id}')">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                        <path d="M3 8L6 11L13 4" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <div class="task-content">
+                    <div class="task-header-row" style="display: flex; gap: 8px; align-items: center; margin-bottom: 4px;">
+                         <span class="priority-badge ${priority} small">
+                            <span class="priority-dot"></span>
+                            ${priority}
+                        </span>
+                        <div class="task-name">${this.escapeHtml(task.name)}</div>
+                    </div>
+                    <div class="task-due-date ${dueDateClass}">${dueDateText}</div>
+                </div>
+                <div class="task-actions">
+                    <button class="icon-btn delete" onclick="app.deleteTask('${task.id}')" title="Delete task">
+                        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                            <path d="M3 5H15M7 8V13M11 8V13M13 5V14C13 14.5 12.5 15 12 15H6C5.5 15 5 14.5 5 14V5M7 5V3C7 2.5 7.5 2 8 2H10C10.5 2 11 2.5 11 3V5" 
+                                stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        `;
+    }
+
+    handleTaskSubmit(e) {
+        e.preventDefault();
+
+        const id = document.getElementById('taskId').value;
+        const name = document.getElementById('taskName').value.trim();
+        const dueDate = document.getElementById('taskDueDate').value;
+        const priority = document.querySelector('input[name="taskPriority"]:checked')?.value || 'low';
+
+        if (id) {
+            // Edit existing
+            this.tasks = this.tasks.map(t => {
+                if (t.id === id) {
+                    return { ...t, name, dueDate, priority };
+                }
+                return t;
+            });
+        } else {
+            // Create new
+            const newTask = {
+                id: Date.now().toString(),
+                name,
+                dueDate,
+                priority,
+                completed: false,
+                createdAt: new Date().toISOString()
+            };
+            this.tasks.push(newTask);
+        }
+
+        this.saveData('tasks', this.tasks);
+        this.renderTasks(this.currentTaskFilter);
+        this.updateTodoStats();
+        this.closeModal('taskModal');
+    }
+
+    switchTaskView(view) {
+        const tasksList = document.getElementById('tasksList');
+        const gridViewBtn = document.getElementById('taskGridViewBtn');
+        const listViewBtn = document.getElementById('taskListViewBtn');
+
+        if (view === 'grid') {
+            tasksList.classList.add('grid-view');
+            gridViewBtn.classList.add('active');
+            listViewBtn.classList.remove('active');
+        } else {
+            tasksList.classList.remove('grid-view');
+            gridViewBtn.classList.remove('active');
+            listViewBtn.classList.add('active');
+        }
+    }
+
+    sortTasks(criteria) {
+        if (criteria === 'default') {
+            this.tasks.sort((a, b) => b.id.localeCompare(a.id));
+        } else if (criteria === 'priority-high') {
+            const priorityMap = { high: 3, medium: 2, low: 1 };
+            this.tasks.sort((a, b) => {
+                const pA = priorityMap[a.priority || 'low'];
+                const pB = priorityMap[b.priority || 'low'];
+                return pB - pA;
+            });
+        } else if (criteria === 'priority-low') {
+            const priorityMap = { high: 3, medium: 2, low: 1 };
+            this.tasks.sort((a, b) => {
+                const pA = priorityMap[a.priority || 'low'];
+                const pB = priorityMap[b.priority || 'low'];
+                return pA - pB;
+            });
+        }
+        this.renderTasks(this.currentTaskFilter);
+    }
+
+    setupTaskDragAndDrop() {
+        const list = document.getElementById('tasksList');
+        if (!list) return;
+
+        let draggedItem = null;
+
+        list.addEventListener('dragstart', (e) => {
+            const item = e.target.closest('.task-item');
+            if (item) {
+                draggedItem = item;
+                e.dataTransfer.effectAllowed = 'move';
+                e.dataTransfer.setData('text/plain', item.dataset.id);
+                setTimeout(() => item.classList.add('dragging'), 0);
+            }
+        });
+
+        list.addEventListener('dragend', (e) => {
+            const item = e.target.closest('.task-item');
+            if (item) {
+                item.classList.remove('dragging');
+                draggedItem = null;
+            }
+        });
+
+        list.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            const afterElement = this.getTaskDragAfterElement(list, e.clientY, e.clientX);
+            const draggable = document.querySelector('.task-item.dragging');
+
+            if (!draggable) return;
+
+            if (afterElement == null) {
+                list.appendChild(draggable);
+            } else {
+                list.insertBefore(draggable, afterElement);
+            }
+        });
+
+        list.addEventListener('drop', (e) => {
+            e.preventDefault();
+            const newOrderIds = [...list.querySelectorAll('.task-item')].map(item => item.dataset.id);
+            this.reorderTasks(newOrderIds);
+        });
+    }
+
+    getTaskDragAfterElement(container, y, x) {
+        const draggableElements = [...container.querySelectorAll('.task-item:not(.dragging)')];
+
+        return draggableElements.reduce((closest, child) => {
+            const box = child.getBoundingClientRect();
+            const distance = Math.hypot(
+                x - (box.left + box.width / 2),
+                y - (box.top + box.height / 2)
+            );
+
+            if (closest === null || distance < closest.distance) {
+                return { distance: distance, element: child };
+            } else {
+                return closest;
+            }
+        }, null)?.element;
+    }
+
+    reorderTasks(newOrderIds) {
+        const newTasks = [];
+        const taskMap = new Map(this.tasks.map(t => [t.id, t]));
+
+        newOrderIds.forEach(id => {
+            if (taskMap.has(id)) {
+                newTasks.push(taskMap.get(id));
+                taskMap.delete(id);
+            }
+        });
+        taskMap.forEach(task => newTasks.push(task));
+        this.tasks = newTasks;
+        this.saveData('tasks', this.tasks);
+    }
+
+    toggleTask(id) {
+        this.tasks = this.tasks.map(t => {
+            if (t.id === id) {
+                return { ...t, completed: !t.completed };
+            }
+            return t;
+        });
+        this.saveData('tasks', this.tasks);
+        this.renderTasks(this.currentTaskFilter);
+        this.updateTodoStats();
+    }
+
+    deleteTask(id) {
+        if (confirm('Are you sure you want to delete this task?')) {
+            this.tasks = this.tasks.filter(t => t.id !== id);
+            this.saveData('tasks', this.tasks);
+            this.renderTasks(this.currentTaskFilter);
+            this.updateTodoStats();
+        }
+    }
+
+    updateTodoStats() {
+        const totalTasksCount = document.getElementById('totalTasksCount');
+        const completedTasksCount = document.getElementById('completedTasksCount');
+        const pendingTasksCount = document.getElementById('pendingTasksCount');
+
+        if (totalTasksCount) totalTasksCount.textContent = this.tasks.length;
+        if (completedTasksCount) {
+            const completed = this.tasks.filter(t => t.completed).length;
+            completedTasksCount.textContent = completed;
+        }
+        if (pendingTasksCount) {
+            const pending = this.tasks.filter(t => !t.completed).length;
+            pendingTasksCount.textContent = pending;
+        }
+    }
+
+    // ============================================
+    // POMODORO PAGE
+    // ============================================
+
+    getPomodoroPageHTML() {
+        return `
+            <header class="app-header">
+                <div class="header-content">
+                    <div class="brand-text">
+                        <h1 class="brand-title">Pomodoro Timer</h1>
+                        <p class="brand-subtitle">Focus better, work smarter</p>
+                    </div>
+                </div>
+            </header>
+
+            <main class="app-main">
+                <section class="stats-section">
+                    <div class="stat-card">
+                        <div class="stat-icon stat-icon-blue">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" />
+                                <path d="M12 6V12L16 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                        </div>
+                        <div class="stat-content">
+                            <p class="stat-label">Sessions Today</p>
+                            <p class="stat-value" id="sessionsToday">0</p>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon stat-icon-green">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                <path d="M13 2L3 14H12L11 22L21 10H12L13 2Z" fill="currentColor" />
+                            </svg>
+                        </div>
+                        <div class="stat-content">
+                            <p class="stat-label">Focus Time</p>
+                            <p class="stat-value" id="totalFocusTime">0m</p>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon stat-icon-orange">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill="currentColor" />
+                            </svg>
+                        </div>
+                        <div class="stat-content">
+                            <p class="stat-label">Current Streak</p>
+                            <p class="stat-value" id="currentStreak">0</p>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="pomodoro-section">
+                    <div class="pomodoro-card">
+                        <div class="mode-selector">
+                            <button class="mode-btn active" data-mode="work">Work</button>
+                            <button class="mode-btn" data-mode="short">Short Break</button>
+                            <button class="mode-btn" data-mode="long">Long Break</button>
+                        </div>
+
+                        <div class="timer-display">
+                            <svg class="timer-ring" width="320" height="320" viewBox="0 0 320 320">
+                                <circle class="timer-ring-bg" cx="160" cy="160" r="140" />
+                                <circle class="timer-ring-progress" cx="160" cy="160" r="140" id="timerProgress" />
+                            </svg>
+                            <div class="timer-content">
+                                <div class="timer-time" id="timerDisplay">25:00</div>
+                                <div class="timer-label" id="timerLabel">Focus Time</div>
+                            </div>
+                        </div>
+
+                        <div class="timer-controls">
+                            <button class="btn-timer-primary" id="startBtn">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                    <path d="M8 5V19L19 12L8 5Z" fill="currentColor" />
+                                </svg>
+                                <span>Start</span>
+                            </button>
+                            <button class="btn-timer-secondary" id="resetBtn">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                    <path d="M4 12C4 16.4183 7.58172 20 12 20C16.4183 20 20 16.4183 20 12C20 7.58172 16.4183 4 12 4C9.25 4 6.82 5.38 5.38 7.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                                    <path d="M4 4V8H8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+                                <span>Reset</span>
+                            </button>
+                        </div>
+
+                        <button class="btn-settings" id="settingsBtn">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                <path d="M10 12.5C11.3807 12.5 12.5 11.3807 12.5 10C12.5 8.61929 11.3807 7.5 10 7.5C8.61929 7.5 7.5 8.61929 7.5 10C7.5 11.3807 8.61929 12.5 10 12.5Z" stroke="currentColor" stroke-width="1.5" />
+                                <path d="M16.25 10C16.25 10.4 16.6 10.75 17 10.75C17.4 10.75 17.75 10.4 17.75 10C17.75 9.6 17.4 9.25 17 9.25C16.6 9.25 16.25 9.6 16.25 10ZM10 2.25C9.6 2.25 9.25 2.6 9.25 3C9.25 3.4 9.6 3.75 10 3.75C10.4 3.75 10.75 3.4 10.75 3C10.75 2.6 10.4 2.25 10 2.25ZM3 9.25C2.6 9.25 2.25 9.6 2.25 10C2.25 10.4 2.6 10.75 3 10.75C3.4 10.75 3.75 10.4 3.75 10C3.75 9.6 3.4 9.25 3 9.25ZM10 16.25C9.6 16.25 9.25 16.6 9.25 17C9.25 17.4 9.6 17.75 10 17.75C10.4 17.75 10.75 17.4 10.75 17C10.75 16.6 10.4 16.25 10 16.25Z" stroke="currentColor" stroke-width="1.5" />
+                            </svg>
+                            <span>Settings</span>
+                        </button>
+                    </div>
+                </section>
+            </main>
+        `;
+    }
+
+    setupPomodoroEventListeners() {
+        const startBtn = document.getElementById('startBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const settingsBtn = document.getElementById('settingsBtn');
+
+        if (startBtn) {
+            startBtn.addEventListener('click', () => this.togglePomodoro());
+        }
+        if (resetBtn) {
+            resetBtn.addEventListener('click', () => this.resetPomodoro());
+        }
+        if (settingsBtn) {
+            settingsBtn.addEventListener('click', () => this.openPomodoroSettings());
+        }
+
+        document.querySelectorAll('.mode-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => this.switchPomodoroMode(e.target.dataset.mode));
+        });
+    }
+
+    togglePomodoro() {
+        const startBtn = document.getElementById('startBtn');
+
+        if (this.pomodoroIsRunning) {
+            this.pausePomodoro();
+            startBtn.innerHTML = `
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                    <path d="M8 5V19L19 12L8 5Z" fill="currentColor" />
+                </svg>
+                <span>Resume</span>
+            `;
+        } else {
+            this.startPomodoro();
+            startBtn.innerHTML = `
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                    <rect x="6" y="4" width="4" height="16" fill="currentColor" />
+                    <rect x="14" y="4" width="4" height="16" fill="currentColor" />
+                </svg>
+                <span>Pause</span>
+            `;
+        }
+    }
+
+    startPomodoro() {
+        this.pomodoroIsRunning = true;
+        const timerDisplay = document.querySelector('.timer-display');
+        if (timerDisplay) {
+            timerDisplay.classList.add('running');
+            timerDisplay.classList.remove('paused');
+        }
+
+        this.pomodoroTimer = setInterval(() => {
+            this.pomodoroTimeLeft--;
+            this.updatePomodoroDisplay();
+
+            if (this.pomodoroTimeLeft <= 0) {
+                this.pomodoroComplete();
+            }
+        }, 1000);
+    }
+
+    pausePomodoro() {
+        this.pomodoroIsRunning = false;
+        const timerDisplay = document.querySelector('.timer-display');
+        if (timerDisplay) {
+            timerDisplay.classList.remove('running');
+            timerDisplay.classList.add('paused');
+        }
+        clearInterval(this.pomodoroTimer);
+    }
+
+    resetPomodoro() {
+        this.pausePomodoro();
+        this.pomodoroIsRunning = false;
+
+        const timerDisplay = document.querySelector('.timer-display');
+        if (timerDisplay) {
+            timerDisplay.classList.remove('running', 'paused');
+        }
+
+        const startBtn = document.getElementById('startBtn');
+        if (startBtn) {
+            startBtn.innerHTML = `
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                    <path d="M8 5V19L19 12L8 5Z" fill="currentColor" />
+                </svg>
+                <span>Start</span>
+            `;
+        }
+
+        this.setTimeForMode(this.pomodoroMode);
+        this.updatePomodoroDisplay();
+    }
+
+    pomodoroComplete() {
+        this.pausePomodoro();
+
+        // Update stats
+        if (this.pomodoroMode === 'work') {
+            this.pomodoroStats.sessionsToday++;
+            this.pomodoroStats.totalFocusTime += this.pomodoroSettings.workDuration;
+            this.pomodoroStats.currentStreak++;
+            this.saveData('pomodoroStats', this.pomodoroStats);
+            this.updatePomodoroStats();
+        }
+
+        // Notify
+        alert(`${this.pomodoroMode === 'work' ? 'Work session' : 'Break'} complete!`);
+
+        // Auto-switch
+        if (this.pomodoroMode === 'work') {
+            const breakMode = this.pomodoroStats.sessionsToday % 4 === 0 ? 'long' : 'short';
+            this.switchPomodoroMode(breakMode);
+        } else {
+            this.switchPomodoroMode('work');
+        }
+    }
+
+    switchPomodoroMode(mode) {
+        this.pomodoroMode = mode;
+        this.resetPomodoro();
+
+        // Update active mode button
+        document.querySelectorAll('.mode-btn').forEach(btn => {
+            btn.classList.remove('active');
+            if (btn.dataset.mode === mode) {
+                btn.classList.add('active');
+            }
+        });
+
+        // Update timer display class
+        const timerDisplay = document.querySelector('.timer-display');
+        if (timerDisplay) {
+            timerDisplay.classList.remove('running', 'paused', 'break');
+            if (mode !== 'work') {
+                timerDisplay.classList.add('break');
+            }
+        }
+
+        // Update label
+        const labels = {
+            work: 'Focus Time',
+            short: 'Short Break',
+            long: 'Long Break'
+        };
+        const timerLabel = document.getElementById('timerLabel');
+        if (timerLabel) {
+            timerLabel.textContent = labels[mode];
+        }
+    }
+
+    setTimeForMode(mode) {
+        const durations = {
+            work: this.pomodoroSettings.workDuration,
+            short: this.pomodoroSettings.shortBreakDuration,
+            long: this.pomodoroSettings.longBreakDuration
+        };
+
+        this.pomodoroTotalTime = durations[mode] * 60;
+        this.pomodoroTimeLeft = this.pomodoroTotalTime;
+    }
+
+    updatePomodoroDisplay() {
+        const minutes = Math.floor(this.pomodoroTimeLeft / 60);
+        const seconds = this.pomodoroTimeLeft % 60;
+
+        const display = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        const timerDisplay = document.getElementById('timerDisplay');
+        if (timerDisplay) {
+            timerDisplay.textContent = display;
+        }
+
+        // Update progress ring
+        const progress = ((this.pomodoroTotalTime - this.pomodoroTimeLeft) / this.pomodoroTotalTime) * 880;
+        const timerProgress = document.getElementById('timerProgress');
+        if (timerProgress) {
+            timerProgress.style.strokeDashoffset = progress;
+        }
+
+        // Update page title
+        document.title = `${display} - Pomodoro Timer`;
+    }
+
+    openPomodoroSettings() {
+        document.getElementById('workDuration').value = this.pomodoroSettings.workDuration;
+        document.getElementById('shortBreakDuration').value = this.pomodoroSettings.shortBreakDuration;
+        document.getElementById('longBreakDuration').value = this.pomodoroSettings.longBreakDuration;
+        this.openModal('pomodoroSettingsModal');
+    }
+
+    handlePomodoroSettingsSubmit(e) {
+        e.preventDefault();
+
+        this.pomodoroSettings.workDuration = parseInt(document.getElementById('workDuration').value);
+        this.pomodoroSettings.shortBreakDuration = parseInt(document.getElementById('shortBreakDuration').value);
+        this.pomodoroSettings.longBreakDuration = parseInt(document.getElementById('longBreakDuration').value);
+
+        this.saveData('pomodoroSettings', this.pomodoroSettings);
+        this.resetPomodoro();
+        this.closeModal('pomodoroSettingsModal');
+    }
+
+    updatePomodoroStats() {
+        const sessionsToday = document.getElementById('sessionsToday');
+        const totalFocusTime = document.getElementById('totalFocusTime');
+        const currentStreak = document.getElementById('currentStreak');
+
+        if (sessionsToday) sessionsToday.textContent = this.pomodoroStats.sessionsToday;
+        if (totalFocusTime) totalFocusTime.textContent = `${this.pomodoroStats.totalFocusTime}m`;
+        if (currentStreak) currentStreak.textContent = this.pomodoroStats.currentStreak;
+    }
+
+    checkPomodoroStats() {
+        const today = new Date().toDateString();
+        if (this.pomodoroStats.lastSessionDate !== today) {
+            this.pomodoroStats.sessionsToday = 0;
+            this.pomodoroStats.totalFocusTime = 0;
+            this.pomodoroStats.lastSessionDate = today;
+            this.saveData('pomodoroStats', this.pomodoroStats);
+        }
+    }
+
+    // ============================================
+    // MODAL MANAGEMENT
+    // ============================================
+
+    openModal(modalId, shouldReset = true) {
+        const modal = document.getElementById(modalId);
+        if (modal) {
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+
+            if (!shouldReset) return;
+
+            // Reset forms
+            if (modalId === 'habitModal') {
+                document.getElementById('habitModalTitle').textContent = 'Create New Habit';
+                document.getElementById('habitSubmitBtnText').textContent = 'Create Habit';
+                document.getElementById('habitForm').reset();
+                document.getElementById('habitId').value = '';
+                document.getElementById('habitDays').value = 21;
+            } else if (modalId === 'taskModal') {
+                document.getElementById('taskModalTitle').textContent = 'Create New Task';
+                document.getElementById('taskSubmitBtnText').textContent = 'Create Task';
+                document.getElementById('taskForm').reset();
+                document.getElementById('taskId').value = '';
+                const today = new Date().toISOString().split('T')[0];
+                document.getElementById('taskDueDate').value = today;
+            }
+        }
+    }
+
+    closeModal(modalId) {
+        const modal = document.getElementById(modalId);
+        if (modal) {
+            modal.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+    }
+
+    // ============================================
+    // UTILITY FUNCTIONS
+    // ============================================
+
+    saveData(key, data) {
+        localStorage.setItem(key, JSON.stringify(data));
+    }
+
+    loadData(key) {
+        const saved = localStorage.getItem(key);
+        return saved ? JSON.parse(saved) : null;
+    }
+
+    formatDate(dateString) {
+        const date = new Date(dateString);
+        const options = { month: 'short', day: 'numeric', year: 'numeric' };
+        return date.toLocaleDateString('en-US', options);
+    }
+
+    escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+}
+
+// Initialize the app and make it globally accessible
+window.app = new ProductivityHub();

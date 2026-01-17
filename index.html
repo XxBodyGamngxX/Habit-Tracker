@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Productivity Hub — Build Better, Daily</title>
+    <meta name="description"
+        content="A beautifully simple productivity hub with habit tracker, to-do list, and Pomodoro timer.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:wght@600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <!-- Navigation Bar -->
+    <nav class="main-nav">
+        <div class="nav-content">
+            <div class="nav-brand">
+                <div class="brand-icon">
+                    <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                        <circle cx="16" cy="16" r="14" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+                            stroke-dasharray="4 4" />
+                        <path d="M16 8V16L20 20" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                    </svg>
+                </div>
+                <span class="nav-brand-text">Productivity Hub</span>
+            </div>
+            <div class="nav-links">
+                <a href="#" class="nav-link active" data-page="habits">Habit Tracker</a>
+                <a href="#" class="nav-link" data-page="todo">To-Do List</a>
+                <a href="#" class="nav-link" data-page="pomodoro">Pomodoro</a>
+            </div>
+            <div class="nav-actions">
+                <button class="btn-icon" id="themeToggle" title="Toggle theme">
+                    <svg class="theme-icon sun-icon" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                        <circle cx="10" cy="10" r="4" stroke="currentColor" stroke-width="1.5" />
+                        <path
+                            d="M10 2V3M10 17V18M18 10H17M3 10H2M15.657 4.343L14.95 5.05M5.05 14.95L4.343 15.657M15.657 15.657L14.95 14.95M5.05 5.05L4.343 4.343"
+                            stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                    </svg>
+                    <svg class="theme-icon moon-icon" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                        <path
+                            d="M17 10.5C16.9 14.6 13.6 18 9.5 18C5.4 18 2 14.6 2 10.5C2 6.9 4.5 3.9 8 3.1C7.4 3.9 7 4.9 7 6C7 8.8 9.2 11 12 11C13.1 11 14.1 10.6 14.9 10C14.9 10.2 17 10.3 17 10.5Z"
+                            stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="app-container">
+        <!-- Dynamic Content Container -->
+        <div id="pageContent"></div>
+    </div>
+
+    <!-- Habit Modal -->
+    <div id="habitModal" class="modal">
+        <div class="modal-backdrop"></div>
+        <div class="modal-container">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title" id="habitModalTitle">Create New Habit</h2>
+                    <button class="modal-close" id="closeHabitModal">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" />
+                        </svg>
+                    </button>
+                </div>
+
+                <form id="habitForm" class="modal-form">
+                    <input type="hidden" id="habitId">
+
+                    <div class="form-group">
+                        <label for="habitName" class="form-label">Habit Name</label>
+                        <input type="text" id="habitName" class="form-input"
+                            placeholder="e.g., Morning meditation, Read 30 minutes, Exercise" required maxlength="50"
+                            autocomplete="off">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="habitDays" class="form-label">Duration</label>
+                        <div class="input-with-suffix">
+                            <input type="number" id="habitDays" class="form-input" value="21" min="1" max="31" required>
+                            <span class="input-suffix">days</span>
+                        </div>
+                        <p class="form-hint">How many days do you want to track this habit? (1-31)</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Priority</label>
+                        <div class="priority-grid">
+                            <label class="priority-option">
+                                <input type="radio" name="priority" value="low" checked>
+                                <div class="priority-card priority-low">
+                                    <div class="priority-dot"></div>
+                                    <span class="priority-label">Low</span>
+                                </div>
+                            </label>
+                            <label class="priority-option">
+                                <input type="radio" name="priority" value="medium">
+                                <div class="priority-card priority-medium">
+                                    <div class="priority-dot"></div>
+                                    <span class="priority-label">Medium</span>
+                                </div>
+                            </label>
+                            <label class="priority-option">
+                                <input type="radio" name="priority" value="high">
+                                <div class="priority-card priority-high">
+                                    <div class="priority-dot"></div>
+                                    <span class="priority-label">High</span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Card Color</label>
+                        <div class="color-picker-grid">
+                            <label class="color-option">
+                                <input type="radio" name="cardColor" value="default" checked>
+                                <div class="color-swatch color-default" title="Default"></div>
+                            </label>
+                            <label class="color-option">
+                                <input type="radio" name="cardColor" value="rose">
+                                <div class="color-swatch color-rose" title="Rose"></div>
+                            </label>
+                            <label class="color-option">
+                                <input type="radio" name="cardColor" value="amber">
+                                <div class="color-swatch color-amber" title="Amber"></div>
+                            </label>
+                            <label class="color-option">
+                                <input type="radio" name="cardColor" value="emerald">
+                                <div class="color-swatch color-emerald" title="Emerald"></div>
+                            </label>
+                            <label class="color-option">
+                                <input type="radio" name="cardColor" value="sky">
+                                <div class="color-swatch color-sky" title="Sky"></div>
+                            </label>
+                            <label class="color-option">
+                                <input type="radio" name="cardColor" value="violet">
+                                <div class="color-swatch color-violet" title="Violet"></div>
+                            </label>
+                            <label class="color-option">
+                                <input type="radio" name="cardColor" value="slate">
+                                <div class="color-swatch color-slate" title="Slate"></div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn-secondary" id="cancelHabitBtn">Cancel</button>
+                        <button type="submit" class="btn-primary">
+                            <span id="habitSubmitBtnText">Create Habit</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Task Modal -->
+    <div id="taskModal" class="modal">
+        <div class="modal-backdrop"></div>
+        <div class="modal-container">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title" id="taskModalTitle">Create New Task</h2>
+                    <button class="modal-close" id="closeTaskModal">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" />
+                        </svg>
+                    </button>
+                </div>
+
+                <form id="taskForm" class="modal-form">
+                    <input type="hidden" id="taskId">
+
+                    <div class="form-group">
+                        <label for="taskName" class="form-label">Task Name</label>
+                        <input type="text" id="taskName" class="form-input"
+                            placeholder="e.g., Finish project report, Buy groceries" required maxlength="100"
+                            autocomplete="off">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="taskDueDate" class="form-label">Due Date</label>
+                        <input type="date" id="taskDueDate" class="form-input" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Priority</label>
+                        <div class="priority-grid">
+                            <label class="priority-option">
+                                <input type="radio" name="taskPriority" value="low" checked>
+                                <div class="priority-card priority-low">
+                                    <div class="priority-dot"></div>
+                                    <span class="priority-label">Low</span>
+                                </div>
+                            </label>
+                            <label class="priority-option">
+                                <input type="radio" name="taskPriority" value="medium">
+                                <div class="priority-card priority-medium">
+                                    <div class="priority-dot"></div>
+                                    <span class="priority-label">Medium</span>
+                                </div>
+                            </label>
+                            <label class="priority-option">
+                                <input type="radio" name="taskPriority" value="high">
+                                <div class="priority-card priority-high">
+                                    <div class="priority-dot"></div>
+                                    <span class="priority-label">High</span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn-secondary" id="cancelTaskBtn">Cancel</button>
+                        <button type="submit" class="btn-primary">
+                            <span id="taskSubmitBtnText">Create Task</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pomodoro Settings Modal -->
+    <div id="pomodoroSettingsModal" class="modal">
+        <div class="modal-backdrop"></div>
+        <div class="modal-container">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title">Timer Settings</h2>
+                    <button class="modal-close" id="closePomodoroSettings">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" />
+                        </svg>
+                    </button>
+                </div>
+
+                <form id="pomodoroSettingsForm" class="modal-form">
+                    <div class="form-group">
+                        <label for="workDuration" class="form-label">Work Duration</label>
+                        <div class="input-with-suffix">
+                            <input type="number" id="workDuration" class="form-input" value="25" min="1" max="60"
+                                required>
+                            <span class="input-suffix">minutes</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="shortBreakDuration" class="form-label">Short Break Duration</label>
+                        <div class="input-with-suffix">
+                            <input type="number" id="shortBreakDuration" class="form-input" value="5" min="1" max="30"
+                                required>
+                            <span class="input-suffix">minutes</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="longBreakDuration" class="form-label">Long Break Duration</label>
+                        <div class="input-with-suffix">
+                            <input type="number" id="longBreakDuration" class="form-input" value="15" min="1" max="60"
+                                required>
+                            <span class="input-suffix">minutes</span>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn-secondary" id="cancelPomodoroSettings">Cancel</button>
+                        <button type="submit" class="btn-primary">Save Settings</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
