@@ -28,12 +28,13 @@
                             stroke-linejoin="round" />
                     </svg>
                 </div>
-                <span class="nav-brand-text">Productivity Hub</span>
+                <span class="nav-brand-text">Bishr's Hub</span>
             </div>
             <div class="nav-links">
                 <a href="#" class="nav-link active" data-page="habits">Habit Tracker</a>
                 <a href="#" class="nav-link" data-page="todo">To-Do List</a>
                 <a href="#" class="nav-link" data-page="pomodoro">Pomodoro</a>
+                <a href="#" class="nav-link" data-page="playlist">Playlist</a>
             </div>
             <div class="nav-actions">
                 <button class="btn-icon" id="themeToggle" title="Toggle theme">
@@ -284,6 +285,45 @@
             </div>
         </div>
     </div>
+
+    <!-- Playlist Modal -->
+    <div id="playlistModal" class="modal">
+        <div class="modal-backdrop"></div>
+        <div class="modal-container">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title">Add Playlist</h2>
+                    <button class="modal-close" id="closePlaylistModal">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" />
+                        </svg>
+                    </button>
+                </div>
+
+                <form id="playlistForm" class="modal-form">
+                    <div class="form-group">
+                        <label for="playlistUrl" class="form-label">YouTube Playlist URL</label>
+                        <input type="url" id="playlistUrl" class="form-input"
+                            placeholder="https://www.youtube.com/playlist?list=..." required autocomplete="off">
+                        <p class="form-hint">Paste the full link to the YouTube playlist.</p>
+                    </div>
+
+
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn-secondary" id="cancelPlaylistBtn">Cancel</button>
+                        <button type="submit" class="btn-primary" id="playlistSubmitBtn">
+                            <span>Import Playlist</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Video Modal (To see details or just a simple list expansion? I'll probably just use the main page for the list) -->
+    <!-- I'll skip a specific video modal for now and render videos in the main view -->
 
     <script src="app.js"></script>
 </body>

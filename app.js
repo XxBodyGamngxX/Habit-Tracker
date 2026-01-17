@@ -24,6 +24,8 @@ class ProductivityHub {
         this.pomodoroMode = 'work';
         this.pomodoroIsRunning = false;
         this.currentTaskFilter = 'pending';
+        this.playlists = this.loadData('playlists') || [];
+        this.youtubeApiKey = 'AIzaSyDOpHgt8xrp_SlMs0rWT8YDxeQsyeB3kvc';
 
         this.init();
     }
@@ -80,6 +82,11 @@ class ProductivityHub {
         document.getElementById('cancelPomodoroSettings').addEventListener('click', () => this.closeModal('pomodoroSettingsModal'));
         document.getElementById('pomodoroSettingsForm').addEventListener('submit', (e) => this.handlePomodoroSettingsSubmit(e));
 
+        // Playlist Modal
+        document.getElementById('closePlaylistModal').addEventListener('click', () => this.closeModal('playlistModal'));
+        document.getElementById('cancelPlaylistBtn').addEventListener('click', () => this.closeModal('playlistModal'));
+        document.getElementById('playlistForm').addEventListener('submit', (e) => this.handlePlaylistSubmit(e));
+
         // Close modals on backdrop click
         document.querySelectorAll('.modal-backdrop').forEach(backdrop => {
             backdrop.addEventListener('click', (e) => {
@@ -126,6 +133,11 @@ class ProductivityHub {
                 this.setupPomodoroEventListeners();
                 this.updatePomodoroDisplay();
                 this.updatePomodoroStats();
+                break;
+            case 'playlist':
+                content.innerHTML = this.getPlaylistPageHTML();
+                this.setupPlaylistEventListeners();
+                this.renderPlaylists();
                 break;
         }
     }
@@ -1316,6 +1328,263 @@ class ProductivityHub {
             this.pomodoroStats.totalFocusTime = 0;
             this.pomodoroStats.lastSessionDate = today;
             this.saveData('pomodoroStats', this.pomodoroStats);
+        }
+    }
+
+    // ============================================
+    // PLAYLIST TRACKER
+    // ============================================
+
+    getPlaylistPageHTML() {
+        return `
+            <header class="app-header">
+                <div class="header-content">
+                    <div class="brand-text">
+                        <h1 class="brand-title">Playlist Tracker</h1>
+                        <p class="brand-subtitle">Track your learning journey</p>
+                    </div>
+                    <div class="header-actions">
+                        <button class="btn-primary" id="addPlaylistBtn">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                <path d="M10 4V16M4 10H16" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                            </svg>
+                            <span>Add Playlist</span>
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <main class="app-main">
+                <section class="playlists-section">
+                    <div id="playlistsContainer"></div>
+                    
+                    <div id="playlistEmptyState" class="playlist-empty-state" style="display: none;">
+                        <div class="empty-icon">
+                            <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+                                <rect x="10" y="20" width="60" height="40" rx="4" stroke="currentColor" stroke-width="2" stroke-dasharray="8 8" opacity="0.2"/>
+                                <path d="M35 30L50 40L35 50V30Z" stroke="currentColor" stroke-width="3" stroke-linecap="round" opacity="0.3"/>
+                            </svg>
+                        </div>
+                        <h3 class="empty-title">No Playlists Yet</h3>
+                        <p class="empty-description">Import a YouTube playlist to start tracking your progress.</p>
+                        <button class="btn-secondary" onclick="app.openModal('playlistModal')">
+                            Import Playlist
+                        </button>
+                    </div>
+                </section>
+            </main>
+        `;
+    }
+
+    setupPlaylistEventListeners() {
+        const addBtn = document.getElementById('addPlaylistBtn');
+        if (addBtn) {
+            addBtn.addEventListener('click', () => {
+                this.openModal('playlistModal');
+            });
+        }
+    }
+
+    async handlePlaylistSubmit(e) {
+        e.preventDefault();
+
+        const submitBtn = document.getElementById('playlistSubmitBtn');
+        const originalBtnText = submitBtn.innerHTML;
+        submitBtn.innerHTML = '<span>Loading...</span>';
+        submitBtn.disabled = true;
+
+        const url = document.getElementById('playlistUrl').value.trim();
+
+        try {
+            const playlistId = this.extractPlaylistId(url);
+            if (!playlistId) throw new Error('Invalid YouTube Playlist URL');
+
+            // Check if already exists
+            if (this.playlists.some(p => p.id === playlistId)) {
+                throw new Error('Playlist already added');
+            }
+
+            const playlistData = await this.fetchYouTubePlaylist(playlistId);
+            this.playlists.push(playlistData);
+            this.saveData('playlists', this.playlists);
+            this.renderPlaylists();
+            this.closeModal('playlistModal');
+        } catch (error) {
+            alert(error.message);
+        } finally {
+            submitBtn.innerHTML = originalBtnText;
+            submitBtn.disabled = false;
+        }
+    }
+
+    extractPlaylistId(url) {
+        const reg = /[?&]list=([^#\&\?]+)/;
+        const match = url.match(reg);
+        return match ? match[1] : null;
+    }
+
+    async fetchYouTubePlaylist(playlistId) {
+        const key = this.youtubeApiKey;
+
+        // 1. Get Playlist Details (Title, Thumb)
+        const detailsUrl = `https://www.googleapis.com/youtube/v3/playlists?part=snippet&id=${playlistId}&key=${key}`;
+        const detailsResp = await fetch(detailsUrl);
+        const detailsData = await detailsResp.json();
+
+        if (detailsData.error) {
+            throw new Error(`YouTube API Error: ${detailsData.error.message}`);
+        }
+
+        if (!detailsData.items || detailsData.items.length === 0) {
+            throw new Error('Playlist not found or private');
+        }
+
+        const details = detailsData.items[0].snippet;
+
+        // 2. Get All Items using Pagination
+        let videos = [];
+        let nextPageToken = '';
+
+        do {
+            const itemsUrl = `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=${playlistId}&maxResults=50&key=${key}${nextPageToken ? `&pageToken=${nextPageToken}` : ''}`;
+            const itemsResp = await fetch(itemsUrl);
+            const itemsData = await itemsResp.json();
+
+            if (itemsData.error) {
+                throw new Error(itemsData.error.message);
+            }
+
+            if (itemsData.items) {
+                const pageVideos = itemsData.items.map(item => ({
+                    id: item.snippet.resourceId.videoId,
+                    title: item.snippet.title,
+                    thumbnail: item.snippet.thumbnails?.default?.url || '',
+                    channelTitle: item.snippet.videoOwnerChannelTitle || item.snippet.channelTitle,
+                    completed: false
+                })).filter(v => v.title !== 'Private video' && v.title !== 'Deleted video');
+
+                videos = [...videos, ...pageVideos];
+            }
+
+            nextPageToken = itemsData.nextPageToken || null;
+
+        } while (nextPageToken);
+
+        return {
+            id: playlistId,
+            title: details.title,
+            thumbnail: details.thumbnails?.medium?.url || details.thumbnails?.default?.url,
+            channel: details.channelTitle,
+            videos: videos,
+            expanded: false
+        };
+    }
+
+    renderPlaylists() {
+        const container = document.getElementById('playlistsContainer');
+        const emptyState = document.getElementById('playlistEmptyState');
+
+        if (!container) return;
+
+        if (this.playlists.length === 0) {
+            container.innerHTML = '';
+            if (emptyState) emptyState.style.display = 'block';
+            return;
+        }
+
+        if (emptyState) emptyState.style.display = 'none';
+        container.innerHTML = this.playlists.map(p => this.getPlaylistCardHTML(p)).join('');
+    }
+
+    getPlaylistCardHTML(playlist) {
+        const total = playlist.videos.length;
+        const completed = playlist.videos.filter(v => v.completed).length;
+        const progress = total === 0 ? 0 : (completed / total) * 100;
+        const expandedClass = playlist.expanded ? 'expanded' : '';
+
+        return `
+            <div class="playlist-card ${expandedClass}" id="playlist-${playlist.id}">
+                <div class="playlist-header" onclick="app.togglePlaylistExpand('${playlist.id}')">
+                    <div class="playlist-info">
+                        <img src="${playlist.thumbnail}" alt="" class="playlist-thumbnail">
+                        <div class="playlist-details">
+                            <h3 class="playlist-title">${this.escapeHtml(playlist.title)}</h3>
+                            <div class="playlist-meta">
+                                ${completed} / ${total} watched • ${playlist.channel}
+                            </div>
+                            <div class="playlist-progress">
+                                <div class="playlist-progress-bar-bg">
+                                    <div class="playlist-progress-bar-fill" style="width: ${progress}%"></div>
+                                </div>
+                                <span class="playlist-progress-text">${Math.round(progress)}%</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="playlist-actions" style="margin-left: 16px; display: flex; gap: 8px;">
+                        <button class="icon-btn delete" onclick="event.stopPropagation(); app.deletePlaylist('${playlist.id}')" title="Delete Playlist">
+                            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                                <path d="M3.75 4.5H14.25M7.5 8.25V12.75M10.5 8.25V12.75M13.5 4.5V14.25C13.5 14.6642 13.1642 15 12.75 15H5.25C4.83579 15 4.5 14.6642 4.5 14.25V4.5M6.75 4.5V3C6.75 2.58579 7.08579 2.25 7.5 2.25H10.5C10.9142 2.25 11.25 2.58579 11.25 3V4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+                        <div class="playlist-expand-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="playlist-videos">
+                    <div class="video-list">
+                        ${playlist.videos.map((video, idx) => `
+                            <div class="video-item ${video.completed ? 'completed' : ''}">
+                                <div class="video-checkbox" onclick="app.toggleVideo('${playlist.id}', '${video.id}')">
+                                    ${video.completed ? `
+                                        <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                                            <path d="M3 8L6 11L13 4" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        </svg>
+                                    ` : ''}
+                                </div>
+                                <img src="${video.thumbnail}" class="video-thumbnail" loading="lazy">
+                                <div class="video-info">
+                                    <div class="video-title" title="${this.escapeHtml(video.title)}">
+                                        <a href="https://www.youtube.com/watch?v=${video.id}" target="_blank" class="video-link">${this.escapeHtml(video.title)}</a>
+                                    </div>
+                                    <div class="video-channel">${this.escapeHtml(video.channelTitle)}</div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    togglePlaylistExpand(id) {
+        const playlist = this.playlists.find(p => p.id === id);
+        if (playlist) {
+            playlist.expanded = !playlist.expanded;
+            this.renderPlaylists(); // Re-render to update state
+        }
+    }
+
+    toggleVideo(playlistId, videoId) {
+        const playlist = this.playlists.find(p => p.id === playlistId);
+        if (playlist) {
+            const video = playlist.videos.find(v => v.id === videoId);
+            if (video) {
+                video.completed = !video.completed;
+                this.saveData('playlists', this.playlists);
+                this.renderPlaylists();
+            }
+        }
+    }
+
+    deletePlaylist(id) {
+        if (confirm('Are you sure you want to delete this playlist?')) {
+            this.playlists = this.playlists.filter(p => p.id !== id);
+            this.saveData('playlists', this.playlists);
+            this.renderPlaylists();
         }
     }
 

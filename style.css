@@ -1651,3 +1651,206 @@ body.dark-theme .habit-card.card-slate {
     height: 8px;
     border-radius: 50%;
 }
+
+/* Playlist Page Styles */
+.playlist-header-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: var(--spacing-lg);
+}
+
+.playlist-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border-light);
+    border-radius: var(--radius-xl);
+    padding: var(--spacing-lg);
+    box-shadow: var(--shadow-sm);
+    margin-bottom: var(--spacing-lg);
+    transition: box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.playlist-card:hover {
+    box-shadow: var(--shadow-md);
+    border-color: var(--color-border);
+}
+
+.playlist-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+}
+
+.playlist-info {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    flex: 1;
+}
+
+.playlist-thumbnail {
+    width: 60px;
+    height: 60px;
+    border-radius: var(--radius-md);
+    object-fit: cover;
+    background-color: var(--color-border-light);
+}
+
+.playlist-details {
+    flex: 1;
+}
+
+.playlist-title {
+    font-size: var(--font-size-lg);
+    font-weight: 700;
+    color: var(--color-text-primary);
+    margin-bottom: 4px;
+}
+
+.playlist-meta {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-tertiary);
+}
+
+.playlist-expand-icon {
+    transition: transform 0.3s ease;
+    color: var(--color-text-tertiary);
+}
+
+.playlist-card.expanded .playlist-expand-icon {
+    transform: rotate(180deg);
+}
+
+.playlist-videos {
+    display: none;
+    margin-top: var(--spacing-lg);
+    padding-top: var(--spacing-lg);
+    border-top: 1px solid var(--color-border-light);
+    animation: slideDown 0.3s ease-out;
+}
+
+.playlist-card.expanded .playlist-videos {
+    display: block;
+}
+
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.video-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.video-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-sm);
+    border-radius: var(--radius-md);
+    transition: background-color 0.2s ease;
+}
+
+.video-item:hover {
+    background-color: var(--color-bg);
+}
+
+.video-item.completed .video-title {
+    text-decoration: line-through;
+    color: var(--color-text-tertiary);
+}
+
+.video-thumbnail {
+    width: 80px;
+    height: 45px;
+    border-radius: var(--radius-sm);
+    object-fit: cover;
+    background-color: var(--color-border-light);
+    flex-shrink: 0;
+}
+
+.video-info {
+    flex: 1;
+    min-width: 0; 
+}
+
+.video-title {
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    color: var(--color-text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 2px;
+}
+
+.video-channel {
+    font-size: var(--font-size-xs);
+    color: var(--color-text-tertiary);
+}
+
+.video-checkbox {
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--color-border);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.video-item.completed .video-checkbox {
+    background-color: var(--color-primary);
+    border-color: var(--color-primary);
+}
+
+.video-link {
+    color: inherit;
+    text-decoration: none;
+}
+
+.video-link:hover {
+    text-decoration: underline;
+}
+
+.playlist-progress {
+    margin-top: var(--spacing-sm);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+}
+
+.playlist-progress-bar-bg {
+    flex: 1;
+    height: 6px;
+    background-color: var(--color-border-light);
+    border-radius: var(--radius-full);
+    overflow: hidden;
+}
+
+.playlist-progress-bar-fill {
+    height: 100%;
+    background-color: var(--color-primary);
+    border-radius: var(--radius-full);
+    transition: width 0.5s ease;
+}
+
+.playlist-progress-text {
+    font-size: var(--font-size-xs);
+    color: var(--color-text-secondary);
+    font-weight: 600;
+    min-width: 40px;
+    text-align: right;
+}
+
+/* Empty State for Playlist */
+.playlist-empty-state {
+    text-align: center;
+    padding: var(--spacing-3xl);
+    color: var(--color-text-tertiary);
+}
