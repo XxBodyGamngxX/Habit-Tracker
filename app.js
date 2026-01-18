@@ -768,48 +768,153 @@ class ProductivityHub {
             return;
         }
 
-        tasksList.innerHTML = filteredTasks.map(task => this.getTaskItemHTML(task)).join('');
+        // Always use date-based blocks in both views
+        const groupedTasks = this.groupTasksByDate(filteredTasks);
+        const isGridView = tasksList.classList.contains('grid-view');
+        tasksList.innerHTML = groupedTasks.map(group => this.getDateCardHTML(group, isGridView)).join('');
+
+        // Setup drag and drop after rendering
+        this.setupTaskDragAndDrop();
     }
 
-    getTaskItemHTML(task) {
-        const dueDate = new Date(task.dueDate);
+    groupTasksByDate(tasks) {
+        const groups = {};
         const today = new Date();
         today.setHours(0, 0, 0, 0);
-        dueDate.setHours(0, 0, 0, 0);
+
+        tasks.forEach(task => {
+            // Use the task's dueDate directly if it's already in YYYY-MM-DD format
+            // Otherwise parse and format it locally
+            let dateKey = task.dueDate;
+
+            // If the dueDate includes time info, extract just the date part
+            if (dateKey && dateKey.includes('T')) {
+                dateKey = dateKey.split('T')[0];
+            }
+
+            // Create a date object for display (parse as local date)
+            const [year, month, day] = dateKey.split('-').map(Number);
+            const dueDate = new Date(year, month - 1, day);
+
+            if (!groups[dateKey]) {
+                groups[dateKey] = {
+                    dateKey: dateKey,
+                    date: dueDate,
+                    tasks: []
+                };
+            }
+            groups[dateKey].tasks.push(task);
+        });
+
+        // Sort groups by date
+        return Object.values(groups).sort((a, b) => a.date - b.date);
+    }
+
+    getDateLabel(date) {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const tomorrow = new Date(today);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        const yesterday = new Date(today);
+        yesterday.setDate(yesterday.getDate() - 1);
+
+        if (date.getTime() === today.getTime()) {
+            return 'Today';
+        } else if (date.getTime() === tomorrow.getTime()) {
+            return 'Tomorrow';
+        } else if (date.getTime() === yesterday.getTime()) {
+            return 'Yesterday';
+        } else {
+            return date.toLocaleDateString('en-US', {
+                weekday: 'long',
+                day: 'numeric',
+                month: 'long'
+            });
+        }
+    }
+
+    getDateCardHTML(group, isGridView = false) {
+        const dateLabel = this.getDateLabel(group.date);
+        const taskCount = group.tasks.length;
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        let cardClass = '';
+        if (group.date < today) {
+            cardClass = 'overdue';
+        } else if (group.date.getTime() === today.getTime()) {
+            cardClass = 'today';
+        }
+
+        return `
+            <div class="date-card ${cardClass}" data-date="${group.dateKey}">
+                <div class="date-card-header">
+                    <div class="date-card-info">
+                        <h3 class="date-card-title">${dateLabel}</h3>
+                        <span class="date-card-count">${taskCount} task${taskCount !== 1 ? 's' : ''}</span>
+                    </div>
+                    <button class="date-card-add-btn" onclick="app.openModal('taskModal')" title="Add task">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                            <path d="M10 4V16M4 10H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </button>
+                </div>
+                <div class="date-card-tasks" data-date="${group.dateKey}">
+                    ${group.tasks.map(task => this.getTaskItemHTML(task)).join('')}
+                </div>
+            </div>
+        `;
+    }
+
+
+    getTaskItemHTML(task) {
+        // Parse the dueDate as local date to avoid timezone issues
+        let dateStr = task.dueDate;
+        if (dateStr && dateStr.includes('T')) {
+            dateStr = dateStr.split('T')[0];
+        }
+        const [year, month, day] = dateStr.split('-').map(Number);
+        const dueDate = new Date(year, month - 1, day);
+
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        // Format date for display
+        const dateDisplay = dueDate.toLocaleDateString('en-US', {
+            month: 'short',
+            day: 'numeric'
+        });
 
         let dueDateClass = '';
-        let dueDateText = this.formatDate(task.dueDate);
 
         if (dueDate < today && !task.completed) {
             dueDateClass = 'overdue';
-            dueDateText = '⚠️ Overdue - ' + dueDateText;
         } else if (dueDate.getTime() === today.getTime() && !task.completed) {
             dueDateClass = 'today';
-            dueDateText = '📅 Due Today';
         }
 
         const priority = task.priority || 'low';
 
         return `
-            <div class="task-item ${task.completed ? 'completed' : ''}" draggable="true" data-id="${task.id}">
+            <div class="task-item ${task.completed ? 'completed' : ''} ${dueDateClass}" draggable="true" data-id="${task.id}">
                 <div class="task-checkbox ${task.completed ? 'checked' : ''}" onclick="app.toggleTask('${task.id}')">
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                        <path d="M3 8L6 11L13 4" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                        <path d="M3 8L6 11L13 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
                 </div>
-                <div class="task-content">
-                    <div class="task-header-row" style="display: flex; gap: 8px; align-items: center; margin-bottom: 4px;">
-                         <span class="priority-badge ${priority} small">
-                            <span class="priority-dot"></span>
-                            ${priority}
-                        </span>
-                        <div class="task-name">${this.escapeHtml(task.name)}</div>
-                    </div>
-                    <div class="task-due-date ${dueDateClass}">${dueDateText}</div>
+                <div class="task-main-content">
+                    <div class="task-name">${this.escapeHtml(task.name)}</div>
+                    <div class="task-time">${dateDisplay}</div>
                 </div>
                 <div class="task-actions">
-                    <button class="icon-btn delete" onclick="app.deleteTask('${task.id}')" title="Delete task">
-                        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                    <button class="task-action-btn edit" onclick="event.stopPropagation(); app.editTask('${task.id}')" title="Edit task">
+                        <svg width="16" height="16" viewBox="0 0 18 18" fill="none">
+                            <path d="M8.25 3H3C2.44772 3 2 3.44772 2 4V15C2 15.5523 2.44772 16 3 16H14C14.5523 16 15 15.5523 15 15V9.75" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                            <path d="M13.5 2.25L15.75 4.5M16.5 3.75L10.5 9.75L8.25 10.5L9 8.25L15 2.25C15.4142 1.83579 16.0858 1.83579 16.5 2.25Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                    <button class="task-action-btn delete" onclick="event.stopPropagation(); app.deleteTask('${task.id}')" title="Delete task">
+                        <svg width="16" height="16" viewBox="0 0 18 18" fill="none">
                             <path d="M3 5H15M7 8V13M11 8V13M13 5V14C13 14.5 12.5 15 12 15H6C5.5 15 5 14.5 5 14V5M7 5V3C7 2.5 7.5 2 8 2H10C10.5 2 11 2.5 11 3V5" 
                                 stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
@@ -868,6 +973,9 @@ class ProductivityHub {
             gridViewBtn.classList.remove('active');
             listViewBtn.classList.add('active');
         }
+
+        // Re-render tasks to apply the correct view format
+        this.renderTasks(this.currentTaskFilter);
     }
 
     sortTasks(criteria) {
@@ -896,11 +1004,13 @@ class ProductivityHub {
         if (!list) return;
 
         let draggedItem = null;
+        let originalParent = null;
 
         list.addEventListener('dragstart', (e) => {
             const item = e.target.closest('.task-item');
             if (item) {
                 draggedItem = item;
+                originalParent = item.parentElement;
                 e.dataTransfer.effectAllowed = 'move';
                 e.dataTransfer.setData('text/plain', item.dataset.id);
                 setTimeout(() => item.classList.add('dragging'), 0);
@@ -911,73 +1021,103 @@ class ProductivityHub {
             const item = e.target.closest('.task-item');
             if (item) {
                 item.classList.remove('dragging');
+
+                // Check if the item ended up outside a date-card-tasks container
+                const currentParent = item.parentElement;
+                if (!currentParent || !currentParent.classList.contains('date-card-tasks')) {
+                    // Task is orphaned - re-render to fix
+                    this.renderTasks(this.currentTaskFilter);
+                    return;
+                }
+
                 draggedItem = null;
+                originalParent = null;
             }
         });
 
         list.addEventListener('dragover', (e) => {
             e.preventDefault();
-            const afterElement = this.getTaskDragAfterElement(list, e.clientY, e.clientX);
-            const draggable = document.querySelector('.task-item.dragging');
 
+            const draggable = document.querySelector('.task-item.dragging');
             if (!draggable) return;
 
-            if (afterElement == null) {
-                list.appendChild(draggable);
+            // ONLY allow dropping inside date-card-tasks containers
+            const dateCardTasks = e.target.closest('.date-card-tasks');
+            if (dateCardTasks) {
+                e.dataTransfer.dropEffect = 'move';
+                const afterElement = this.getTaskDragAfterElement(dateCardTasks, e.clientY, e.clientX);
+                if (afterElement == null) {
+                    dateCardTasks.appendChild(draggable);
+                } else {
+                    dateCardTasks.insertBefore(draggable, afterElement);
+                }
             } else {
-                list.insertBefore(draggable, afterElement);
+                // Not over a valid drop target - show "not allowed" cursor
+                e.dataTransfer.dropEffect = 'none';
             }
         });
 
         list.addEventListener('drop', (e) => {
             e.preventDefault();
-            const newOrderIds = [...list.querySelectorAll('.task-item')].map(item => item.dataset.id);
-            this.reorderTasks(newOrderIds);
+            const draggable = document.querySelector('.task-item.dragging');
+
+            if (!draggable) return;
+
+            // Check if dropped inside a valid date-card-tasks container
+            const dateCardTasks = draggable.closest('.date-card-tasks');
+            if (dateCardTasks) {
+                const newDateKey = dateCardTasks.dataset.date;
+                const taskId = draggable.dataset.id;
+                this.updateTaskDueDate(taskId, newDateKey);
+
+                // Collect new order and save
+                const newOrderIds = [...list.querySelectorAll('.task-item')].map(item => item.dataset.id);
+                this.reorderTasks(newOrderIds);
+
+                // Re-render to clean up empty cards
+                this.renderTasks(this.currentTaskFilter);
+            } else {
+                // Dropped outside - restore to original position
+                this.renderTasks(this.currentTaskFilter);
+            }
         });
+    }
+
+    updateTaskDueDate(taskId, newDateKey) {
+        const task = this.tasks.find(t => t.id === taskId);
+        if (task) {
+            // newDateKey is already in YYYY-MM-DD format from the data-date attribute
+            // Just use it directly to avoid timezone conversion issues
+            task.dueDate = newDateKey;
+            this.saveData('tasks', this.tasks);
+        }
     }
 
     getTaskDragAfterElement(container, y, x) {
         const draggableElements = [...container.querySelectorAll('.task-item:not(.dragging)')];
-        const isGridView = container.classList.contains('grid-view');
 
-        const closest = draggableElements.reduce((closest, child) => {
-            const box = child.getBoundingClientRect();
-            const distance = Math.hypot(
-                x - (box.left + box.width / 2),
-                y - (box.top + box.height / 2)
-            );
-
-            if (closest === null || distance < closest.distance) {
-                return { distance: distance, element: child };
-            } else {
-                return closest;
-            }
-        }, null);
-
-        if (!closest) {
+        // If no elements, return null (append to end)
+        if (draggableElements.length === 0) {
             return null;
         }
 
-        const box = closest.element.getBoundingClientRect();
+        // Find the element we should insert before based on vertical position
+        // Since tasks within a date card are always in a vertical list
+        let closestElement = null;
+        let closestOffset = Number.NEGATIVE_INFINITY;
 
-        if (isGridView) {
-            // In grid view, check both horizontal and vertical position
-            const isAfterHorizontally = x > (box.left + box.width / 2);
-            const isAfterVertically = y > (box.top + box.height / 2);
+        for (const child of draggableElements) {
+            const box = child.getBoundingClientRect();
+            const offset = y - box.top - box.height / 2;
 
-            // If cursor is to the right or below the center, insert after
-            if (isAfterHorizontally || isAfterVertically) {
-                return closest.element.nextElementSibling;
-            }
-        } else {
-            // In list view, only check vertical position
-            const offsetY = y - box.top;
-            if (offsetY > box.height / 2) {
-                return closest.element.nextElementSibling;
+            // We want the element just below our cursor (negative offset closest to 0)
+            if (offset < 0 && offset > closestOffset) {
+                closestOffset = offset;
+                closestElement = child;
             }
         }
 
-        return closest.element;
+        return closestElement;
     }
 
     reorderTasks(newOrderIds) {
@@ -1005,6 +1145,24 @@ class ProductivityHub {
         this.saveData('tasks', this.tasks);
         this.renderTasks(this.currentTaskFilter);
         this.updateTodoStats();
+    }
+
+    editTask(id) {
+        const task = this.tasks.find(t => t.id === id);
+        if (!task) return;
+
+        document.getElementById('taskModalTitle').textContent = 'Edit Task';
+        document.getElementById('taskSubmitBtnText').textContent = 'Save Changes';
+        document.getElementById('taskId').value = task.id;
+        document.getElementById('taskName').value = task.name;
+        document.getElementById('taskDueDate').value = task.dueDate;
+
+        const priority = task.priority || 'low';
+        document.querySelectorAll('input[name="taskPriority"]').forEach(radio => {
+            radio.checked = radio.value === priority;
+        });
+
+        this.openModal('taskModal', false);
     }
 
     deleteTask(id) {

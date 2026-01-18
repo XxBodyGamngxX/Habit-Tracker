@@ -1137,34 +1137,48 @@ body.dark-theme .habit-card.card-slate {
    TO-DO LIST STYLES
    ======================================== */
 
-/* Tasks List */
+/* Tasks List - List View (Vertical Full-Width Date Blocks) */
 .tasks-list {
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-md);
+    gap: var(--spacing-lg);
+    padding: var(--spacing-md) 0;
+}
+
+/* List view date cards take full width */
+.tasks-list .date-card {
+    min-width: 100%;
+    width: 100%;
 }
 
 /* Task Item */
 .task-item {
-    background: var(--color-surface);
-    border: 1px solid var(--color-border-light);
-    border-radius: var(--radius-lg);
-    padding: var(--spacing-lg);
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid var(--color-border-light);
+    border-radius: 0;
+    padding: var(--spacing-lg) 0;
     display: flex;
     align-items: center;
     gap: var(--spacing-md);
     transition: all var(--transition-base);
-    box-shadow: var(--shadow-sm);
     position: relative;
 }
 
+.task-item:last-child {
+    border-bottom: none;
+}
+
 .task-item:hover {
-    box-shadow: var(--shadow-md);
-    border-color: var(--color-border);
+    background: rgba(0, 0, 0, 0.02);
+}
+
+body.dark-theme .task-item:hover {
+    background: rgba(255, 255, 255, 0.03);
 }
 
 .task-item.completed {
-    opacity: 0.6;
+    opacity: 0.5;
 }
 
 .task-item.completed .task-name {
@@ -1172,23 +1186,33 @@ body.dark-theme .habit-card.card-slate {
     color: var(--color-text-tertiary);
 }
 
+/* Overdue and Today states */
+.task-item.overdue:not(.completed) {
+    background: rgba(255, 77, 79, 0.05);
+}
+
+.task-item.today:not(.completed) {
+    background: rgba(250, 173, 20, 0.05);
+}
+
 /* Task Checkbox */
 .task-checkbox {
-    width: 24px;
-    height: 24px;
-    min-width: 24px;
-    border: 2px solid var(--color-border);
-    border-radius: var(--radius-sm);
+    width: 22px;
+    height: 22px;
+    min-width: 22px;
+    border: 2px solid #D1D5DB;
+    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     transition: all var(--transition-base);
-    background: var(--color-bg);
+    background: transparent;
 }
 
 .task-checkbox:hover {
-    border-color: var(--color-primary);
+    border-color: #9CA3AF;
+    transform: scale(1.1);
 }
 
 .task-checkbox.checked {
@@ -1200,6 +1224,7 @@ body.dark-theme .habit-card.card-slate {
     opacity: 0;
     transform: scale(0);
     transition: all var(--transition-base);
+    color: white;
 }
 
 .task-checkbox.checked svg {
@@ -1207,42 +1232,73 @@ body.dark-theme .habit-card.card-slate {
     transform: scale(1);
 }
 
-/* Task Content */
-.task-content {
+/* Task Main Content */
+.task-main-content {
     flex: 1;
     min-width: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-md);
+    border-bottom: 1px solid var(--color-border-light);
+    padding-bottom: var(--spacing-sm);
 }
 
 .task-name {
     font-size: var(--font-size-base);
-    font-weight: 600;
+    font-weight: 500;
     color: var(--color-text-primary);
-    margin-bottom: 4px;
     word-wrap: break-word;
+    flex: 1;
 }
 
-.task-due-date {
+.task-time {
     font-size: var(--font-size-sm);
-    color: var(--color-text-secondary);
-    display: flex;
-    align-items: center;
-    gap: 4px;
+    color: var(--color-text-tertiary);
+    font-weight: 400;
+    white-space: nowrap;
 }
 
-.task-due-date.overdue {
-    color: var(--color-danger);
-    font-weight: 600;
-}
-
-.task-due-date.today {
-    color: var(--color-warning);
-    font-weight: 600;
-}
-
-/* Task Actions */
+/* Task Actions Container */
 .task-actions {
     display: flex;
     gap: var(--spacing-xs);
+    opacity: 0;
+    transition: opacity var(--transition-base);
+}
+
+.task-item:hover .task-actions {
+    opacity: 1;
+}
+
+/* Task Action Buttons */
+.task-action-btn {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: transparent;
+    color: var(--color-text-tertiary);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all var(--transition-base);
+}
+
+.task-action-btn:hover {
+    background: var(--color-bg);
+    color: var(--color-text-primary);
+}
+
+.task-action-btn.edit:hover {
+    background: rgba(74, 144, 226, 0.1);
+    color: var(--color-secondary);
+}
+
+.task-action-btn.delete:hover {
+    background: var(--color-danger-bg);
+    color: var(--color-danger);
 }
 
 /* Filter Controls */
@@ -1528,34 +1584,203 @@ body.dark-theme .habit-card.card-slate {
 /* Task Grid View */
 .tasks-list.grid-view {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: var(--spacing-md);
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: var(--spacing-lg);
+    flex-direction: unset;
 }
 
-.tasks-list.grid-view .task-item {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: var(--spacing-sm);
+.tasks-list.grid-view .date-card {
+    min-width: auto;
+    width: auto;
+}
+
+/* Date Card Styles */
+.date-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border-light);
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    transition: all var(--transition-base);
+}
+
+.date-card:hover {
+    box-shadow: var(--shadow-md);
+}
+
+.date-card.today {
+    border-color: var(--color-secondary);
+    border-width: 2px;
+}
+
+.date-card.overdue {
+    border-color: var(--color-danger);
+    border-width: 2px;
+}
+
+.date-card-header {
     padding: var(--spacing-lg);
-    height: 100%;
+    border-bottom: 1px solid var(--color-border-light);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--color-bg);
+}
+
+.date-card.today .date-card-header {
+    background: linear-gradient(135deg, rgba(74, 144, 226, 0.1), rgba(107, 168, 240, 0.05));
+}
+
+.date-card.overdue .date-card-header {
+    background: linear-gradient(135deg, rgba(255, 77, 79, 0.1), rgba(255, 120, 117, 0.05));
+}
+
+.date-card-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.date-card-title {
+    font-family: var(--font-display);
+    font-size: var(--font-size-lg);
+    font-weight: 700;
+    color: var(--color-text-primary);
+    margin: 0;
+}
+
+.date-card.today .date-card-title {
+    color: var(--color-secondary);
+}
+
+.date-card.overdue .date-card-title {
+    color: var(--color-danger);
+}
+
+.date-card-count {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-tertiary);
+    font-weight: 500;
+}
+
+.date-card-add-btn {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: var(--color-primary);
+    color: white;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all var(--transition-base);
+    box-shadow: var(--shadow-sm);
+}
+
+.date-card-add-btn:hover {
+    background: var(--color-primary-dark);
+    transform: scale(1.1);
+    box-shadow: var(--shadow-md);
+}
+
+.date-card-add-btn:active {
+    transform: scale(1);
+}
+
+.date-card-tasks {
+    padding: var(--spacing-sm) 0;
+}
+
+/* Tasks inside date cards */
+.date-card .task-item {
+    padding: var(--spacing-md) var(--spacing-lg);
+    border-bottom: 1px solid var(--color-border-light);
+    background: transparent;
+}
+
+.date-card .task-item:last-child {
+    border-bottom: none;
+}
+
+.date-card .task-item:hover {
+    background: rgba(0, 0, 0, 0.02);
+}
+
+body.dark-theme .date-card .task-item:hover {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.date-card .task-main-content {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.date-card .task-delete-btn {
+    opacity: 0;
+}
+
+.date-card .task-item:hover .task-delete-btn {
+    opacity: 1;
+}
+
+/* Remove individual card styles in grid view since we use date cards now */
+.tasks-list.grid-view .task-item {
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    padding: var(--spacing-md) var(--spacing-lg);
+    border-bottom: 1px solid var(--color-border-light);
+}
+
+.tasks-list.grid-view .task-item:last-child {
+    border-bottom: none;
+}
+
+.tasks-list.grid-view .task-item:hover {
+    background: rgba(0, 0, 0, 0.02);
+    box-shadow: none;
 }
 
 .tasks-list.grid-view .task-checkbox {
-    position: absolute;
-    top: var(--spacing-lg);
-    right: var(--spacing-lg);
+    position: static;
 }
 
-.tasks-list.grid-view .task-content {
-    width: 100%;
-    margin-top: var(--spacing-sm);
+.tasks-list.grid-view .task-main-content {
+    width: auto;
+    flex: 1;
+    margin-top: 0;
+    flex-direction: row;
+    align-items: center;
+    border-bottom: none;
+    padding-bottom: 0;
 }
 
-.tasks-list.grid-view .task-actions {
-    margin-top: auto;
-    width: 100%;
-    display: flex;
-    justify-content: flex-end;
+.tasks-list.grid-view .task-time {
+    margin-top: 0;
+}
+
+/* Task item dragging inside date cards */
+.date-card .task-item.dragging {
+    opacity: 0.5;
+    background: var(--color-bg);
+    border: 1px dashed var(--color-primary);
+    border-radius: var(--radius-sm);
+}
+
+/* Visual feedback when dragging over date cards */
+.date-card-tasks {
+    min-height: 60px;
+    transition: background var(--transition-base);
+}
+
+.date-card-tasks:has(.task-item.dragging) {
+    background: rgba(255, 107, 53, 0.05);
+}
+
+/* Prevent tasks from being visually outside date cards */
+.tasks-list>.task-item {
+    display: none;
 }
 
 /* Sort Select */
