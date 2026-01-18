@@ -474,6 +474,23 @@ body.dark-theme .moon-icon {
 .empty-icon {
     margin: 0 auto var(--spacing-lg);
     color: var(--color-text-tertiary);
+    cursor: pointer;
+    transition: all var(--transition-base);
+}
+
+.empty-icon:hover {
+    color: var(--color-primary);
+    transform: scale(1.1);
+}
+
+.empty-icon:hover svg circle {
+    opacity: 0.5;
+    stroke: var(--color-primary);
+}
+
+.empty-icon:hover svg path {
+    opacity: 1;
+    stroke: var(--color-primary);
 }
 
 .empty-title {

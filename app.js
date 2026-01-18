@@ -228,7 +228,7 @@ class ProductivityHub {
                     </div>
 
                     <div id="emptyState" class="empty-state" style="display: none;">
-                        <div class="empty-icon">
+                        <div class="empty-icon" onclick="app.openModal('habitModal')" title="Create habit">
                             <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
                                 <circle cx="40" cy="40" r="38" stroke="currentColor" stroke-width="2" stroke-dasharray="8 8" opacity="0.2" />
                                 <path d="M40 25V55M25 40H55" stroke="currentColor" stroke-width="3" stroke-linecap="round" opacity="0.3" />
@@ -236,9 +236,6 @@ class ProductivityHub {
                         </div>
                         <h3 class="empty-title">No habits yet</h3>
                         <p class="empty-description">Start building better routines by creating your first habit.</p>
-                        <button class="btn-secondary" onclick="app.openModal('habitModal')">
-                            Create Your First Habit
-                        </button>
                     </div>
 
                     <div id="habitsGrid" class="habits-grid"></div>
