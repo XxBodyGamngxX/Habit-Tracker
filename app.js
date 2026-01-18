@@ -938,8 +938,9 @@ class ProductivityHub {
 
     getTaskDragAfterElement(container, y, x) {
         const draggableElements = [...container.querySelectorAll('.task-item:not(.dragging)')];
+        const isGridView = container.classList.contains('grid-view');
 
-        return draggableElements.reduce((closest, child) => {
+        const closest = draggableElements.reduce((closest, child) => {
             const box = child.getBoundingClientRect();
             const distance = Math.hypot(
                 x - (box.left + box.width / 2),
@@ -958,11 +959,22 @@ class ProductivityHub {
         }
 
         const box = closest.element.getBoundingClientRect();
-        // Determine if we should place after the closest element
-        // If in grid view (or generally), if cursor is to the right of center, we tend to want to insert after.
-        // We use a threshold to be safe.
-        if (x > box.left + box.width / 2) {
-            return closest.element.nextElementSibling;
+
+        if (isGridView) {
+            // In grid view, check both horizontal and vertical position
+            const isAfterHorizontally = x > (box.left + box.width / 2);
+            const isAfterVertically = y > (box.top + box.height / 2);
+
+            // If cursor is to the right or below the center, insert after
+            if (isAfterHorizontally || isAfterVertically) {
+                return closest.element.nextElementSibling;
+            }
+        } else {
+            // In list view, only check vertical position
+            const offsetY = y - box.top;
+            if (offsetY > box.height / 2) {
+                return closest.element.nextElementSibling;
+            }
         }
 
         return closest.element;
