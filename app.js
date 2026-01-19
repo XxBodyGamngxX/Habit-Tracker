@@ -1703,6 +1703,11 @@ class ProductivityHub {
                         </div>
                     </div>
                     <div class="playlist-actions" style="margin-left: 16px; display: flex; gap: 8px;">
+                        <button class="icon-btn" onclick="event.stopPropagation(); app.downloadPlaylist('${playlist.id}')" title="Download Playlist">
+                            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                                <path d="M9 12.75V2.25M9 12.75L4.5 8.25M9 12.75L13.5 8.25M3.75 15.75H14.25" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
                         <button class="icon-btn delete" onclick="event.stopPropagation(); app.deletePlaylist('${playlist.id}')" title="Delete Playlist">
                             <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
                                 <path d="M3.75 4.5H14.25M7.5 8.25V12.75M10.5 8.25V12.75M13.5 4.5V14.25C13.5 14.6642 13.1642 15 12.75 15H5.25C4.83579 15 4.5 14.6642 4.5 14.25V4.5M6.75 4.5V3C6.75 2.58579 7.08579 2.25 7.5 2.25H10.5C10.9142 2.25 11.25 2.58579 11.25 3V4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -1769,6 +1774,129 @@ class ProductivityHub {
             this.saveData('playlists', this.playlists);
             this.renderPlaylists();
         }
+    }
+
+    downloadPlaylist(id) {
+        const playlist = this.playlists.find(p => p.id === id);
+        if (!playlist) return;
+
+        // Create safe filename
+        const safeTitle = playlist.title.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+        const filename = `download_${safeTitle}.bat`;
+
+        // Sanitize title for batch script output
+        const cleanTitle = playlist.title.replace(/[&|<>^%"]/g, '');
+
+        // Construct batch script content
+        // Using GOTO flow style to avoid crasing inside IF code blocks
+        const scriptContent = `@echo off
+set "playlist_url=https://www.youtube.com/playlist?list=${playlist.id}"
+
+echo ==========================================
+echo Downloading Playlist: ${cleanTitle}
+echo ==========================================
+echo.
+echo This script will auto-configure everything needed.
+echo.
+
+:: ------------------------------------------------
+:: 1. CHECK FOR YT-DLP
+:: ------------------------------------------------
+:CHECK_YTDLP
+if exist "yt-dlp.exe" goto UPDATE_YTDLP
+echo [1/3] Downloading yt-dlp...
+curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp.exe -o yt-dlp.exe
+if %errorlevel% neq 0 goto ERROR_YTDLP
+goto CHECK_FFMPEG
+
+:UPDATE_YTDLP
+echo [1/3] Checking for yt-dlp updates...
+yt-dlp.exe -U
+goto CHECK_FFMPEG
+
+:: ------------------------------------------------
+:: 2. CHECK FOR FFMPEG
+:: ------------------------------------------------
+:CHECK_FFMPEG
+if exist "ffmpeg.exe" goto START_DOWNLOAD
+echo.
+echo [2/3] FFmpeg not found. Downloading... 
+echo This fixes "HTTP 403" errors. Please wait...
+
+curl -L -o ffmpeg.zip "https://github.com/yt-dlp/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-win64-gpl.zip"
+if %errorlevel% neq 0 goto ERROR_FFMPEG
+
+echo Extracting FFmpeg...
+powershell -Command "Expand-Archive -Path ffmpeg.zip -DestinationPath . -Force"
+
+echo Setting up FFmpeg...
+for /d %%I in (ffmpeg-master-*) do (
+    if exist "%%I\\bin\\ffmpeg.exe" (
+        move "%%I\\bin\\ffmpeg.exe" . >nul
+        move "%%I\\bin\\ffprobe.exe" . >nul
+    )
+)
+
+:: Cleanup
+if exist "ffmpeg.zip" del "ffmpeg.zip"
+for /d %%I in (ffmpeg-master-*) do rd /s /q "%%I"
+
+if not exist "ffmpeg.exe" goto ERROR_FFMPEG_INSTALL
+goto START_DOWNLOAD
+
+:: ------------------------------------------------
+:: 3. START DOWNLOAD
+:: ------------------------------------------------
+:START_DOWNLOAD
+echo.
+echo [3/3] Starting download...
+echo.
+
+if not exist "yt-dlp.exe" goto ERROR_YTDLP
+
+yt-dlp.exe -i --ffmpeg-location . -o "%%(playlist_index)s - %%(title)s.%%(ext)s" "%playlist_url%"
+
+echo.
+echo ==========================================
+echo Download Complete!
+echo ==========================================
+goto END
+
+:: ------------------------------------------------
+:: ERROR HANDLERS
+:: ------------------------------------------------
+:ERROR_YTDLP
+echo.
+echo ERROR: Could not download or find yt-dlp.exe.
+echo Please check your internet connection.
+goto END
+
+:ERROR_FFMPEG
+echo.
+echo ERROR: Could not download FFmpeg.
+goto END
+
+:ERROR_FFMPEG_INSTALL
+echo.
+echo WARNING: FFmpeg extraction failed. Downloads might still fail.
+goto START_DOWNLOAD
+
+:END
+pause
+`;
+
+        // Trigger download of the batch file
+        const blob = new Blob([scriptContent], { type: 'text/plain' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+
+        alert('Script updated to "Safety Mode"!\\n\\nI have completely rewritten the script structure to prevent it from closing instantly.\\n\\n1. Delete the old .bat files.\\n2. Run this new one.');
     }
 
     // ============================================
