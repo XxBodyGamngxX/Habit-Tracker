@@ -668,64 +668,146 @@
     </div>
 
     <!-- Savings Vault Modal -->
-    <div id="savingsVaultModal" class="modal">
-        <div class="modal-backdrop" onclick="app.closeModal('savingsVaultModal')"></div>
-        <div class="modal-container">
+    <!-- General Actions Modal -->
+    <div id="generalActionsModal" class="modal">
+        <div class="modal-backdrop" onclick="app.closeModal('generalActionsModal')"></div>
+        <div class="modal-container" style="max-width: 500px;">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h2 class="modal-title">🏦 Savings Vault Transaction</h2>
-                    <button type="button" class="modal-close" onclick="app.closeModal('savingsVaultModal')">
+                    <h2 class="modal-title">🏦 Fund Transactions</h2>
+                    <button type="button" class="modal-close" onclick="app.closeModal('generalActionsModal')">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                            <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2"
-                                stroke-linecap="round" />
+                            <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
                         </svg>
                     </button>
                 </div>
 
-                <!-- Balances Overview Card -->
+                <!-- Balances Grid -->
                 <div style="padding: 0 var(--spacing-xl); margin-top: var(--spacing-lg);">
-                    <div style="background: var(--color-bg); border: 1.5px solid var(--color-border); border-radius: var(--radius-lg); padding: var(--spacing-md); display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-sm); text-align: center;">
+                    <div style="background: var(--color-bg); border: 1.5px solid var(--color-border); border-radius: var(--radius-lg); padding: var(--spacing-sm) var(--spacing-md); display: grid; grid-template-columns: 1fr 1fr 1fr; gap: var(--spacing-xs); text-align: center; font-size: var(--font-size-xs);">
                         <div>
-                            <span style="font-size: 10px; font-weight: 700; color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.5px; display: block;">Vault Balance</span>
-                            <span id="modalVaultBalance" style="font-weight: 800; font-size: var(--font-size-lg); color: var(--color-success); display: block; margin-top: 2px;">EGP 0.00</span>
+                            <span style="font-weight: 700; color: var(--color-text-secondary); text-transform: uppercase; font-size: 9px; letter-spacing: 0.5px; display: block;">Visa</span>
+                            <span id="modalVisaBalanceText" style="font-weight: 800; font-size: var(--font-size-sm); color: #0284c7; display: block; margin-top: 2px;">EGP 0.00</span>
                         </div>
-                        <div style="border-left: 1.5px solid var(--color-border);">
-                            <span style="font-size: 10px; font-weight: 700; color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.5px; display: block;">Available Budget</span>
-                            <span id="modalAvailableBudget" style="font-weight: 800; font-size: var(--font-size-lg); color: var(--color-primary); display: block; margin-top: 2px;">EGP 0.00</span>
+                        <div style="border-left: 1.5px solid var(--color-border); border-right: 1.5px solid var(--color-border);">
+                            <span style="font-weight: 700; color: var(--color-text-secondary); text-transform: uppercase; font-size: 9px; letter-spacing: 0.5px; display: block;">Wallet</span>
+                            <span id="modalWalletBalanceText" style="font-weight: 800; font-size: var(--font-size-sm); color: #d97706; display: block; margin-top: 2px;">EGP 0.00</span>
+                        </div>
+                        <div>
+                            <span style="font-weight: 700; color: var(--color-text-secondary); text-transform: uppercase; font-size: 9px; letter-spacing: 0.5px; display: block;">Savings Vault</span>
+                            <span id="modalVaultBalanceText" style="font-weight: 800; font-size: var(--font-size-sm); color: var(--color-success); display: block; margin-top: 2px;">EGP 0.00</span>
                         </div>
                     </div>
                 </div>
 
-                <form id="savingsVaultModalForm" class="modal-form" onsubmit="app.handleSavingsVaultModalSubmit(event)">
-                    <input type="hidden" id="vaultModalDirection" value="deposit">
-
-                    <!-- Transaction Type Toggle -->
+                <form id="generalActionsModalForm" class="modal-form" onsubmit="app.handleGeneralActionsSubmit(event)">
+                    <!-- Action Type selector -->
                     <div class="form-group">
                         <label class="form-label">Transaction Type</label>
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
-                            <button type="button" id="vaultModalDepositBtn" class="form-classify-btn active" onclick="app.setVaultModalDirection('deposit')" style="padding: 10px var(--spacing-md); font-size: var(--font-size-xs); font-weight: 700; border-radius: var(--radius-md); cursor: pointer; border: 1.5px solid var(--color-border); background: var(--color-surface); transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 6px;">
-                                📥 Deposit to Vault
+                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 6px;">
+                            <button type="button" id="actionTypeAddBtn" class="form-classify-btn active" onclick="app.setGeneralActionType('add')" style="padding: 10px var(--spacing-xs); font-size: 10px; font-weight: 700; border-radius: var(--radius-md); cursor: pointer; border: 1.5px solid var(--color-border); background: var(--color-surface); transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 4px;">
+                                📥 Add Funds
                             </button>
-                            <button type="button" id="vaultModalWithdrawBtn" class="form-classify-btn" onclick="app.setVaultModalDirection('withdraw')" style="padding: 10px var(--spacing-md); font-size: var(--font-size-xs); font-weight: 700; border-radius: var(--radius-md); cursor: pointer; border: 1.5px solid var(--color-border); background: var(--color-surface); transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 6px;">
-                                📤 Withdraw to Budget
+                            <button type="button" id="actionTypeRemoveBtn" class="form-classify-btn" onclick="app.setGeneralActionType('remove')" style="padding: 10px var(--spacing-xs); font-size: 10px; font-weight: 700; border-radius: var(--radius-md); cursor: pointer; border: 1.5px solid var(--color-border); background: var(--color-surface); transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 4px;">
+                                📤 Remove
                             </button>
+                            <button type="button" id="actionTypeTransferBtn" class="form-classify-btn" onclick="app.setGeneralActionType('transfer')" style="padding: 10px var(--spacing-xs); font-size: 10px; font-weight: 700; border-radius: var(--radius-md); cursor: pointer; border: 1.5px solid var(--color-border); background: var(--color-surface); transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 4px;">
+                                ⇄ Transfer
+                            </button>
+                            <button type="button" id="actionTypeBudgetBtn" class="form-classify-btn" onclick="app.setGeneralActionType('budget')" style="padding: 10px var(--spacing-xs); font-size: 10px; font-weight: 700; border-radius: var(--radius-md); cursor: pointer; border: 1.5px solid var(--color-border); background: var(--color-surface); transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 4px;">
+                                ⚙️ Set Budget
+                            </button>
+                        </div>
+                        <input type="hidden" id="generalActionType" value="add">
+                    </div>
+
+                    <!-- Single Account Selector (For Add / Remove) -->
+                    <div id="generalActionsSingleAccountGroup" class="form-group">
+                        <label id="generalActionsSingleAccountLabel" class="form-label">Target Account</label>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px;">
+                            <button type="button" id="singleAccountVisaBtn" class="form-classify-btn active" onclick="app.setGeneralActionsSingleAccount('visa')" style="padding: 10px var(--spacing-sm); font-size: var(--font-size-xs); font-weight: 700; border-radius: var(--radius-md); cursor: pointer; border: 1.5px solid var(--color-border); background: var(--color-surface); transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 4px;">
+                                💳 Visa
+                            </button>
+                            <button type="button" id="singleAccountWalletBtn" class="form-classify-btn" onclick="app.setGeneralActionsSingleAccount('wallet')" style="padding: 10px var(--spacing-sm); font-size: var(--font-size-xs); font-weight: 700; border-radius: var(--radius-md); cursor: pointer; border: 1.5px solid var(--color-border); background: var(--color-surface); transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 4px;">
+                                💵 Wallet
+                            </button>
+                            <button type="button" id="singleAccountVaultBtn" class="form-classify-btn" onclick="app.setGeneralActionsSingleAccount('vault')" style="padding: 10px var(--spacing-sm); font-size: var(--font-size-xs); font-weight: 700; border-radius: var(--radius-md); cursor: pointer; border: 1.5px solid var(--color-border); background: var(--color-surface); transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 4px;">
+                                🏦 Vault
+                            </button>
+                        </div>
+                        <input type="hidden" id="generalActionsSingleAccount" value="visa">
+                    </div>
+
+                    <!-- Dual Account Selectors (For Transfer) -->
+                    <div id="generalActionsTransferGroup" class="form-group" style="display: none;">
+                        <div style="margin-bottom: var(--spacing-sm);">
+                            <label class="form-label">Source Account (From)</label>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px;">
+                                <button type="button" id="transferSrcVisaBtn" class="form-classify-btn active" onclick="app.setGeneralActionsTransferSrc('visa')" style="padding: 10px var(--spacing-sm); font-size: var(--font-size-xs); font-weight: 700; border-radius: var(--radius-md); cursor: pointer; border: 1.5px solid var(--color-border); background: var(--color-surface); transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 4px;">
+                                    💳 Visa
+                                </button>
+                                <button type="button" id="transferSrcWalletBtn" class="form-classify-btn" onclick="app.setGeneralActionsTransferSrc('wallet')" style="padding: 10px var(--spacing-sm); font-size: var(--font-size-xs); font-weight: 700; border-radius: var(--radius-md); cursor: pointer; border: 1.5px solid var(--color-border); background: var(--color-surface); transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 4px;">
+                                    💵 Wallet
+                                </button>
+                                <button type="button" id="transferSrcVaultBtn" class="form-classify-btn" onclick="app.setGeneralActionsTransferSrc('vault')" style="padding: 10px var(--spacing-sm); font-size: var(--font-size-xs); font-weight: 700; border-radius: var(--radius-md); cursor: pointer; border: 1.5px solid var(--color-border); background: var(--color-surface); transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 4px;">
+                                    🏦 Vault
+                                </button>
+                            </div>
+                            <input type="hidden" id="generalActionsTransferSrc" value="visa">
+                        </div>
+
+                        <div>
+                            <label class="form-label">Destination Account (To)</label>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px;">
+                                <button type="button" id="transferDstVisaBtn" class="form-classify-btn" onclick="app.setGeneralActionsTransferDst('visa')" style="padding: 10px var(--spacing-sm); font-size: var(--font-size-xs); font-weight: 700; border-radius: var(--radius-md); cursor: pointer; border: 1.5px solid var(--color-border); background: var(--color-surface); transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 4px;">
+                                    💳 Visa
+                                </button>
+                                <button type="button" id="transferDstWalletBtn" class="form-classify-btn active" onclick="app.setGeneralActionsTransferDst('wallet')" style="padding: 10px var(--spacing-sm); font-size: var(--font-size-xs); font-weight: 700; border-radius: var(--radius-md); cursor: pointer; border: 1.5px solid var(--color-border); background: var(--color-surface); transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 4px;">
+                                    💵 Wallet
+                                </button>
+                                <button type="button" id="transferDstVaultBtn" class="form-classify-btn" onclick="app.setGeneralActionsTransferDst('vault')" style="padding: 10px var(--spacing-sm); font-size: var(--font-size-xs); font-weight: 700; border-radius: var(--radius-md); cursor: pointer; border: 1.5px solid var(--color-border); background: var(--color-surface); transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 4px;">
+                                    🏦 Vault
+                                </button>
+                            </div>
+                            <input type="hidden" id="generalActionsTransferDst" value="wallet">
                         </div>
                     </div>
 
-                    <!-- Amount Field with Currency Suffix -->
-                    <div class="form-group">
-                        <label for="vaultModalAmount" class="form-label">Amount</label>
+                    <!-- Budget Settings Group (For Set Budget) -->
+                    <div id="generalActionsBudgetGroup" class="form-group" style="display: none;">
+                        <div style="margin-bottom: var(--spacing-sm);">
+                            <label for="generalActionsVisaIncludeSelect" class="form-label">Include Visa in Spending Budget?</label>
+                            <select id="generalActionsVisaIncludeSelect" class="form-input" onchange="app.toggleModalVisaAlloc(this.value)" style="height: 48px; background: var(--color-bg);">
+                                <option value="no">❌ No (Exclude Visa)</option>
+                                <option value="yes">✅ Yes (Include Visa)</option>
+                            </select>
+                        </div>
+
+                        <div id="generalActionsVisaAllocGroup" style="display: none; margin-bottom: var(--spacing-sm);">
+                            <label for="generalActionsVisaAllocInput" class="form-label">Visa Spending Budget Allocation</label>
+                            <input type="number" id="generalActionsVisaAllocInput" class="form-input" placeholder="e.g. 500" min="0" value="0">
+                        </div>
+
+                        <div>
+                            <label for="generalActionsWalletAllocInput" class="form-label">Wallet Spending Budget Allocation</label>
+                            <input type="number" id="generalActionsWalletAllocInput" class="form-input" placeholder="e.g. 500" min="0" value="0">
+                        </div>
+                    </div>
+
+                    <!-- Amount Group -->
+                    <div id="generalActionsAmountGroup" class="form-group">
+                        <label for="generalActionsAmount" class="form-label">Amount</label>
                         <div class="input-with-suffix">
-                            <input type="number" id="vaultModalAmount" class="form-input" placeholder="0.00" step="0.01" min="0.01" required autocomplete="off">
-                            <span class="input-suffix" id="vaultModalCurrencySuffix">EGP</span>
+                            <input type="number" id="generalActionsAmount" class="form-input" placeholder="0.00" step="0.01" min="0.01" required autocomplete="off">
+                            <span class="input-suffix" id="generalActionsCurrencySuffix">EGP</span>
                         </div>
                     </div>
 
                     <!-- Modal Action Buttons -->
                     <div class="modal-footer">
-                        <button type="button" class="btn-secondary" onclick="app.closeModal('savingsVaultModal')">Cancel</button>
-                        <button type="submit" class="btn-primary" id="vaultModalSubmitBtn" style="background: var(--color-success); border-color: var(--color-success);">
-                            <span>Confirm Deposit</span>
+                        <button type="button" class="btn-secondary" onclick="app.closeModal('generalActionsModal')">Cancel</button>
+                        <button type="submit" class="btn-primary" id="generalActionsSubmitBtn" style="background: var(--color-success); border-color: var(--color-success);">
+                            <span id="generalActionsSubmitBtnText">Confirm Addition</span>
                         </button>
                     </div>
                 </form>
@@ -861,10 +943,38 @@
                 <p style="color: var(--color-text-secondary); margin-bottom: var(--spacing-xl); font-size: var(--font-size-sm);">Let's shape your financial routine crease by crease. Set your incoming funds (allowance, salary, or budget) for this month to calculate a recommended daily spending limit.</p>
                 
                 <form id="financeSetupForm" onsubmit="app.handleFinanceSetup(event)" style="display: flex; flex-direction: column; gap: var(--spacing-md); text-align: left;">
-                    <div class="form-group">
-                        <label for="financeIncomeInput" class="form-label">Starting Income / Balance</label>
-                        <input type="number" id="financeIncomeInput" class="form-input" placeholder="e.g. 1000" min="1" required>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-md);">
+                        <div class="form-group">
+                            <label for="financeSetupVisaInput" class="form-label">Starting Visa Balance</label>
+                            <input type="number" id="financeSetupVisaInput" class="form-input" placeholder="e.g. 500" min="0" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="financeSetupWalletInput" class="form-label">Starting Wallet Balance</label>
+                            <input type="number" id="financeSetupWalletInput" class="form-input" placeholder="e.g. 800" min="0" required>
+                        </div>
                     </div>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-md);">
+                        <div class="form-group">
+                            <label for="financeSetupWalletVaultAllocInput" class="form-label">Savings Vault Allocation</label>
+                            <input type="number" id="financeSetupWalletVaultAllocInput" class="form-input" placeholder="e.g. 300" min="0" required>
+                            <span style="font-size: 10px; color: var(--color-text-secondary); margin-top: 4px; display: block;">Remainder is allocated to the spending budget</span>
+                        </div>
+                        <div class="form-group">
+                            <label for="financeSetupVisaIncludeSelect" class="form-label">Include Visa in Spending Budget?</label>
+                            <select id="financeSetupVisaIncludeSelect" class="form-input" onchange="app.toggleSetupVisaAlloc(this.value)" style="height: 48px; background: var(--color-bg);">
+                                <option value="no">❌ No (Exclude Visa)</option>
+                                <option value="yes">✅ Yes (Include Visa)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div id="financeSetupVisaAllocGroup" class="form-group" style="display: none;">
+                        <label for="financeSetupVisaAllocInput" class="form-label">Visa Budget Allocation</label>
+                        <input type="number" id="financeSetupVisaAllocInput" class="form-input" placeholder="e.g. 500" min="0" value="0">
+                        <span style="font-size: 10px; color: var(--color-text-secondary); margin-top: 4px; display: block;">Specify how much Visa money to include in your spending budget</span>
+                    </div>
+
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-md);">
                         <div class="form-group">
                             <label for="financeStartDateInput" class="form-label">Starting Entry Date</label>
@@ -892,7 +1002,7 @@
             <div id="financeDashboardContainer" style="display: none;">
                 <!-- Stats Row -->
                 <section class="stats-section" style="margin-bottom: var(--spacing-xl);">
-                    <!-- Monthly Budget Stat -->
+                    <!-- Total Money Stat -->
                     <div class="stat-card">
                         <div class="stat-icon stat-icon-blue">
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -902,12 +1012,9 @@
                                 <line x1="16" y1="10" x2="16" y2="10" />
                             </svg>
                         </div>
-                        <div class="stat-content" style="flex: 1; display: flex; flex-direction: column;">
-                            <p class="stat-label">Monthly Funds</p>
-                            <div style="display: flex; justify-content: space-between; align-items: center; gap: var(--spacing-xs); flex-wrap: wrap;">
-                                <p class="stat-value" id="financeMonthlyBudgetVal" style="margin-bottom: 0;">EGP 0.00</p>
-                                <button type="button" onclick="app.showAddFundsPrompt()" class="btn-primary" style="font-size: 11px; padding: 4px 10px; height: 26px; border-radius: var(--radius-md); font-weight: 700; background: var(--color-primary); border: none; cursor: pointer; display: inline-flex; align-items: center; justify-content: center;">+ Add Funds</button>
-                            </div>
+                        <div class="stat-content">
+                            <p class="stat-label">Total Money</p>
+                            <p class="stat-value" id="financeMonthlyBudgetVal" style="margin-bottom: 0;">EGP 0.00</p>
                         </div>
                     </div>
 
@@ -919,18 +1026,29 @@
                                 <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
                             </svg>
                         </div>
-                        <div class="stat-content" style="flex: 1; display: flex; flex-direction: column;">
+                        <div class="stat-content">
                             <p class="stat-label">Savings Vault</p>
-                            <div style="display: flex; justify-content: space-between; align-items: center; gap: var(--spacing-xs); flex-wrap: wrap;">
-                                <p class="stat-value financeSavingsVaultVal" id="financeSavingsVaultVal" style="margin-bottom: 0;">EGP 0.00</p>
-                                <button type="button" onclick="app.showVaultTransferPrompt()" class="btn-primary" style="font-size: 11px; padding: 4px 10px; height: 26px; border-radius: var(--radius-md); font-weight: 700; background: var(--color-success); border: none; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; color: white;">⇄ Transfer</button>
-                            </div>
+                            <p class="stat-value financeSavingsVaultVal" id="financeSavingsVaultVal" style="margin-bottom: 0;">EGP 0.00</p>
                         </div>
                     </div>
 
-                    <!-- Remaining Balance Stat -->
+                    <!-- Money in Visa Stat -->
                     <div class="stat-card">
-                        <div class="stat-icon stat-icon-orange">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #E0F2FE, #BAE6FD); color: #0284c7;">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="2" y="5" width="20" height="14" rx="2" ry="2" />
+                                <line x1="2" y1="10" x2="22" y2="10" />
+                            </svg>
+                        </div>
+                        <div class="stat-content">
+                            <p class="stat-label">Money in Visa</p>
+                            <p class="stat-value" id="financeVisaBalanceVal" style="margin-bottom: 0;">EGP 0.00</p>
+                        </div>
+                    </div>
+
+                    <!-- Money in Wallet Stat -->
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #FEF3C7, #FDE68A); color: #d97706;">
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M21 12V7H5a2 2 0 0 1 0-4h14v4" />
                                 <path d="M3 5v14a2 2 0 0 0 2 2h16v-5" />
@@ -938,22 +1056,22 @@
                             </svg>
                         </div>
                         <div class="stat-content">
-                            <p class="stat-label">Remaining Balance</p>
-                            <p class="stat-value" id="financeRemainingCardVal">$0.00</p>
+                            <p class="stat-label">Money in Wallet</p>
+                            <p class="stat-value" id="financeWalletBalanceVal" style="margin-bottom: 0;">EGP 0.00</p>
                         </div>
                     </div>
 
-                    <!-- Today's Spend Stat -->
-                    <div class="stat-card" id="financeTodaySpentCard">
-                        <div class="stat-icon" id="financeTodaySpentIcon" style="background: linear-gradient(135deg, #DCFCE7, #BBF7D0); color: var(--color-success);">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <line x1="12" y1="1" x2="12" y2="23"></line>
-                                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                    <!-- General Actions Stat -->
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #F3F4F6, #D1D5DB); color: #374151;">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="3" />
+                                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
                             </svg>
                         </div>
-                        <div class="stat-content">
-                            <p class="stat-label">Today's Spend</p>
-                            <p class="stat-value" id="financeTodaySpentVal">$0.00</p>
+                        <div class="stat-content" style="flex: 1; display: flex; flex-direction: column;">
+                            <p class="stat-label" style="margin-bottom: var(--spacing-xs);">General Actions</p>
+                            <button type="button" onclick="app.showGeneralActionsPrompt()" class="btn-primary" style="font-size: 11px; padding: 4px 10px; height: 26px; border-radius: var(--radius-md); font-weight: 700; background: var(--color-primary); border: none; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; width: fit-content; color: white;">Open menu</button>
                         </div>
                     </div>
                 </section>
@@ -999,6 +1117,20 @@
                                         <label for="expenseDateInput" class="form-label">Date of Purchase</label>
                                         <input type="date" id="expenseDateInput" class="form-input" required>
                                     </div>
+                                </div>
+
+                                <!-- Payment Method Selector -->
+                                <div class="form-group" style="margin-bottom: var(--spacing-xs);">
+                                    <label class="form-label" style="font-size: 11px; margin-bottom: 4px;">Payment Method</label>
+                                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                                        <button type="button" id="expensePaymentVisaBtn" class="form-classify-btn active" onclick="app.setExpensePaymentMethod('visa')" style="padding: 8px 12px; font-size: var(--font-size-xs); font-weight: 700; border-radius: var(--radius-md); cursor: pointer; border: 1.5px solid var(--color-border); background: var(--color-surface); transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 6px;">
+                                            💳 Visa
+                                        </button>
+                                        <button type="button" id="expensePaymentWalletBtn" class="form-classify-btn" onclick="app.setExpensePaymentMethod('wallet')" style="padding: 8px 12px; font-size: var(--font-size-xs); font-weight: 700; border-radius: var(--radius-md); cursor: pointer; border: 1.5px solid var(--color-border); background: var(--color-surface); transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 6px;">
+                                            💵 Wallet
+                                        </button>
+                                    </div>
+                                    <input type="hidden" id="selectedExpensePaymentMethod" value="visa">
                                 </div>
                                 
                                 <div class="form-group" style="margin-bottom: var(--spacing-xs);">

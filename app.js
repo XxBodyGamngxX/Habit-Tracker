@@ -135,6 +135,24 @@ class ProductivityHub {
         this.financeData.itemPreferences = this.financeData.itemPreferences || {};
         this.financeData.lastClaimedBonusDate = this.financeData.lastClaimedBonusDate || '';
 
+        if (this.financeData.visaBalance === undefined && this.financeData.walletBalance === undefined) {
+            const totalSpent = (this.financeData.expenses || []).filter(e => e.type !== 'income').reduce((sum, e) => sum + e.amount, 0);
+            this.financeData.visaBalance = Math.max(0, (this.financeData.monthlyIncome || 0) - totalSpent);
+            this.financeData.walletBalance = 0;
+        } else {
+            this.financeData.visaBalance = this.financeData.visaBalance !== undefined ? this.financeData.visaBalance : 0;
+            this.financeData.walletBalance = this.financeData.walletBalance !== undefined ? this.financeData.walletBalance : 0;
+        }
+        if (this.financeData.visaIncluded === undefined) {
+            this.financeData.visaIncluded = true;
+        }
+        if (this.financeData.visaAllocation === undefined) {
+            this.financeData.visaAllocation = this.financeData.visaBalance;
+        }
+        if (this.financeData.walletAllocation === undefined) {
+            this.financeData.walletAllocation = this.financeData.walletBalance;
+        }
+
         this.isCloudDataLoaded = false;
 
         this.init();
@@ -3283,8 +3301,29 @@ pause
                                 'Transportation 🚗': true
                             },
                             itemPreferences: (data.financeData && data.financeData.itemPreferences) || {},
-                            lastClaimedBonusDate: (data.financeData && data.financeData.lastClaimedBonusDate) || ''
+                            lastClaimedBonusDate: (data.financeData && data.financeData.lastClaimedBonusDate) || '',
+                            visaBalance: (data.financeData && data.financeData.visaBalance !== undefined) ? data.financeData.visaBalance : null,
+                            walletBalance: (data.financeData && data.financeData.walletBalance !== undefined) ? data.financeData.walletBalance : null,
+                            visaIncluded: (data.financeData && data.financeData.visaIncluded !== undefined) ? data.financeData.visaIncluded : true,
+                            visaAllocation: (data.financeData && data.financeData.visaAllocation !== undefined) ? data.financeData.visaAllocation : null,
+                            walletAllocation: (data.financeData && data.financeData.walletAllocation !== undefined) ? data.financeData.walletAllocation : null
                         };
+
+                        if (this.financeData.visaBalance === null && this.financeData.walletBalance === null) {
+                            const totalSpent = (this.financeData.expenses || []).filter(e => e.type !== 'income').reduce((sum, e) => sum + e.amount, 0);
+                            this.financeData.visaBalance = Math.max(0, (this.financeData.monthlyIncome || 0) - totalSpent);
+                            this.financeData.walletBalance = 0;
+                        } else {
+                            this.financeData.visaBalance = this.financeData.visaBalance !== null ? this.financeData.visaBalance : 0;
+                            this.financeData.walletBalance = this.financeData.walletBalance !== null ? this.financeData.walletBalance : 0;
+                        }
+                        if (this.financeData.visaAllocation === null) {
+                            this.financeData.visaAllocation = this.financeData.visaBalance;
+                        }
+                        if (this.financeData.walletAllocation === null) {
+                            this.financeData.walletAllocation = this.financeData.walletBalance;
+                        }
+
                         this.saveData('financeData', this.financeData);
 
                         // Load user role (RBAC)
@@ -3868,7 +3907,9 @@ pause
                 'Transportation 🚗': true
             },
             itemPreferences: {},
-            lastClaimedBonusDate: ''
+            lastClaimedBonusDate: '',
+            visaBalance: 0,
+            walletBalance: 0
         };
         this.isCloudDataLoaded = false;
 
@@ -5711,7 +5752,9 @@ pause
                     'Transportation 🚗': true
                 },
                 itemPreferences: this.financeData.itemPreferences || {},
-                lastClaimedBonusDate: this.financeData.lastClaimedBonusDate || ''
+                lastClaimedBonusDate: this.financeData.lastClaimedBonusDate || '',
+                visaBalance: 0,
+                walletBalance: 0
             };
             this.saveFinanceData();
         }
@@ -5740,15 +5783,54 @@ pause
         }
     }
 
+    toggleSetupVisaAlloc(val) {
+        const group = document.getElementById('financeSetupVisaAllocGroup');
+        const input = document.getElementById('financeSetupVisaAllocInput');
+        if (group && input) {
+            if (val === 'yes') {
+                group.style.display = 'block';
+                input.required = true;
+            } else {
+                group.style.display = 'none';
+                input.required = false;
+                input.value = '0';
+            }
+        }
+    }
+
     handleFinanceSetup(event) {
         if (event) event.preventDefault();
-        const incomeInput = document.getElementById('financeIncomeInput');
+        const visaInput = document.getElementById('financeSetupVisaInput');
+        const walletInput = document.getElementById('financeSetupWalletInput');
+        const walletVaultAllocInput = document.getElementById('financeSetupWalletVaultAllocInput');
+        const visaIncludeSelect = document.getElementById('financeSetupVisaIncludeSelect');
+        const visaAllocInput = document.getElementById('financeSetupVisaAllocInput');
         const startDateInput = document.getElementById('financeStartDateInput');
         const currencySelect = document.getElementById('financeCurrencySelect');
-        if (!incomeInput || !startDateInput || !currencySelect) return;
 
-        const income = parseFloat(incomeInput.value);
-        if (isNaN(income) || income <= 0) return;
+        if (!visaInput || !walletInput || !walletVaultAllocInput || !visaIncludeSelect || !visaAllocInput || !startDateInput || !currencySelect) return;
+
+        const startingVisa = parseFloat(visaInput.value) || 0;
+        const startingWallet = parseFloat(walletInput.value) || 0;
+        const vaultAlloc = parseFloat(walletVaultAllocInput.value) || 0;
+        const visaIncluded = visaIncludeSelect.value === 'yes';
+        const visaAlloc = visaIncluded ? (parseFloat(visaAllocInput.value) || 0) : 0;
+
+        if (startingWallet < vaultAlloc) {
+            alert("Savings Vault allocation cannot exceed your starting Wallet balance.");
+            return;
+        }
+        if (visaIncluded && startingVisa < visaAlloc) {
+            alert("Visa allocation cannot exceed your starting Visa balance.");
+            return;
+        }
+
+        const walletAlloc = startingWallet - vaultAlloc;
+        const activeSpendingBudget = walletAlloc + visaAlloc;
+        if (activeSpendingBudget <= 0) {
+            alert("Active spending budget must be greater than zero.");
+            return;
+        }
 
         const startDateVal = startDateInput.value;
         const currencyVal = currencySelect.value || 'EGP';
@@ -5757,25 +5839,52 @@ pause
         const entryDateObj = new Date(startDateVal);
         const lastDayOfMonthObj = new Date(entryDateObj.getFullYear(), entryDateObj.getMonth() + 1, 0);
         const remainingDays = lastDayOfMonthObj.getDate() - entryDateObj.getDate() + 1; // inclusive
-        const dailyBudget = parseFloat((income / Math.max(1, remainingDays)).toFixed(2));
+        const dailyBudget = parseFloat((activeSpendingBudget / Math.max(1, remainingDays)).toFixed(2));
 
-        this.financeData.monthlyIncome = income;
+        // Save values
+        this.financeData.visaIncluded = visaIncluded;
+        this.financeData.visaAllocation = visaAlloc;
+        this.financeData.walletAllocation = walletAlloc;
+        this.financeData.visaBalance = startingVisa;
+        this.financeData.walletBalance = walletAlloc; 
+        this.financeData.savingsBalance = vaultAlloc; // Set to allocated vault amount
+        this.financeData.monthlyIncome = activeSpendingBudget;
         this.financeData.dailyBudget = dailyBudget;
         this.financeData.monthYear = startDateVal.substring(0, 7);
         this.financeData.startingDate = startDateVal;
         this.financeData.currency = currencyVal;
-        this.financeData.expenses = [{
-            id: 'txn_init_' + Date.now(),
-            name: 'Initial Monthly Budget',
-            description: 'Starting monthly income allocation',
-            amount: income,
-            category: 'Income 💵',
-            date: new Date(startDateVal).toISOString(),
-            isEssential: true,
-            type: 'income'
-        }];
+        this.financeData.expenses = [];
+
+        // Log initial entries
+        if (visaAlloc > 0 && visaIncluded) {
+            this.financeData.expenses.push({
+                id: 'txn_init_visa_' + Date.now(),
+                name: 'Initial Visa Budget',
+                description: 'Starting Visa allocation for spending',
+                amount: visaAlloc,
+                category: 'Income 💵',
+                date: new Date(startDateVal).toISOString(),
+                isEssential: true,
+                type: 'income',
+                paymentMethod: 'visa'
+            });
+        }
+        if (walletAlloc > 0) {
+            this.financeData.expenses.push({
+                id: 'txn_init_wallet_' + (Date.now() + 1),
+                name: 'Initial Wallet Budget',
+                description: 'Starting Wallet allocation for spending',
+                amount: walletAlloc,
+                category: 'Income 💵',
+                date: new Date(startDateVal).toISOString(),
+                isEssential: true,
+                type: 'income',
+                paymentMethod: 'wallet'
+            });
+        }
+
+
         this.financeData.xpBonusClaimedDates = {};
-        this.financeData.savingsBalance = 0;
         this.financeData.savingsGoals = [];
 
         const defaults = this.loadData('adminDefaultCategories') || ['Coffee ☕', 'Diet & Groceries 🍏', 'Gaming 🎮', 'PC Accessories 💻', 'Transportation 🚗'];
@@ -5791,6 +5900,8 @@ pause
             this.financeData.dailyBudget = 0;
             this.financeData.expenses = [];
             this.financeData.xpBonusClaimedDates = {};
+            this.financeData.visaBalance = 0;
+            this.financeData.walletBalance = 0;
 
             this.saveData('financeData', this.financeData);
             this.switchPage('finance');
@@ -5869,6 +5980,7 @@ pause
         const amountInput = document.getElementById('expenseAmountInput');
         const dateInput = document.getElementById('expenseDateInput');
         const catInput = document.getElementById('selectedExpenseCategory');
+        const paymentInput = document.getElementById('selectedExpensePaymentMethod');
 
         if (!nameInput || !descInput || !amountInput || !dateInput || !catInput) return;
 
@@ -5877,8 +5989,14 @@ pause
         const amount = parseFloat(amountInput.value);
         const purchaseDate = dateInput.value || new Date().toISOString().substring(0, 10);
         const category = catInput.value || 'General';
+        const paymentMethod = paymentInput ? (paymentInput.value || 'visa') : 'visa';
 
         if (!name || !description || isNaN(amount) || amount <= 0) return;
+
+        if (paymentMethod === 'visa' && this.financeData.visaIncluded === false) {
+            alert("Visa is currently excluded from your spending budget. Please adjust your budget settings to include it, or select Wallet.");
+            return;
+        }
 
         const isEssentialInput = document.getElementById('formExpenseIsEssential');
         const isEssential = isEssentialInput ? (isEssentialInput.value === 'true') : this.isCategoryEssential(category);
@@ -5890,13 +6008,20 @@ pause
             amount: amount,
             category: category,
             date: new Date(purchaseDate).toISOString(),
-            isEssential: isEssential
+            isEssential: isEssential,
+            paymentMethod: paymentMethod
         };
 
         // Learn this rule for future entries
         const cleanName = name.replace(/[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDC00-\uDFFF]/g, '').trim().toLowerCase();
         if (cleanName) {
             this.financeData.itemPreferences[cleanName] = isEssential;
+        }
+
+        if (paymentMethod === 'visa') {
+            this.financeData.visaBalance = (this.financeData.visaBalance || 0) - amount;
+        } else {
+            this.financeData.walletBalance = (this.financeData.walletBalance || 0) - amount;
         }
 
         this.financeData.expenses.push(expense);
@@ -5909,6 +6034,11 @@ pause
         dateInput.value = new Date().toISOString().substring(0, 10);
         catInput.value = '';
         this.setFormExpenseClassification(true);
+        if (this.financeData.visaIncluded === false) {
+            this.setExpensePaymentMethod('wallet');
+        } else {
+            this.setExpensePaymentMethod('visa');
+        }
 
         // Remove active class from buttons
         document.querySelectorAll('.preset-tags-grid .preset-tag-btn').forEach(btn => btn.classList.remove('active'));
@@ -5930,12 +6060,27 @@ pause
         if (confirm(msg)) {
             if (isIncome) {
                 this.financeData.monthlyIncome = Math.max(0, (this.financeData.monthlyIncome || 0) - item.amount);
+                // Deduct from where it was added
+                const method = item.paymentMethod || 'visa';
+                if (method === 'visa') {
+                    this.financeData.visaBalance = Math.max(0, (this.financeData.visaBalance || 0) - item.amount);
+                } else {
+                    this.financeData.walletBalance = Math.max(0, (this.financeData.walletBalance || 0) - item.amount);
+                }
                 const now = new Date();
                 const lastDayOfMonthObj = new Date(now.getFullYear(), now.getMonth() + 1, 0);
                 const remainingDays = lastDayOfMonthObj.getDate() - now.getDate() + 1;
                 const totalSpent = this.financeData.expenses.filter(e => e.id !== id && e.type !== 'income').reduce((sum, e) => sum + e.amount, 0);
                 const remainingBalance = this.financeData.monthlyIncome - totalSpent;
                 this.financeData.dailyBudget = parseFloat((remainingBalance / Math.max(1, remainingDays)).toFixed(2));
+            } else {
+                // Return expense amount back to selected payment balance
+                const method = item.paymentMethod || 'visa';
+                if (method === 'visa') {
+                    this.financeData.visaBalance = (this.financeData.visaBalance || 0) + item.amount;
+                } else {
+                    this.financeData.walletBalance = (this.financeData.walletBalance || 0) + item.amount;
+                }
             }
 
             this.financeData.expenses = this.financeData.expenses.filter(e => e.id !== id);
@@ -6089,22 +6234,74 @@ pause
         const dailyLimit = this.financeData.dailyBudget;
         const currency = this.financeData.currency || 'EGP';
 
-        // Calculate spends (filtering out income entries)
+        // Calculate spends (filtering out income entries, and optionally filtering Visa if excluded)
+        const visaActive = this.financeData.visaIncluded !== false;
         const todayDateStr = new Date().toDateString();
-        const todayExpenses = this.financeData.expenses.filter(e => e.type !== 'income' && new Date(e.date).toDateString() === todayDateStr);
+        const todayExpenses = this.financeData.expenses.filter(e => 
+            e.type !== 'income' && 
+            new Date(e.date).toDateString() === todayDateStr &&
+            (visaActive || e.paymentMethod !== 'visa')
+        );
         const todaySpent = todayExpenses.reduce((sum, e) => sum + e.amount, 0);
 
-        const totalSpent = this.financeData.expenses.filter(e => e.type !== 'income').reduce((sum, e) => sum + e.amount, 0);
+        const totalSpent = this.financeData.expenses.filter(e => 
+            e.type !== 'income' && 
+            (visaActive || e.paymentMethod !== 'visa')
+        ).reduce((sum, e) => sum + e.amount, 0);
         const remainingBalance = income - totalSpent;
 
         // Render standard values
-        monthlyBudgetVal.textContent = `${currency} ${income.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        const visaBal = this.financeData.visaBalance !== undefined ? this.financeData.visaBalance : 0;
+        const walletBal = this.financeData.walletBalance !== undefined ? this.financeData.walletBalance : 0;
+        const totalActiveMoney = (visaActive ? visaBal : 0) + walletBal;
+        
+        if (monthlyBudgetVal) {
+            monthlyBudgetVal.textContent = `${currency} ${totalActiveMoney.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        }
         if (remainingCardVal) {
             remainingCardVal.textContent = `${currency} ${remainingBalance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
         }
-        todaySpentVal.textContent = `${currency} ${todaySpent.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-        totalSpentText.textContent = `${currency} ${totalSpent.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-        remainingText.textContent = `${currency} ${remainingBalance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        if (todaySpentVal) {
+            todaySpentVal.textContent = `${currency} ${todaySpent.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        }
+        if (totalSpentText) {
+            totalSpentText.textContent = `${currency} ${totalSpent.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        }
+        if (remainingText) {
+            remainingText.textContent = `${currency} ${remainingBalance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        }
+
+        // Render Visa & Wallet Balances
+        const visaValEl = document.getElementById('financeVisaBalanceVal');
+        const walletValEl = document.getElementById('financeWalletBalanceVal');
+        if (visaValEl) {
+            visaValEl.textContent = `${currency} ${visaBal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}${!visaActive ? ' (Excluded)' : ''}`;
+            const cardEl = visaValEl.closest('.stat-card');
+            if (cardEl) {
+                cardEl.style.opacity = visaActive ? '1' : '0.6';
+            }
+        }
+        if (walletValEl) {
+            walletValEl.textContent = `${currency} ${walletBal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        }
+
+        // Adjust expense log payment buttons if Visa is excluded
+        const expensePaymentVisaBtn = document.getElementById('expensePaymentVisaBtn');
+        if (expensePaymentVisaBtn) {
+            if (!visaActive) {
+                expensePaymentVisaBtn.style.opacity = '0.4';
+                expensePaymentVisaBtn.style.cursor = 'not-allowed';
+                expensePaymentVisaBtn.title = 'Visa is excluded from your budget';
+                const paymentInput = document.getElementById('selectedExpensePaymentMethod');
+                if (paymentInput && paymentInput.value === 'visa') {
+                    this.setExpensePaymentMethod('wallet');
+                }
+            } else {
+                expensePaymentVisaBtn.style.opacity = '1';
+                expensePaymentVisaBtn.style.cursor = 'pointer';
+                expensePaymentVisaBtn.title = '';
+            }
+        }
 
         // Render Savings Vault Value
         document.querySelectorAll('.financeSavingsVaultVal, #financeSavingsVaultVal').forEach(el => {
@@ -6287,10 +6484,21 @@ pause
                         amountMarkup = `<span class="expense-amount">- ${currency} ${exp.amount.toFixed(2)}</span>`;
                     }
 
+                    let paymentMethodBadge = '';
+                    if (exp.paymentMethod) {
+                        const isVisa = exp.paymentMethod === 'visa';
+                        const label = isVisa ? '💳 Visa' : '💵 Wallet';
+                        const bg = isVisa ? 'rgba(99, 102, 241, 0.15)' : 'rgba(217, 119, 6, 0.15)';
+                        const fg = isVisa ? '#4f46e5' : '#b45309';
+                        const border = isVisa ? '#6366f1' : '#d97706';
+                        paymentMethodBadge = `<span class="category-badge" style="background: ${bg}; color: ${fg}; border: 1px solid ${border}; border-radius: 4px; padding: 1.5px 6px; font-size: 9px; font-weight: 700; margin-right: 4px;">${label}</span>`;
+                    }
+
                     row.innerHTML = `
                         <div class="expense-details">
                             <span class="expense-name">${this.escapeHtml(exp.name)}${detailsStr}</span>
                             <div class="expense-meta">
+                                ${paymentMethodBadge ? paymentMethodBadge + ' <span>•</span> ' : ''}
                                 <span class="expense-tag">${this.escapeHtml(exp.category || 'General')}</span>
                                 <span>•</span>
                                 ${badgeMarkup}
@@ -6825,144 +7033,443 @@ pause
         }
     }
 
-    // Prompt-based Add Funds from Stat Card
-    showAddFundsPrompt() {
-        const currency = this.financeData.currency || 'EGP';
-        const amountStr = prompt(`Enter amount to add to your monthly budget (${currency}):`);
-        if (!amountStr) return;
-
-        const amount = parseFloat(amountStr);
-        if (isNaN(amount) || amount <= 0) {
-            alert("Invalid amount entered.");
-            return;
-        }
-
-        this.financeData.monthlyIncome += amount;
-        if (!this.financeData.expenses) this.financeData.expenses = [];
-        this.financeData.expenses.push({
-            id: 'txn_fund_' + Date.now(),
-            name: 'Added Funds',
-            description: 'Mid-month budget boost',
-            amount: amount,
-            category: 'Income 💵',
-            date: new Date().toISOString(),
-            isEssential: true,
-            type: 'income'
-        });
-
-        // Recalculate dailyBudget using remaining days in the month from today
+    recalculateDailyBudget() {
         const now = new Date();
         const lastDayOfMonthObj = new Date(now.getFullYear(), now.getMonth() + 1, 0);
         const remainingDays = lastDayOfMonthObj.getDate() - now.getDate() + 1; // inclusive of today
-
-        const totalSpent = this.financeData.expenses.filter(e => e.type !== 'income').reduce((sum, e) => sum + e.amount, 0);
-        const remainingBalance = this.financeData.monthlyIncome - totalSpent;
-        this.financeData.dailyBudget = parseFloat((remainingBalance / Math.max(1, remainingDays)).toFixed(2));
-
-        this.saveFinanceData();
-        this.renderFinanceDashboard();
-        alert(`Successfully injected ${currency} ${amount.toFixed(2)} into your monthly budget!`);
-    }
-
-    // Custom Savings Vault Modal trigger
-    showVaultTransferPrompt() {
-        const currency = this.financeData.currency || 'EGP';
-        const currentSavings = this.financeData.savingsBalance || 0;
-        const totalSpent = (this.financeData.expenses || []).filter(e => e.type !== 'income').reduce((sum, e) => sum + e.amount, 0);
+        
+        const visaActive = this.financeData.visaIncluded !== false;
+        const totalSpent = (this.financeData.expenses || [])
+            .filter(e => e.type !== 'income' && (visaActive || e.paymentMethod !== 'visa'))
+            .reduce((sum, e) => sum + e.amount, 0);
+            
         const remainingBalance = (this.financeData.monthlyIncome || 0) - totalSpent;
-
-        const vaultBalEl = document.getElementById('modalVaultBalance');
-        const budgetBalEl = document.getElementById('modalAvailableBudget');
-        const suffixEl = document.getElementById('vaultModalCurrencySuffix');
-        const amountInput = document.getElementById('vaultModalAmount');
-
-        if (vaultBalEl) {
-            vaultBalEl.textContent = `${currency} ${currentSavings.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-        }
-        if (budgetBalEl) {
-            budgetBalEl.textContent = `${currency} ${remainingBalance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-        }
-        if (suffixEl) {
-            suffixEl.textContent = currency;
-        }
-        if (amountInput) {
-            amountInput.value = '';
-        }
-
-        this.setVaultModalDirection('deposit');
-        this.openModal('savingsVaultModal', false);
+        this.financeData.dailyBudget = parseFloat((remainingBalance / Math.max(1, remainingDays)).toFixed(2));
     }
 
-    // Toggle deposit vs withdraw mode in custom Savings Vault Modal
-    setVaultModalDirection(dir) {
-        const hiddenDir = document.getElementById('vaultModalDirection');
-        const depositBtn = document.getElementById('vaultModalDepositBtn');
-        const withdrawBtn = document.getElementById('vaultModalWithdrawBtn');
-        const submitBtnText = document.querySelector('#vaultModalSubmitBtn span');
+    // Open General Actions Modal and populate current balances
+    showGeneralActionsPrompt() {
+        const currency = this.financeData.currency || 'EGP';
+        const visaActive = this.financeData.visaIncluded !== false;
+        const totalSpent = (this.financeData.expenses || [])
+            .filter(e => e.type !== 'income' && (visaActive || e.paymentMethod !== 'visa'))
+            .reduce((sum, e) => sum + e.amount, 0);
+        const remainingBalance = (this.financeData.monthlyIncome || 0) - totalSpent;
+        const currentVisa = this.financeData.visaBalance !== undefined ? this.financeData.visaBalance : 0;
+        const currentWallet = this.financeData.walletBalance !== undefined ? this.financeData.walletBalance : 0;
+        const currentSavings = this.financeData.savingsBalance || 0;
 
-        if (hiddenDir) hiddenDir.value = dir;
+        const visaText = document.getElementById('modalVisaBalanceText');
+        const walletText = document.getElementById('modalWalletBalanceText');
+        const vaultText = document.getElementById('modalVaultBalanceText');
+        const suffixEl = document.getElementById('generalActionsCurrencySuffix');
+        const amountInput = document.getElementById('generalActionsAmount');
 
-        if (dir === 'deposit') {
-            if (depositBtn) depositBtn.classList.add('active');
-            if (withdrawBtn) withdrawBtn.classList.remove('active');
-            if (submitBtnText) submitBtnText.textContent = 'Confirm Deposit';
+        if (visaText) visaText.textContent = `${currency} ${currentVisa.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        if (walletText) walletText.textContent = `${currency} ${currentWallet.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        if (vaultText) vaultText.textContent = `${currency} ${currentSavings.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        if (suffixEl) suffixEl.textContent = currency;
+        if (amountInput) amountInput.value = '';
+
+        this.setGeneralActionType('add');
+        this.setGeneralActionsSingleAccount('visa');
+        this.setGeneralActionsTransferSrc('visa');
+        this.setGeneralActionsTransferDst('wallet');
+
+        this.openModal('generalActionsModal', false);
+    }
+
+    // Set Active General Action Type
+    setGeneralActionType(type) {
+        const addBtn = document.getElementById('actionTypeAddBtn');
+        const removeBtn = document.getElementById('actionTypeRemoveBtn');
+        const xferBtn = document.getElementById('actionTypeTransferBtn');
+        const budgetBtn = document.getElementById('actionTypeBudgetBtn');
+        const input = document.getElementById('generalActionType');
+        
+        const singleGrp = document.getElementById('generalActionsSingleAccountGroup');
+        const xferGrp = document.getElementById('generalActionsTransferGroup');
+        const budgetGrp = document.getElementById('generalActionsBudgetGroup');
+        const amountGrp = document.getElementById('generalActionsAmountGroup');
+        
+        const label = document.getElementById('generalActionsSingleAccountLabel');
+        const submitText = document.getElementById('generalActionsSubmitBtnText');
+        const submitBtn = document.getElementById('generalActionsSubmitBtn');
+
+        if (!input) return;
+        input.value = type;
+
+        // Toggle buttons active state
+        if (addBtn) addBtn.classList.toggle('active', type === 'add');
+        if (removeBtn) removeBtn.classList.toggle('active', type === 'remove');
+        if (xferBtn) xferBtn.classList.toggle('active', type === 'transfer');
+        if (budgetBtn) budgetBtn.classList.toggle('active', type === 'budget');
+
+        // Toggle visible form fields
+        if (type === 'transfer') {
+            if (singleGrp) singleGrp.style.display = 'none';
+            if (xferGrp) xferGrp.style.display = 'block';
+            if (budgetGrp) budgetGrp.style.display = 'none';
+            if (amountGrp) amountGrp.style.display = 'block';
+            if (submitText) submitText.textContent = 'Confirm Transfer';
+            if (submitBtn) {
+                submitBtn.style.background = 'var(--color-primary)';
+                submitBtn.style.borderColor = 'var(--color-primary)';
+            }
+        } else if (type === 'budget') {
+            if (singleGrp) singleGrp.style.display = 'none';
+            if (xferGrp) xferGrp.style.display = 'none';
+            if (budgetGrp) budgetGrp.style.display = 'block';
+            if (amountGrp) amountGrp.style.display = 'none';
+            
+            // Populate current values in the modal inputs
+            const visaIncludeSelect = document.getElementById('generalActionsVisaIncludeSelect');
+            const visaAllocInput = document.getElementById('generalActionsVisaAllocInput');
+            const walletAllocInput = document.getElementById('generalActionsWalletAllocInput');
+            
+            if (visaIncludeSelect) {
+                visaIncludeSelect.value = this.financeData.visaIncluded !== false ? 'yes' : 'no';
+                this.toggleModalVisaAlloc(visaIncludeSelect.value);
+            }
+            if (visaAllocInput) visaAllocInput.value = this.financeData.visaAllocation || 0;
+            if (walletAllocInput) walletAllocInput.value = this.financeData.walletAllocation || 0;
+
+            if (submitText) submitText.textContent = 'Save Budget Settings';
+            if (submitBtn) {
+                submitBtn.style.background = 'var(--color-primary)';
+                submitBtn.style.borderColor = 'var(--color-primary)';
+            }
         } else {
-            if (withdrawBtn) withdrawBtn.classList.add('active');
-            if (depositBtn) depositBtn.classList.remove('active');
-            if (submitBtnText) submitBtnText.textContent = 'Confirm Withdrawal';
+            if (singleGrp) singleGrp.style.display = 'block';
+            if (xferGrp) xferGrp.style.display = 'none';
+            if (budgetGrp) budgetGrp.style.display = 'none';
+            if (amountGrp) amountGrp.style.display = 'block';
+            if (label) label.textContent = type === 'add' ? 'Target Account' : 'Source Account';
+            if (submitText) submitText.textContent = type === 'add' ? 'Confirm Addition' : 'Confirm Removal';
+            if (submitBtn) {
+                if (type === 'add') {
+                    submitBtn.style.background = 'var(--color-success)';
+                    submitBtn.style.borderColor = 'var(--color-success)';
+                } else {
+                    submitBtn.style.background = 'var(--color-danger)';
+                    submitBtn.style.borderColor = 'var(--color-danger)';
+                }
+            }
         }
     }
 
-    // Form submission handler for custom Savings Vault Modal
-    handleSavingsVaultModalSubmit(event) {
+    // Toggle Visa allocation section visibility in unified modal
+    toggleModalVisaAlloc(val) {
+        const group = document.getElementById('generalActionsVisaAllocGroup');
+        const input = document.getElementById('generalActionsVisaAllocInput');
+        if (group && input) {
+            if (val === 'yes') {
+                group.style.display = 'block';
+                input.required = true;
+            } else {
+                group.style.display = 'none';
+                input.required = false;
+                input.value = '0';
+            }
+        }
+    }
+
+    // Set target account for Add/Remove operations
+    setGeneralActionsSingleAccount(acc) {
+        const visaBtn = document.getElementById('singleAccountVisaBtn');
+        const walletBtn = document.getElementById('singleAccountWalletBtn');
+        const vaultBtn = document.getElementById('singleAccountVaultBtn');
+        const input = document.getElementById('generalActionsSingleAccount');
+        if (!input) return;
+
+        input.value = acc;
+        if (visaBtn) visaBtn.classList.toggle('active', acc === 'visa');
+        if (walletBtn) walletBtn.classList.toggle('active', acc === 'wallet');
+        if (vaultBtn) vaultBtn.classList.toggle('active', acc === 'vault');
+    }
+
+    // Set source account for Transfer operations
+    setGeneralActionsTransferSrc(acc) {
+        const visaBtn = document.getElementById('transferSrcVisaBtn');
+        const walletBtn = document.getElementById('transferSrcWalletBtn');
+        const vaultBtn = document.getElementById('transferSrcVaultBtn');
+        const input = document.getElementById('generalActionsTransferSrc');
+        if (!input) return;
+
+        input.value = acc;
+        if (visaBtn) visaBtn.classList.toggle('active', acc === 'visa');
+        if (walletBtn) walletBtn.classList.toggle('active', acc === 'wallet');
+        if (vaultBtn) vaultBtn.classList.toggle('active', acc === 'vault');
+        
+        // Prevent transfer source and destination from matching
+        const dstInput = document.getElementById('generalActionsTransferDst');
+        if (dstInput && dstInput.value === acc) {
+            const fallback = acc === 'visa' ? 'wallet' : 'visa';
+            this.setGeneralActionsTransferDst(fallback);
+        }
+    }
+
+    // Set destination account for Transfer operations
+    setGeneralActionsTransferDst(acc) {
+        const visaBtn = document.getElementById('transferDstVisaBtn');
+        const walletBtn = document.getElementById('transferDstWalletBtn');
+        const vaultBtn = document.getElementById('transferDstVaultBtn');
+        const input = document.getElementById('generalActionsTransferDst');
+        if (!input) return;
+
+        input.value = acc;
+        if (visaBtn) visaBtn.classList.toggle('active', acc === 'visa');
+        if (walletBtn) walletBtn.classList.toggle('active', acc === 'wallet');
+        if (vaultBtn) vaultBtn.classList.toggle('active', acc === 'vault');
+
+        // Prevent transfer source and destination from matching
+        const srcInput = document.getElementById('generalActionsTransferSrc');
+        if (srcInput && srcInput.value === acc) {
+            const fallback = acc === 'visa' ? 'wallet' : 'visa';
+            this.setGeneralActionsTransferSrc(fallback);
+        }
+    }
+
+    // Set active quick-log payment method
+    setExpensePaymentMethod(method) {
+        const visaBtn = document.getElementById('expensePaymentVisaBtn');
+        const walletBtn = document.getElementById('expensePaymentWalletBtn');
+        const input = document.getElementById('selectedExpensePaymentMethod');
+        if (!visaBtn || !walletBtn || !input) return;
+
+        input.value = method;
+        if (method === 'visa') {
+            visaBtn.classList.add('active');
+            walletBtn.classList.remove('active');
+        } else {
+            walletBtn.classList.add('active');
+            visaBtn.classList.remove('active');
+        }
+    }
+
+    // Handle submission of General Actions Modal
+    handleGeneralActionsSubmit(event) {
         if (event) event.preventDefault();
 
-        const dirInput = document.getElementById('vaultModalDirection');
-        const amountInput = document.getElementById('vaultModalAmount');
-        if (!dirInput || !amountInput) return;
+        const typeInput = document.getElementById('generalActionType');
+        if (!typeInput) return;
 
-        const direction = dirInput.value;
+        const actionType = typeInput.value;
+        const currency = this.financeData.currency || 'EGP';
+        const expenses = this.financeData.expenses || [];
+
+        if (actionType === 'budget') {
+            const visaIncludeSelect = document.getElementById('generalActionsVisaIncludeSelect');
+            const visaAllocInput = document.getElementById('generalActionsVisaAllocInput');
+            const walletAllocInput = document.getElementById('generalActionsWalletAllocInput');
+            if (!visaIncludeSelect || !visaAllocInput || !walletAllocInput) return;
+
+            const visaIncluded = visaIncludeSelect.value === 'yes';
+            const visaAlloc = visaIncluded ? (parseFloat(visaAllocInput.value) || 0) : 0;
+            const walletAlloc = parseFloat(walletAllocInput.value) || 0;
+
+            const visaBal = this.financeData.visaBalance || 0;
+            if (visaIncluded && visaAlloc > visaBal) {
+                alert(`Visa allocation cannot exceed your actual Visa balance (${currency} ${visaBal.toFixed(2)}).`);
+                return;
+            }
+
+            const activeSpendingBudget = walletAlloc + visaAlloc;
+            if (activeSpendingBudget <= 0) {
+                alert("Spending budget must be greater than zero.");
+                return;
+            }
+
+            this.financeData.visaIncluded = visaIncluded;
+            this.financeData.visaAllocation = visaAlloc;
+            this.financeData.walletAllocation = walletAlloc;
+            this.financeData.monthlyIncome = activeSpendingBudget;
+
+            this.recalculateDailyBudget();
+            this.saveFinanceData();
+            this.renderFinanceDashboard();
+            this.closeModal('generalActionsModal');
+            alert("Spending budget settings updated successfully!");
+            return;
+        }
+
+        const amountInput = document.getElementById('generalActionsAmount');
+        if (!amountInput) return;
+
         const amount = parseFloat(amountInput.value);
         if (isNaN(amount) || amount <= 0) {
             alert("Please enter a valid positive amount.");
             return;
         }
 
-        const currency = this.financeData.currency || 'EGP';
-        const currentSavings = this.financeData.savingsBalance || 0;
-        const totalSpent = (this.financeData.expenses || []).filter(e => e.type !== 'income').reduce((sum, e) => sum + e.amount, 0);
-        const remainingBalance = (this.financeData.monthlyIncome || 0) - totalSpent;
+        if (actionType === 'add') {
+            const targetAcc = document.getElementById('generalActionsSingleAccount').value || 'visa';
+            
+            if (targetAcc === 'vault') {
+                const visa = this.financeData.visaBalance || 0;
+                const wallet = this.financeData.walletBalance || 0;
+                
+                if (amount > visa && amount > wallet) {
+                    alert(`Insufficient active funds! You only have ${currency} ${visa.toFixed(2)} in Visa and ${currency} ${wallet.toFixed(2)} in Wallet to deposit into the Vault.`);
+                    return;
+                }
+                
+                let deductedFrom = 'visa';
+                if (visa >= amount) {
+                    this.financeData.visaBalance = visa - amount;
+                } else {
+                    this.financeData.walletBalance = wallet - amount;
+                    deductedFrom = 'wallet';
+                }
+                
+                this.financeData.monthlyIncome -= amount;
+                this.financeData.savingsBalance = (this.financeData.savingsBalance || 0) + amount;
+                
+                expenses.push({
+                    id: 'txn_vault_add_' + Date.now(),
+                    name: 'Vault Deposit',
+                    description: `Deposited into Savings Vault from ${deductedFrom === 'visa' ? 'Visa' : 'Wallet'}`,
+                    amount: amount,
+                    category: 'Savings 🏦',
+                    date: new Date().toISOString(),
+                    isEssential: true,
+                    type: 'transfer',
+                    paymentMethod: deductedFrom
+                });
+            } else {
+                this.financeData.monthlyIncome += amount;
+                if (targetAcc === 'visa') {
+                    this.financeData.visaBalance = (this.financeData.visaBalance || 0) + amount;
+                } else {
+                    this.financeData.walletBalance = (this.financeData.walletBalance || 0) + amount;
+                }
 
-        if (direction === 'deposit') {
-            if (amount > remainingBalance) {
-                alert(`Insufficient funds! Your available budget is only ${currency} ${remainingBalance.toFixed(2)}.`);
+                expenses.push({
+                    id: 'txn_fund_add_' + Date.now(),
+                    name: `Added Funds to ${targetAcc === 'visa' ? 'Visa' : 'Wallet'}`,
+                    description: 'Direct budget boost',
+                    amount: amount,
+                    category: 'Income 💵',
+                    date: new Date().toISOString(),
+                    isEssential: true,
+                    type: 'income',
+                    paymentMethod: targetAcc
+                });
+            }
+            alert(`Successfully added ${currency} ${amount.toFixed(2)} to ${targetAcc === 'visa' ? 'Visa' : targetAcc === 'wallet' ? 'Wallet' : 'Savings Vault'}!`);
+
+        } else if (actionType === 'remove') {
+            const sourceAcc = document.getElementById('generalActionsSingleAccount').value || 'visa';
+            
+            if (sourceAcc === 'vault') {
+                const vaultBal = this.financeData.savingsBalance || 0;
+                if (amount > vaultBal) {
+                    alert(`Insufficient funds in Vault! Available balance: ${currency} ${vaultBal.toFixed(2)}.`);
+                    return;
+                }
+                this.financeData.savingsBalance = vaultBal - amount;
+                this.financeData.visaBalance = (this.financeData.visaBalance || 0) + amount;
+                this.financeData.monthlyIncome += amount;
+
+                expenses.push({
+                    id: 'txn_vault_rem_' + Date.now(),
+                    name: 'Vault Withdrawal',
+                    description: 'Withdrawn from Vault to Visa',
+                    amount: amount,
+                    category: 'Savings 🏦',
+                    date: new Date().toISOString(),
+                    isEssential: true,
+                    type: 'transfer',
+                    paymentMethod: 'visa'
+                });
+            } else {
+                const sourceBal = sourceAcc === 'visa' ? (this.financeData.visaBalance || 0) : (this.financeData.walletBalance || 0);
+                if (amount > sourceBal) {
+                    alert(`Insufficient funds in ${sourceAcc === 'visa' ? 'Visa' : 'Wallet'}! Available balance: ${currency} ${sourceBal.toFixed(2)}.`);
+                    return;
+                }
+
+                this.financeData.monthlyIncome = Math.max(0, this.financeData.monthlyIncome - amount);
+                if (sourceAcc === 'visa') {
+                    this.financeData.visaBalance = Math.max(0, this.financeData.visaBalance - amount);
+                } else {
+                    this.financeData.walletBalance = Math.max(0, this.financeData.walletBalance - amount);
+                }
+
+                expenses.push({
+                    id: 'txn_fund_rem_' + Date.now(),
+                    name: `Removed Funds from ${sourceAcc === 'visa' ? 'Visa' : 'Wallet'}`,
+                    description: 'Direct budget reduction',
+                    amount: amount,
+                    category: 'Expense 💵',
+                    date: new Date().toISOString(),
+                    isEssential: true,
+                    type: 'expense',
+                    paymentMethod: sourceAcc
+                });
+            }
+            alert(`Successfully removed ${currency} ${amount.toFixed(2)} from ${sourceAcc === 'visa' ? 'Visa' : sourceAcc === 'wallet' ? 'Wallet' : 'Savings Vault'}!`);
+
+        } else if (actionType === 'transfer') {
+            const src = document.getElementById('generalActionsTransferSrc').value || 'visa';
+            const dst = document.getElementById('generalActionsTransferDst').value || 'wallet';
+
+            if (src === dst) {
+                alert("Source and Destination accounts cannot be the same.");
                 return;
             }
-            this.financeData.monthlyIncome -= amount;
-            this.financeData.savingsBalance = currentSavings + amount;
-        } else if (direction === 'withdraw') {
-            if (currentSavings <= 0) {
-                alert("Your Savings Vault is currently empty.");
+
+            let srcBal = 0;
+            if (src === 'visa') srcBal = this.financeData.visaBalance || 0;
+            else if (src === 'wallet') srcBal = this.financeData.walletBalance || 0;
+            else if (src === 'vault') srcBal = this.financeData.savingsBalance || 0;
+
+            if (amount > srcBal) {
+                alert(`Insufficient funds in ${src === 'visa' ? 'Visa' : src === 'wallet' ? 'Wallet' : 'Savings Vault'}! Max available: ${currency} ${srcBal.toFixed(2)}.`);
                 return;
             }
-            if (amount > currentSavings) {
-                alert(`Cannot withdraw more than your current vault balance (${currency} ${currentSavings.toFixed(2)}).`);
-                return;
+
+            // Deduct from Source
+            if (src === 'visa') {
+                this.financeData.visaBalance -= amount;
+                this.financeData.monthlyIncome -= amount;
+            } else if (src === 'wallet') {
+                this.financeData.walletBalance -= amount;
+                this.financeData.monthlyIncome -= amount;
+            } else if (src === 'vault') {
+                this.financeData.savingsBalance -= amount;
             }
-            this.financeData.savingsBalance = currentSavings - amount;
-            this.financeData.monthlyIncome = (this.financeData.monthlyIncome || 0) + amount;
+
+            // Add to Destination
+            if (dst === 'visa') {
+                this.financeData.visaBalance = (this.financeData.visaBalance || 0) + amount;
+                this.financeData.monthlyIncome = (this.financeData.monthlyIncome || 0) + amount;
+            } else if (dst === 'wallet') {
+                this.financeData.walletBalance = (this.financeData.walletBalance || 0) + amount;
+                this.financeData.monthlyIncome = (this.financeData.monthlyIncome || 0) + amount;
+            } else if (dst === 'vault') {
+                this.financeData.savingsBalance = (this.financeData.savingsBalance || 0) + amount;
+            }
+
+            expenses.push({
+                id: 'txn_xfer_' + Date.now(),
+                name: `Transfer: ${src === 'visa' ? 'Visa' : src === 'wallet' ? 'Wallet' : 'Vault'} ➔ ${dst === 'visa' ? 'Visa' : dst === 'wallet' ? 'Wallet' : 'Vault'}`,
+                description: 'Internal transfer',
+                amount: amount,
+                category: 'Transfer ⇄',
+                date: new Date().toISOString(),
+                isEssential: true,
+                type: 'transfer'
+            });
+
+            alert(`Successfully transferred ${currency} ${amount.toFixed(2)} from ${src === 'visa' ? 'Visa' : src === 'wallet' ? 'Wallet' : 'Savings Vault'} to ${dst === 'visa' ? 'Visa' : dst === 'wallet' ? 'Wallet' : 'Savings Vault'}!`);
         }
 
-        // Recalculate daily budget using remaining days in the month
-        const now = new Date();
-        const lastDayOfMonthObj = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-        const remainingDays = lastDayOfMonthObj.getDate() - now.getDate() + 1;
-        const newRemaining = this.financeData.monthlyIncome - totalSpent;
-        this.financeData.dailyBudget = parseFloat((newRemaining / Math.max(1, remainingDays)).toFixed(2));
-
+        this.financeData.expenses = expenses;
+        this.recalculateDailyBudget();
         this.saveFinanceData();
         this.renderFinanceDashboard();
-        this.closeModal('savingsVaultModal');
+        this.closeModal('generalActionsModal');
     }
 
     // Mid-Month Add Funds
