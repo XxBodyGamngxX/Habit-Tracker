@@ -7096,8 +7096,19 @@ pause
         const submitText = document.getElementById('generalActionsSubmitBtnText');
         const submitBtn = document.getElementById('generalActionsSubmitBtn');
 
+        const amountInput = document.getElementById('generalActionsAmount');
+        const visaAllocInput = document.getElementById('generalActionsVisaAllocInput');
+        const walletAllocInput = document.getElementById('generalActionsWalletAllocInput');
+
         if (!input) return;
         input.value = type;
+
+        // Toggle required attributes to prevent HTML5 hidden invalid element validation errors
+        if (amountInput) amountInput.required = (type !== 'budget');
+        if (type !== 'budget') {
+            if (visaAllocInput) visaAllocInput.required = false;
+            if (walletAllocInput) walletAllocInput.required = false;
+        }
 
         // Toggle buttons active state
         if (addBtn) addBtn.classList.toggle('active', type === 'add');
@@ -7124,15 +7135,16 @@ pause
             
             // Populate current values in the modal inputs
             const visaIncludeSelect = document.getElementById('generalActionsVisaIncludeSelect');
-            const visaAllocInput = document.getElementById('generalActionsVisaAllocInput');
-            const walletAllocInput = document.getElementById('generalActionsWalletAllocInput');
             
             if (visaIncludeSelect) {
                 visaIncludeSelect.value = this.financeData.visaIncluded !== false ? 'yes' : 'no';
                 this.toggleModalVisaAlloc(visaIncludeSelect.value);
             }
             if (visaAllocInput) visaAllocInput.value = this.financeData.visaAllocation || 0;
-            if (walletAllocInput) walletAllocInput.value = this.financeData.walletAllocation || 0;
+            if (walletAllocInput) {
+                walletAllocInput.value = this.financeData.walletAllocation || 0;
+                walletAllocInput.required = true;
+            }
 
             if (submitText) submitText.textContent = 'Save Budget Settings';
             if (submitBtn) {
