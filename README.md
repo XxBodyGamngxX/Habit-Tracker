@@ -248,7 +248,7 @@ interface FinanceData {
   - `fire-border`: Pulsing flame glow border.
   - `rainbow-border`: 360-degree rotating gradient rainbow border.
 
----
+----
 
 ## 6. 🔄 Sync & Persistence Logic
 
