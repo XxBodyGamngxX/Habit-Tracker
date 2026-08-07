@@ -5725,18 +5725,57 @@ pause
         this.saveData('financeData', this.financeData);
     }
 
+    getFinanceCycleDetails(data = this.financeData) {
+        if (!data.startingDate) {
+            const now = new Date();
+            const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+            return {
+                cycleEndDate: lastDay,
+                remainingDays: Math.max(1, lastDay.getDate() - now.getDate() + 1),
+                formattedRange: now.toLocaleString('default', { month: 'long' })
+            };
+        }
+
+        const startDate = new Date(data.startingDate);
+        startDate.setHours(0, 0, 0, 0);
+
+        const cycleEndDate = new Date(startDate);
+        cycleEndDate.setMonth(cycleEndDate.getMonth() + 1);
+
+        const now = new Date();
+        now.setHours(0, 0, 0, 0);
+        
+        const diffTime = cycleEndDate - now;
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        const remainingDays = diffDays > 0 ? diffDays : 1;
+
+        const formatOpts = { month: 'short', day: 'numeric' };
+        const formattedRange = `${startDate.toLocaleDateString('default', formatOpts)} - ${cycleEndDate.toLocaleDateString('default', formatOpts)}`;
+
+        return { cycleEndDate, remainingDays, formattedRange };
+    }
+
+    checkFinanceCycleReset() {
+        if (!this.financeData.startingDate) {
+             const currentMonthYear = new Date().toISOString().substring(0, 7);
+             return this.financeData.monthYear && this.financeData.monthYear !== currentMonthYear;
+        }
+        const cycle = this.getFinanceCycleDetails();
+        const now = new Date();
+        now.setHours(0, 0, 0, 0);
+        return now >= cycle.cycleEndDate;
+    }
+
     initFinancePage() {
         if (this.currentUser && !this.isCloudDataLoaded) {
             console.log("initFinancePage: Waiting for Firestore data to load...");
             return;
         }
 
-        const currentMonthYear = new Date().toISOString().substring(0, 7); // YYYY-MM
-
-        // If current month is different, auto-reset for new month
-        if (this.financeData.monthYear !== currentMonthYear) {
+        // If current cycle has ended, auto-reset for new cycle
+        if (this.checkFinanceCycleReset()) {
             this.financeData = {
-                monthYear: currentMonthYear,
+                monthYear: new Date().toISOString().substring(0, 7),
                 startingDate: '',
                 monthlyIncome: 0,
                 dailyBudget: 0,
@@ -5835,10 +5874,10 @@ pause
         const startDateVal = startDateInput.value;
         const currencyVal = currencySelect.value || 'EGP';
 
-        // Calculate remaining days in month from the selected starting entry date
-        const entryDateObj = new Date(startDateVal);
-        const lastDayOfMonthObj = new Date(entryDateObj.getFullYear(), entryDateObj.getMonth() + 1, 0);
-        const remainingDays = lastDayOfMonthObj.getDate() - entryDateObj.getDate() + 1; // inclusive
+        this.financeData.startingDate = startDateVal;
+        
+        // Calculate remaining days using the new cycle logic
+        const remainingDays = this.getFinanceCycleDetails().remainingDays;
         const dailyBudget = parseFloat((activeSpendingBudget / Math.max(1, remainingDays)).toFixed(2));
 
         // Save values
@@ -5851,7 +5890,6 @@ pause
         this.financeData.monthlyIncome = activeSpendingBudget;
         this.financeData.dailyBudget = dailyBudget;
         this.financeData.monthYear = startDateVal.substring(0, 7);
-        this.financeData.startingDate = startDateVal;
         this.financeData.currency = currencyVal;
         this.financeData.expenses = [];
 
@@ -6067,9 +6105,7 @@ pause
                 } else {
                     this.financeData.walletBalance = Math.max(0, (this.financeData.walletBalance || 0) - item.amount);
                 }
-                const now = new Date();
-                const lastDayOfMonthObj = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-                const remainingDays = lastDayOfMonthObj.getDate() - now.getDate() + 1;
+                const remainingDays = this.getFinanceCycleDetails().remainingDays;
                 const totalSpent = this.financeData.expenses.filter(e => e.id !== id && e.type !== 'income').reduce((sum, e) => sum + e.amount, 0);
                 const remainingBalance = this.financeData.monthlyIncome - totalSpent;
                 this.financeData.dailyBudget = parseFloat((remainingBalance / Math.max(1, remainingDays)).toFixed(2));
@@ -6367,34 +6403,41 @@ pause
         }
 
         // Dynamic alerts (depletion indicator)
-        const currentDay = new Date().getDate();
-        const now = new Date();
-        const totalDays = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
-        const avgDailySpend = currentDay > 0 ? (totalSpent / currentDay) : 0;
+        const cycle = this.getFinanceCycleDetails();
+        let startDate = new Date();
+        if (this.financeData.startingDate) {
+            startDate = new Date(this.financeData.startingDate);
+        } else {
+            startDate = new Date(startDate.getFullYear(), startDate.getMonth(), 1);
+        }
+        startDate.setHours(0, 0, 0, 0);
+        
+        const nowDays = new Date();
+        nowDays.setHours(0, 0, 0, 0);
+        const elapsedDays = Math.max(1, Math.ceil((nowDays - startDate) / (1000 * 60 * 60 * 24)) + 1);
+        const avgDailySpend = elapsedDays > 0 ? (totalSpent / elapsedDays) : 0;
 
         if (remainingBalance <= 0) {
             alertBanner.className = 'finance-alert danger';
-            alertBanner.innerHTML = `🚨 <div><strong>Out of Budget!</strong> You have completely depleted your monthly funds. Consider resetting or restricting your spending.</div>`;
+            alertBanner.innerHTML = `🚨 <div><strong>Out of Budget!</strong> You have completely depleted your funds for this cycle. Consider resetting or restricting your spending.</div>`;
         } else if (avgDailySpend > dailyLimit) {
-            const remainingDays = remainingBalance / avgDailySpend;
-            const depletionDay = currentDay + remainingDays;
-
-            if (depletionDay < totalDays) {
-                const depDayInt = Math.min(totalDays, Math.ceil(depletionDay));
-                const suffix = (day) => {
-                    const s = ["th", "st", "nd", "rd"],
-                        v = day % 100;
-                    return day + (s[(v - 20) % 10] || s[v] || s[0]);
-                };
+            const daysUntilDepletion = remainingBalance / avgDailySpend;
+            
+            if (daysUntilDepletion < cycle.remainingDays) {
                 alertBanner.className = 'finance-alert warning';
-                alertBanner.innerHTML = `⚠️ <div><strong>Early Depletion Risk!</strong> At your current velocity of <strong>${currency} ${avgDailySpend.toFixed(2)}/day</strong> (vs recommended ${currency} ${dailyLimit.toFixed(2)}/day), you are on track to deplete all funds by the <strong>${suffix(depDayInt)}</strong> of the month.</div>`;
+                alertBanner.innerHTML = `⚠️ <div><strong>Early Depletion Risk!</strong> At your current velocity of <strong>${currency} ${avgDailySpend.toFixed(2)}/day</strong> (vs recommended ${currency} ${dailyLimit.toFixed(2)}/day), you are on track to deplete all funds before the cycle ends.</div>`;
             } else {
                 alertBanner.className = 'finance-alert success';
-                alertBanner.innerHTML = `✅ <div><strong>On Track!</strong> Your remaining balance of ${currency} ${remainingBalance.toFixed(2)} is healthy and will last until the end of the month.</div>`;
+                alertBanner.innerHTML = `✅ <div><strong>On Track!</strong> Your remaining balance of ${currency} ${remainingBalance.toFixed(2)} is healthy and will last until the end of the cycle.</div>`;
             }
         } else {
             alertBanner.className = 'finance-alert success';
-            alertBanner.innerHTML = `✅ <div><strong>Safe Spending!</strong> Your average spending of <strong>${currency} ${avgDailySpend.toFixed(2)}/day</strong> is under the recommended limit. You are on track to finish the month with a surplus of <strong>${currency} ${remainingBalance.toFixed(2)}</strong>!</div>`;
+            alertBanner.innerHTML = `✅ <div><strong>Safe Spending!</strong> Your average spending of <strong>${currency} ${avgDailySpend.toFixed(2)}/day</strong> is under the recommended limit. You are on track to finish the cycle with a surplus of <strong>${currency} ${remainingBalance.toFixed(2)}</strong>!</div>`;
+        }
+
+        const subtitle = document.getElementById('financeCycleSubtitle');
+        if (subtitle) {
+            subtitle.innerHTML = `Cycle: <strong style="color: var(--color-primary);">${cycle.formattedRange}</strong> (${cycle.remainingDays} days left) <br> Track income, set a daily budget, log expenses, and earn XP.`;
         }
 
         // Gamification Reward section (Yesterday's Check)
@@ -7034,9 +7077,7 @@ pause
     }
 
     recalculateDailyBudget() {
-        const now = new Date();
-        const lastDayOfMonthObj = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-        const remainingDays = lastDayOfMonthObj.getDate() - now.getDate() + 1; // inclusive of today
+        const remainingDays = this.getFinanceCycleDetails().remainingDays;
         
         const visaActive = this.financeData.visaIncluded !== false;
         const totalSpent = (this.financeData.expenses || [])
@@ -7506,10 +7547,7 @@ pause
             type: 'income'
         });
 
-        // Recalculate dailyBudget using remaining days in the month from today
-        const now = new Date();
-        const lastDayOfMonthObj = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-        const remainingDays = lastDayOfMonthObj.getDate() - now.getDate() + 1; // inclusive of today
+        const remainingDays = this.getFinanceCycleDetails().remainingDays;
 
         const totalSpent = this.financeData.expenses.filter(e => e.type !== 'income').reduce((sum, e) => sum + e.amount, 0);
         const remainingBalance = this.financeData.monthlyIncome - totalSpent;
@@ -7561,10 +7599,7 @@ pause
             alert(`Successfully withdrew ${currency} ${amount.toFixed(2)} to your account! 📤`);
         }
 
-        // Recalculate dailyBudget using new remaining balance
-        const now = new Date();
-        const lastDayOfMonthObj = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-        const remainingDays = lastDayOfMonthObj.getDate() - now.getDate() + 1; // inclusive of today
+        const remainingDays = this.getFinanceCycleDetails().remainingDays;
 
         const newRemaining = this.financeData.monthlyIncome - totalSpent;
         this.financeData.dailyBudget = parseFloat((newRemaining / Math.max(1, remainingDays)).toFixed(2));
@@ -7956,11 +7991,7 @@ pause
             const userData = userSnap.data();
             const finance = userData.financeData || {};
 
-            // Calculate remaining days from starting entryDate
-            const startingDateVal = finance.startingDate || new Date().toISOString().substring(0, 10);
-            const entryDateObj = new Date(startingDateVal);
-            const lastDayOfMonthObj = new Date(entryDateObj.getFullYear(), entryDateObj.getMonth() + 1, 0);
-            const remainingDays = lastDayOfMonthObj.getDate() - entryDateObj.getDate() + 1;
+            const remainingDays = this.getFinanceCycleDetails(finance).remainingDays;
 
             const dailyBudget = parseFloat((newIncome / Math.max(1, remainingDays)).toFixed(2));
 
@@ -8005,11 +8036,7 @@ pause
             // Delete log
             finance.expenses = (finance.expenses || []).filter(e => e.id !== expenseId);
 
-            // Recalculate dailyBudget using remaining days in the month from starting entry date
-            const startingDateVal = finance.startingDate || new Date().toISOString().substring(0, 10);
-            const entryDateObj = new Date(startingDateVal);
-            const lastDayOfMonthObj = new Date(entryDateObj.getFullYear(), entryDateObj.getMonth() + 1, 0);
-            const remainingDays = lastDayOfMonthObj.getDate() - entryDateObj.getDate() + 1;
+            const remainingDays = this.getFinanceCycleDetails(finance).remainingDays;
 
             const totalSpent = finance.expenses.reduce((sum, e) => sum + e.amount, 0);
             const remainingBalance = finance.monthlyIncome - totalSpent;
