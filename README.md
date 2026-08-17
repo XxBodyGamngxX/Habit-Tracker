@@ -7,7 +7,7 @@
 ## 1. 📌 Executive Overview & Tech Stack
 
 ### Purpose
-**Mornigami** is a unified, gamified personal productivity and financial intelligence hub designed to streamline daily routines, habit building, task management, focus sessions, and expense control. Built with a high-performance single-page application architecture (SPA) alongside modular standalone pages, Mornigami turns daily self-discipline into an engaging RPG-style growth system with XP points, leveling, customizer store items, daily bounties, community leaderboards, and AI-driven financial advisories.
+**Mornigami** is a unified, gamified personal productivity, and financial intelligence hub designed to streamline daily routines, habit building, task management, focus sessions, and expense control. Built with a high-performance single-page application architecture (SPA) alongside modular standalone pages, Mornigami turns daily self-discipline into an engaging RPG-style growth system with XP points, leveling, customizer store items, daily bounties, community leaderboards, and AI-driven financial advisories.
 
 ### Complete Technology Breakdown
 - **Frontend Core**: Vanilla JavaScript (ES6+ Object-Oriented Architecture), HTML5, HTML5 Web Audio API.
