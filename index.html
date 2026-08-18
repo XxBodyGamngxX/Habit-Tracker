@@ -1825,6 +1825,18 @@
             </div>
 
             <div class="settings-container">
+                <!-- User ID Badge Card -->
+                <div class="settings-section" style="padding: var(--spacing-md) var(--spacing-lg); display: flex; align-items: center; justify-content: space-between; background: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(99, 102, 241, 0.02)); border: 1px solid var(--color-border-light);">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span style="font-size: 20px;">🆔</span>
+                        <div>
+                            <div style="font-size: var(--font-size-xs); color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700;">Account Number</div>
+                            <div style="font-family: var(--font-display); font-size: var(--font-size-md); font-weight: 800; color: var(--color-primary);">Member #<span id="settingsUserNumber">—</span></div>
+                        </div>
+                    </div>
+                    <div style="font-size: var(--font-size-xs); color: var(--color-text-secondary);" id="settingsAccountCreated"></div>
+                </div>
+
                 <!-- Profile Picture -->
                 <div class="settings-section">
                     <h3 class="settings-section-title">
@@ -2719,7 +2731,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, updateProfile, updateEmail, updatePassword, reauthenticateWithCredential, EmailAuthProvider, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, deleteDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, getDoc, deleteDoc, collection, getDocs, runTransaction } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCs7MTj0iVx11l2YE0vP5YB9fUGhkeMOE4",
@@ -2738,7 +2750,7 @@
 
         window.auth = auth;
         window.db = db;
-        window.firestoreUtils = { doc, setDoc, getDoc, deleteDoc, collection, getDocs };
+        window.firestoreUtils = { doc, setDoc, getDoc, deleteDoc, collection, getDocs, runTransaction };
 
         window.firebaseAuth = {
             createUserWithEmailAndPassword,

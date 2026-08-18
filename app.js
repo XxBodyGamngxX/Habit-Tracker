@@ -6,6 +6,7 @@ class ProductivityHub {
     constructor() {
         this.currentPage = 'home';
         this.userBadges = [];
+        this.userNumber = parseInt(localStorage.getItem('userNumber')) || null;
 
         // Daily Bounties
         this.bountyInterval = null;
@@ -764,6 +765,9 @@ class ProductivityHub {
 
                 const settingsEmail = document.getElementById('settingsEmail');
                 if (settingsEmail) settingsEmail.value = email;
+
+                const settingsUserNumber = document.getElementById('settingsUserNumber');
+                if (settingsUserNumber) settingsUserNumber.textContent = this.userNumber ? this.userNumber : '—';
 
                 const settingsAvatarPreview = document.getElementById('settingsAvatarPreview');
                 if (settingsAvatarPreview) {
@@ -3208,7 +3212,8 @@ pause
                     userEmailText.textContent = displayName.charAt(0).toUpperCase() + displayName.slice(1);
                 }
                 if (dropdownUserEmail) {
-                    dropdownUserEmail.textContent = user.displayName ? `Logged in as ${user.displayName}` : `Logged in as ${user.email}`;
+                    const idLabel = this.userNumber ? ` (ID: #${this.userNumber})` : '';
+                    dropdownUserEmail.textContent = user.displayName ? `Logged in as ${user.displayName}${idLabel}` : `Logged in as ${user.email}${idLabel}`;
                 }
             }
             if (this.currentPage === 'auth') {
@@ -3224,6 +3229,29 @@ pause
 
                     if (docSnap.exists()) {
                         const data = docSnap.data();
+
+                        // Load or auto-backfill sequential user number for existing account
+                        if (data.userNumber !== undefined && data.userNumber !== null) {
+                            this.userNumber = data.userNumber;
+                            localStorage.setItem('userNumber', this.userNumber);
+                            if (dropdownUserEmail) {
+                                dropdownUserEmail.textContent = user.displayName ? `Logged in as ${user.displayName} (ID: #${this.userNumber})` : `Logged in as ${user.email} (ID: #${this.userNumber})`;
+                            }
+                        } else {
+                            // Automatically backfill user number for existing user
+                            try {
+                                const assigned = await this.backfillUserNumber(user, user.displayName || '', user.email || '');
+                                if (assigned) {
+                                    this.userNumber = assigned;
+                                    localStorage.setItem('userNumber', this.userNumber);
+                                    if (dropdownUserEmail) {
+                                        dropdownUserEmail.textContent = user.displayName ? `Logged in as ${user.displayName} (ID: #${this.userNumber})` : `Logged in as ${user.email} (ID: #${this.userNumber})`;
+                                    }
+                                }
+                            } catch (backfillErr) {
+                                console.warn("Failed to backfill userNumber:", backfillErr);
+                            }
+                        }
 
                         // Load profile picture from Firestore if exists
                         if (data.profilePicUrl) {
@@ -3340,6 +3368,7 @@ pause
                         }
                         this.applyRoleVisibility();
                         await this.loadGlobalSettings();
+                        this.backfillAllMissingUserNumbers().catch(e => console.warn("Background backfill error:", e));
 
                         // Log activity and set default status
                         const { doc: docRef, setDoc: setDocRef } = window.firestoreUtils;
@@ -3477,7 +3506,166 @@ pause
         }
     }
 
+    async createUserProfileWithSequentialNumber(user, username, email) {
+        if (!window.db || !window.firestoreUtils) {
+            return 1;
+        }
 
+        const { doc, setDoc, runTransaction } = window.firestoreUtils;
+        let assignedNumber = 1;
+
+        if (typeof runTransaction === 'function') {
+            const counterRef = doc(window.db, "metadata", "userCounter");
+            try {
+                assignedNumber = await runTransaction(window.db, async (transaction) => {
+                    const counterSnap = await transaction.get(counterRef);
+                    let currentCount = 0;
+                    if (counterSnap.exists()) {
+                        currentCount = counterSnap.data().lastAssignedNumber || 0;
+                    }
+                    const nextNumber = currentCount + 1;
+                    transaction.set(counterRef, {
+                        lastAssignedNumber: nextNumber,
+                        updatedAt: new Date().toISOString()
+                    }, { merge: true });
+
+                    const userRef = doc(window.db, "users", user.uid);
+                    transaction.set(userRef, {
+                        userNumber: nextNumber,
+                        role: 'user',
+                        email: email,
+                        displayName: username || '',
+                        createdAt: new Date().toISOString()
+                    }, { merge: true });
+
+                    return nextNumber;
+                });
+            } catch (txErr) {
+                console.warn("Firestore transaction for sequential user number failed, falling back to direct write:", txErr);
+                const userRef = doc(window.db, "users", user.uid);
+                await setDoc(userRef, { role: 'user', email: email, displayName: username || '', userNumber: assignedNumber, createdAt: new Date().toISOString() }, { merge: true });
+            }
+        } else {
+            const userRef = doc(window.db, "users", user.uid);
+            await setDoc(userRef, { role: 'user', email: email, displayName: username || '', userNumber: assignedNumber, createdAt: new Date().toISOString() }, { merge: true });
+        }
+
+        const promises = [];
+        if (username) {
+            if (window.firebaseAuth && window.firebaseAuth.updateProfile) {
+                promises.push(window.firebaseAuth.updateProfile(user, { displayName: username }));
+            }
+            const usernameRef = doc(window.db, "usernames", username.toLowerCase());
+            promises.push(setDoc(usernameRef, { email: email, uid: user.uid, userNumber: assignedNumber }, { merge: true }));
+        }
+
+        await Promise.all(promises);
+        this.userNumber = assignedNumber;
+        localStorage.setItem('userNumber', assignedNumber);
+        return assignedNumber;
+    }
+
+    async backfillUserNumber(user, username, email) {
+        if (!window.db || !window.firestoreUtils) return null;
+        const { doc, setDoc, runTransaction } = window.firestoreUtils;
+        let assignedNumber = 1;
+
+        if (typeof runTransaction === 'function') {
+            const counterRef = doc(window.db, "metadata", "userCounter");
+            try {
+                assignedNumber = await runTransaction(window.db, async (transaction) => {
+                    const counterSnap = await transaction.get(counterRef);
+                    let currentCount = 0;
+                    if (counterSnap.exists()) {
+                        currentCount = counterSnap.data().lastAssignedNumber || 0;
+                    }
+                    const nextNumber = currentCount + 1;
+                    transaction.set(counterRef, {
+                        lastAssignedNumber: nextNumber,
+                        updatedAt: new Date().toISOString()
+                    }, { merge: true });
+
+                    const userRef = doc(window.db, "users", user.uid);
+                    transaction.set(userRef, {
+                        userNumber: nextNumber
+                    }, { merge: true });
+
+                    return nextNumber;
+                });
+            } catch (txErr) {
+                console.warn("Backfill transaction failed, using direct write:", txErr);
+                assignedNumber = 1;
+                const userRef = doc(window.db, "users", user.uid);
+                await setDoc(userRef, { userNumber: assignedNumber }, { merge: true });
+            }
+        } else {
+            const userRef = doc(window.db, "users", user.uid);
+            await setDoc(userRef, { userNumber: assignedNumber }, { merge: true });
+        }
+
+        const uname = username || (user.displayName);
+        if (uname) {
+            const usernameRef = doc(window.db, "usernames", uname.toLowerCase());
+            await setDoc(usernameRef, { userNumber: assignedNumber }, { merge: true }).catch(() => {});
+        }
+
+        return assignedNumber;
+    }
+
+    async backfillAllMissingUserNumbers() {
+        if (!window.db || !window.firestoreUtils) return;
+        const { collection, getDocs, doc, setDoc, getDoc } = window.firestoreUtils;
+        try {
+            const counterRef = doc(window.db, "metadata", "userCounter");
+            const counterSnap = await getDoc(counterRef);
+            let currentCount = 0;
+            if (counterSnap.exists()) {
+                currentCount = counterSnap.data().lastAssignedNumber || 0;
+            }
+
+            // 1. Process all documents in "users" collection
+            const usersSnapshot = await getDocs(collection(window.db, "users"));
+            const uidToNumber = {};
+
+            for (const userDoc of usersSnapshot.docs) {
+                const data = userDoc.data();
+                let num = data.userNumber;
+                if (num === undefined || num === null) {
+                    currentCount++;
+                    num = currentCount;
+                    await setDoc(doc(window.db, "users", userDoc.id), { userNumber: num }, { merge: true });
+                } else if (num > currentCount) {
+                    currentCount = num;
+                }
+                uidToNumber[userDoc.id] = num;
+                if (data.displayName) {
+                    uidToNumber[data.displayName.toLowerCase()] = num;
+                }
+            }
+
+            // 2. Process all documents in "usernames" collection (e.g. 'z', 'bishr')
+            const usernamesSnapshot = await getDocs(collection(window.db, "usernames"));
+            for (const uDoc of usernamesSnapshot.docs) {
+                const uData = uDoc.data();
+                if (uData.userNumber === undefined || uData.userNumber === null) {
+                    let num = uData.uid ? uidToNumber[uData.uid] : null;
+                    if (!num) {
+                        currentCount++;
+                        num = currentCount;
+                        if (uData.uid) {
+                            await setDoc(doc(window.db, "users", uData.uid), { userNumber: num }, { merge: true });
+                        }
+                    }
+                    await setDoc(doc(window.db, "usernames", uDoc.id), { userNumber: num }, { merge: true });
+                }
+            }
+
+            // 3. Save updated counter
+            await setDoc(counterRef, { lastAssignedNumber: currentCount, updatedAt: new Date().toISOString() }, { merge: true });
+        } catch (err) {
+            console.warn("Auto-backfill missing user numbers encountered error:", err);
+        }
+    }
 
     setupOverlayAuthEventListeners() {
         const authForm = document.getElementById('overlayAuthForm');
@@ -3633,26 +3821,10 @@ pause
                         .then(() => {
                             return window.firebaseAuth.createUserWithEmailAndPassword(window.auth, email, password);
                         })
-                        .then((userCredential) => {
+                        .then(async (userCredential) => {
                             const user = userCredential.user;
-                            const promises = [];
-                            if (username) {
-                                if (window.firebaseAuth.updateProfile) {
-                                    promises.push(window.firebaseAuth.updateProfile(user, { displayName: username }));
-                                }
-                                if (window.db && window.firestoreUtils) {
-                                    const { doc, setDoc } = window.firestoreUtils;
-                                    const usernameRef = doc(window.db, "usernames", username.toLowerCase());
-                                    promises.push(setDoc(usernameRef, { email: email, uid: user.uid }));
-                                }
-                            }
-                            // Create user document with default role
-                            if (window.db && window.firestoreUtils) {
-                                const { doc, setDoc } = window.firestoreUtils;
-                                const userRef = doc(window.db, "users", user.uid);
-                                promises.push(setDoc(userRef, { role: 'user', email: email, displayName: username || '' }, { merge: true }));
-                            }
-                            return Promise.all(promises).then(() => userCredential);
+                            await this.createUserProfileWithSequentialNumber(user, username, email);
+                            return userCredential;
                         })
                         .then(handleSuccess)
                         .catch(handleError);
@@ -3832,26 +4004,10 @@ pause
                         .then(() => {
                             return window.firebaseAuth.createUserWithEmailAndPassword(window.auth, email, password);
                         })
-                        .then((userCredential) => {
+                        .then(async (userCredential) => {
                             const user = userCredential.user;
-                            const promises = [];
-                            if (username) {
-                                if (window.firebaseAuth.updateProfile) {
-                                    promises.push(window.firebaseAuth.updateProfile(user, { displayName: username }));
-                                }
-                                if (window.db && window.firestoreUtils) {
-                                    const { doc, setDoc } = window.firestoreUtils;
-                                    const usernameRef = doc(window.db, "usernames", username.toLowerCase());
-                                    promises.push(setDoc(usernameRef, { email: email, uid: user.uid }));
-                                }
-                            }
-                            // Create user document with default role
-                            if (window.db && window.firestoreUtils) {
-                                const { doc, setDoc } = window.firestoreUtils;
-                                const userRef = doc(window.db, "users", user.uid);
-                                promises.push(setDoc(userRef, { role: 'user', email: email, displayName: username || '' }, { merge: true }));
-                            }
-                            return Promise.all(promises).then(() => userCredential);
+                            await this.createUserProfileWithSequentialNumber(user, username, email);
+                            return userCredential;
                         })
                         .then(handleSuccess)
                         .catch(handleError);
@@ -3862,10 +4018,11 @@ pause
     // دالة لتصفير بيانات التطبيق بالكامل محلياً
     clearAllLocalData() {
         // 1. مسح البيانات من الـ localStorage
-        const keysToClear = ['habits', 'tasks', 'playlists', 'pomodoroStats', 'motivationalSettings', 'userLevel', 'userXP', 'spentXP', 'unlockedItems', 'activeAvatar', 'activeBorder', 'friendsList', 'financeData'];
+        const keysToClear = ['habits', 'tasks', 'playlists', 'pomodoroStats', 'motivationalSettings', 'userLevel', 'userXP', 'spentXP', 'unlockedItems', 'activeAvatar', 'activeBorder', 'friendsList', 'financeData', 'userNumber'];
         keysToClear.forEach(key => localStorage.removeItem(key));
 
         // 2. إعادة تعيين متغيرات التطبيق في الذاكرة لقيمها الافتراضية
+        this.userNumber = null;
         this.habits = [];
         this.tasks = [];
         this.playlists = [];
@@ -4222,6 +4379,7 @@ pause
         }
 
         try {
+            await this.backfillAllMissingUserNumbers();
             const { collection, getDocs } = window.firestoreUtils;
             const usersCol = collection(window.db, "users");
             const snapshot = await getDocs(usersCol);
@@ -4247,6 +4405,7 @@ pause
                 const data = docSnap.data();
                 const u = {
                     uid: docSnap.id,
+                    userNumber: data.userNumber !== undefined ? data.userNumber : null,
                     displayName: data.displayName || data.username || '',
                     email: data.email || '',
                     role: data.role || 'user',
@@ -4280,6 +4439,13 @@ pause
                     if (diff <= oneDayMs) activeTodayCount++;
                     if (diff <= sevenDaysMs) activeWeekCount++;
                 }
+            });
+
+            users.sort((a, b) => {
+                if (a.userNumber && b.userNumber) return a.userNumber - b.userNumber;
+                if (a.userNumber) return -1;
+                if (b.userNumber) return 1;
+                return 0;
             });
 
             // Update KPI elements
@@ -4363,11 +4529,15 @@ pause
                 ? ' <span style="font-size: 10px; color: var(--color-primary); font-weight: 600;">(You)</span>'
                 : (isDeleted ? ' <span style="font-size: 10px; color: var(--color-danger); font-weight: 600;">(Deleted/Banned)</span>' : '');
 
+            const userNumberBadge = user.userNumber !== null && user.userNumber !== undefined
+                ? `<span style="display: inline-block; padding: 2px 6px; font-size: 11px; font-weight: 700; background: var(--color-primary-light); color: var(--color-primary); border-radius: var(--radius-sm); margin-right: 6px;">#${user.userNumber}</span>`
+                : '';
+
             return `
-                <div class="${rowClass}" data-uid="${user.uid}" data-status="${user.status}" style="${isDeleted ? 'border-color: var(--color-danger-light); background: var(--color-danger-bg); opacity: 0.7;' : ''}">
+                <div class="${rowClass}" data-uid="${user.uid}" data-user-number="${user.userNumber || ''}" data-status="${user.status}" style="${isDeleted ? 'border-color: var(--color-danger-light); background: var(--color-danger-bg); opacity: 0.7;' : ''}">
                     <div class="admin-user-avatar">${avatarHTML}</div>
                     <div class="admin-user-info">
-                        <div class="admin-user-name" style="font-weight: 700; ${isDeleted ? 'text-decoration: line-through;' : ''}">${this.escapeHtml(user.displayName || 'No Name')}${userNameSuffix}</div>
+                        <div class="admin-user-name" style="font-weight: 700; ${isDeleted ? 'text-decoration: line-through;' : ''}">${userNumberBadge}${this.escapeHtml(user.displayName || 'No Name')}${userNameSuffix}</div>
                         <div class="admin-user-email">${this.escapeHtml(user.email || 'Deleted User')}</div>
                     </div>
                     <div>
@@ -4446,9 +4616,10 @@ pause
             const name = row.querySelector('.admin-user-name').textContent.toLowerCase();
             const email = row.querySelector('.admin-user-email').textContent.toLowerCase();
             const uid = row.getAttribute('data-uid').toLowerCase();
+            const userNum = row.getAttribute('data-user-number') || '';
             const status = row.getAttribute('data-status');
 
-            const matchesSearch = name.includes(searchQuery) || email.includes(searchQuery) || uid.includes(searchQuery);
+            const matchesSearch = name.includes(searchQuery) || email.includes(searchQuery) || uid.includes(searchQuery) || userNum.includes(searchQuery) || (`#${userNum}`).includes(searchQuery);
             const matchesStatus = statusFilter === 'all' || status === statusFilter;
 
             if (matchesSearch && matchesStatus) {
