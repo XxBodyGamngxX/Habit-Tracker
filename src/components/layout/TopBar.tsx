@@ -17,7 +17,7 @@ import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 
 interface TopBarProps {
-  onOpenAuth: () => void;
+  onOpenAuth?: () => void;
 }
 
 export const TopBar: React.FC<TopBarProps> = ({ onOpenAuth }) => {
@@ -25,6 +25,11 @@ export const TopBar: React.FC<TopBarProps> = ({ onOpenAuth }) => {
   const { userLevel, userXP, xpNeeded, progressPercent, activeAvatar, activeBorder, unlockedItems } = useGamification();
   const { theme, toggleTheme, accentColor, setAccentColor } = useTheme();
   const navigate = useNavigate();
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate('/login', { replace: true });
+  };
 
   const unlockedColors = Array.isArray(unlockedItems?.colors) ? unlockedItems.colors : [];
   const unlockedColorItems = STORE_ITEMS.colors.filter((c) =>
@@ -184,7 +189,7 @@ export const TopBar: React.FC<TopBarProps> = ({ onOpenAuth }) => {
               )}
               <DropdownMenuSeparator />
               <DropdownMenuItem
-                onClick={signOut}
+                onClick={handleSignOut}
                 className="text-danger focus:text-danger focus:bg-danger-bg"
               >
                 <LogOut className="w-4 h-4 mr-2" />
@@ -194,7 +199,7 @@ export const TopBar: React.FC<TopBarProps> = ({ onOpenAuth }) => {
           </DropdownMenu>
         ) : (
           <Button
-            onClick={onOpenAuth}
+            onClick={onOpenAuth || (() => navigate('/login'))}
             className="rounded-xl h-9 px-3.5 text-xs font-bold gap-1.5"
           >
             <LogIn className="w-4 h-4" />

@@ -182,7 +182,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setUserDoc(null);
     setUserRole('user');
     setUserNumber(null);
-    localStorage.clear();
+    const keysToClear = [
+      'habits',
+      'tasks',
+      'playlists',
+      'pomodoroStats',
+      'pomodoroSettings',
+      'motivationalSettings',
+      'userLevel',
+      'userXP',
+      'spentXP',
+      'unlockedItems',
+      'activeAvatar',
+      'activeBorder',
+      'friendsList',
+      'financeData',
+      'userNumber',
+      'dailyBounties',
+      'bountyStats',
+    ];
+    keysToClear.forEach((k) => localStorage.removeItem(k));
   };
 
   const resetPassword = async (email: string) => {

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
 import { Button } from '@/components/ui/Button';
@@ -10,9 +11,15 @@ import { toast } from 'sonner';
 export const Settings: React.FC = () => {
   const { user, userRole, userNumber, updateUserProfile, resetPassword, signOut } = useAuth();
   const { theme, toggleTheme } = useTheme();
+  const navigate = useNavigate();
 
   const [displayName, setDisplayName] = useState(user?.displayName || '');
   const [saving, setSaving] = useState(false);
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate('/login', { replace: true });
+  };
 
   const handleUpdateProfile = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -127,7 +134,7 @@ export const Settings: React.FC = () => {
         <Button
           variant="destructive"
           size="sm"
-          onClick={signOut}
+          onClick={handleSignOut}
           className="text-xs font-bold h-9 gap-1.5"
         >
           <LogOut className="w-3.5 h-3.5" />
