@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
-import { db, collection, getDocs, doc, setDoc } from '@/lib/firebase';
+import { db, collection, getDocs, doc, setDoc, getDoc } from '@/lib/firebase';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
-import { Shield, Search } from 'lucide-react';
+import { Shield, Search, Megaphone } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import type { UserDoc } from '@/types';
@@ -20,6 +20,10 @@ export const Admin: React.FC = () => {
   const [overrideIncome, setOverrideIncome] = useState<number>(0);
   const [overrideSavings, setOverrideSavings] = useState<number>(0);
 
+  // Announcement state
+  const [announcementText, setAnnouncementText] = useState('');
+  const [announcementActive, setAnnouncementActive] = useState(false);
+
   const fetchAllUsers = async () => {
     if (userRole !== 'admin' || !db) return;
     setLoading(true);
@@ -30,10 +34,33 @@ export const Admin: React.FC = () => {
         list.push({ id: d.id, ...(d.data() as UserDoc) });
       });
       setUsers(list);
+
+      // Fetch announcement
+      const annSnap = await getDoc(doc(db, 'settings', 'announcements'));
+      if (annSnap.exists()) {
+        const d = annSnap.data();
+        setAnnouncementText(d.text || '');
+        setAnnouncementActive(d.active === true);
+      }
     } catch (err) {
       console.error('Error fetching admin users:', err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleSaveAnnouncement = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!db) return;
+    try {
+      await setDoc(doc(db, 'settings', 'announcements'), {
+        text: announcementText.trim(),
+        active: announcementActive,
+        updatedAt: new Date().toISOString(),
+      }, { merge: true });
+      toast.success('System announcement updated!');
+    } catch {
+      toast.error('Failed to update announcement');
     }
   };
 
@@ -254,6 +281,45 @@ export const Admin: React.FC = () => {
               Select a user from the list to inspect their profile and apply overrides.
             </Card>
           )}
+
+          {/* System Announcement Manager */}
+          <Card className="p-5 space-y-3 border-2 border-primary/20 bg-primary/5">
+            <div className="flex items-center gap-2">
+              <Megaphone className="w-4 h-4 text-primary" />
+              <h4 className="font-bold text-sm text-text-primary">System Announcement</h4>
+            </div>
+            <p className="text-[11px] text-text-secondary">
+              Broadcast an alert banner across the entire Mornigami app.
+            </p>
+
+            <form onSubmit={handleSaveAnnouncement} className="space-y-3">
+              <div className="space-y-1">
+                <Input
+                  placeholder="e.g., Welcome to Mornigami 2.0!"
+                  value={announcementText}
+                  onChange={(e) => setAnnouncementText(e.target.value)}
+                  className="h-9 text-xs"
+                />
+              </div>
+
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="announcementActiveCheckbox"
+                  checked={announcementActive}
+                  onChange={(e) => setAnnouncementActive(e.target.checked)}
+                  className="w-4 h-4 rounded text-primary"
+                />
+                <label htmlFor="announcementActiveCheckbox" className="text-xs font-bold text-text-primary cursor-pointer">
+                  Activate Live Banner
+                </label>
+              </div>
+
+              <Button type="submit" size="sm" className="w-full h-8 text-xs font-bold">
+                Broadcast Announcement
+              </Button>
+            </form>
+          </Card>
         </div>
       </div>
     </div>

@@ -10,7 +10,7 @@ import {
   DialogDescription,
 } from '@/components/ui/Dialog';
 import { Input } from '@/components/ui/Input';
-import { Play, Pause, RotateCcw, Settings as SettingsIcon, Flame, Clock, Trophy } from 'lucide-react';
+import { Play, Pause, RotateCcw, Settings as SettingsIcon, Flame, Clock, Trophy, Maximize2, Minimize2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export const Pomodoro: React.FC = () => {
@@ -32,6 +32,7 @@ export const Pomodoro: React.FC = () => {
     isAudioPlaying,
   } = usePomodoro();
 
+  const [zenMode, setZenMode] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [workMins, setWorkMins] = useState(settings.workDuration);
   const [shortMins, setShortMins] = useState(settings.shortBreakDuration);
@@ -58,6 +59,85 @@ export const Pomodoro: React.FC = () => {
     setSettingsOpen(false);
   };
 
+  if (zenMode) {
+    return (
+      <div className="fixed inset-0 z-50 bg-background flex flex-col items-center justify-center p-6 sm:p-12 animate-in fade-in-50 duration-300">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setZenMode(false)}
+          className="absolute top-6 right-6 font-bold text-xs gap-1.5 rounded-xl"
+        >
+          <Minimize2 className="w-4 h-4" />
+          <span>Exit Zen Mode</span>
+        </Button>
+
+        <div className="relative flex flex-col items-center justify-center my-6">
+          <svg className="w-80 h-80 sm:w-96 sm:h-96 -rotate-90 transform">
+            <circle
+              cx="50%"
+              cy="50%"
+              r={radius}
+              className="stroke-border"
+              strokeWidth="12"
+              fill="transparent"
+            />
+            <circle
+              cx="50%"
+              cy="50%"
+              r={radius}
+              className="stroke-primary transition-all duration-500 ease-out"
+              strokeWidth="12"
+              fill="transparent"
+              strokeDasharray={circumference}
+              strokeDashoffset={strokeDashoffset}
+              strokeLinecap="round"
+            />
+          </svg>
+
+          <div className="absolute flex flex-col items-center justify-center text-center">
+            <span className="font-display text-6xl sm:text-7xl font-black text-text-primary tracking-tight">
+              {formatTime(timeLeft)}
+            </span>
+            <span className="text-xs font-bold uppercase tracking-widest text-text-secondary mt-2">
+              {mode === 'work' ? 'Zen Focus Mode' : 'Rest & Refresh'}
+            </span>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-4 mt-6">
+          <Button
+            size="lg"
+            onClick={isRunning ? pause : start}
+            className="h-16 px-10 rounded-2xl font-bold text-lg shadow-lg gap-2"
+          >
+            {isRunning ? (
+              <>
+                <Pause className="w-5 h-5 fill-current" />
+                <span>Pause</span>
+              </>
+            ) : (
+              <>
+                <Play className="w-5 h-5 fill-current ml-0.5" />
+                <span>Start</span>
+              </>
+            )}
+          </Button>
+
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={reset}
+            className="h-16 w-16 rounded-2xl border-border"
+            title="Reset timer"
+          >
+            <RotateCcw className="w-5 h-5 text-text-secondary" />
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-8 animate-in fade-in-50 duration-300 max-w-3xl mx-auto">
       {/* Header */}
@@ -71,20 +151,32 @@ export const Pomodoro: React.FC = () => {
           </p>
         </div>
 
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={() => {
-            setWorkMins(settings.workDuration);
-            setShortMins(settings.shortBreakDuration);
-            setLongMins(settings.longBreakDuration);
-            setSettingsOpen(true);
-          }}
-          className="rounded-xl"
-          title="Timer Settings"
-        >
-          <SettingsIcon className="w-4 h-4 text-text-secondary" />
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => setZenMode(true)}
+            className="rounded-xl"
+            title="Enter Zen Mode (Full Screen)"
+          >
+            <Maximize2 className="w-4 h-4 text-text-secondary" />
+          </Button>
+
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => {
+              setWorkMins(settings.workDuration);
+              setShortMins(settings.shortBreakDuration);
+              setLongMins(settings.longBreakDuration);
+              setSettingsOpen(true);
+            }}
+            className="rounded-xl"
+            title="Timer Settings"
+          >
+            <SettingsIcon className="w-4 h-4 text-text-secondary" />
+          </Button>
+        </div>
       </div>
 
       {/* Mode Switcher Tabs */}
