@@ -1,0 +1,2780 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mornigami</title>
+    <meta name="description"
+        content="Morning + Origami = Mornigami. Shape your morning and fold your habits into structure.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:wght@600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="icon" type="image/png" href="icon.png">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <!-- Navigation Bar -->
+    <nav class="main-nav">
+        <div class="nav-content">
+            <div class="nav-brand active" id="navBrand" style="cursor: pointer;">
+                <div class="brand-icon">
+                    <img src="icon.png" alt="Mornigami Logo" style="width: 48px; height: 48px; object-fit: contain;">
+                </div>
+                <div class="brand-text-container" style="display: flex; flex-direction: column; line-height: 1.1;">
+                    <span class="nav-brand-text"
+                        style="font-size: 1.25rem; font-weight: 800; letter-spacing: -0.03em;">Mornigami</span>
+                    <span class="nav-brand-subtext"
+                        style="font-size: 0.65rem; color: var(--color-text-secondary); font-weight: 500;">Shape your
+                        Morning</span>
+                </div>
+            </div>
+            <div class="nav-links">
+                <a href="#" class="nav-link" data-page="finance" id="financeNavLink">
+                    <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="2" y="6" width="20" height="12" rx="2" />
+                        <circle cx="12" cy="12" r="2" />
+                        <line x1="6" y1="12" x2="6.01" y2="12" />
+                        <line x1="18" y1="12" x2="18.01" y2="12" />
+                    </svg>
+                    <span class="nav-link-text">Finance</span>
+                </a>
+                <a href="#" class="nav-link" data-page="todo">
+                    <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
+                        <rect x="8" y="2" width="8" height="4" rx="1" ry="1" />
+                        <path d="M9 14l2 2 4-4" />
+                    </svg>
+                    <span class="nav-link-text">To-Do List</span>
+                </a>
+                <a href="#" class="nav-link" data-page="pomodoro">
+                    <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10" />
+                        <polyline points="12 6 12 12 16 14" />
+                    </svg>
+                    <span class="nav-link-text">Pomodoro</span>
+                </a>
+                <a href="#" class="nav-link" data-page="playlist">
+                    <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polygon points="5 3 19 12 5 21 5 3" />
+                    </svg>
+                    <span class="nav-link-text">Playlist</span>
+                </a>
+                <a href="#" class="nav-link" data-page="habits">
+                    <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+                    </svg>
+                    <span class="nav-link-text">Habit Tracker</span>
+                </a>
+                <a href="#" class="nav-link" data-page="community" id="communityNavLink">
+                    <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                        <circle cx="9" cy="7" r="4" />
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                    </svg>
+                    <span class="nav-link-text">Community</span>
+                </a>
+                <a href="#" class="nav-link" data-page="admin" id="adminNavLink" style="display: none;">
+                    <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                    </svg>
+                    <span class="nav-link-text">Admin</span>
+                </a>
+            </div>
+            
+            <button class="nav-toggle-btn" id="navToggleBtn" title="Collapse Sidebar" type="button">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="toggle-icon">
+                    <polyline points="15 18 9 12 15 6" />
+                </svg>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Top Bar for actions (accent picker, theme toggle, profile menu) -->
+    <div class="top-bar-actions">
+        <!-- XP Progress Bar Widget -->
+        <div class="xp-nav-widget" id="xpNavWidget"
+            title="XP Progress (Earn XP by completing habits, tasks, focus sessions, and videos)">
+            <div class="xp-level-badge" id="globalLevelBadge">L1</div>
+            <div class="global-badge-wrapper" id="globalBadgeWrapper">
+                <div class="global-badge-icon" id="globalBadgeIcon">🌱</div>
+                <div class="global-badge-tooltip" id="globalBadgeTooltip">🌱 Mornigami Novice</div>
+            </div>
+            <div class="xp-widget-details" style="flex: 1; display: flex; flex-direction: column; gap: 2px;">
+                <div style="display: flex; justify-content: space-between; font-size: 10px; font-weight: 700; color: var(--color-text-secondary); line-height: 1;">
+                    <span>XP Progress</span>
+                    <span id="globalXPText">0 / 500 XP</span>
+                </div>
+                <div class="xp-progress-bar-container">
+                    <div class="xp-progress-bar-fill" id="globalXPBarFill"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="nav-actions" style="display: flex; gap: var(--spacing-sm); align-items: center;">
+            <div class="accent-picker-wrapper" style="position: relative; display: flex; align-items: center;">
+                <button class="btn-icon" id="accentColorBtn" title="Change accent color">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 22C17.52 22 22 17.52 22 12S17.52 2 12 2 2 6.48 2 12s4.48 10 10 10z" />
+                        <circle cx="7.5" cy="10.5" r="1.5" fill="currentColor" />
+                        <circle cx="11.5" cy="7.5" r="1.5" fill="currentColor" />
+                        <circle cx="16.5" cy="9.5" r="1.5" fill="currentColor" />
+                        <circle cx="15.5" cy="14.5" r="1.5" fill="currentColor" />
+                    </svg>
+                </button>
+                <div class="accent-color-dropdown" id="accentColorDropdown"></div>
+            </div>
+            <button class="btn-icon" id="themeToggle" title="Toggle theme">
+                <svg class="theme-icon sun-icon" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                    <circle cx="10" cy="10" r="4" stroke="currentColor" stroke-width="1.5" />
+                    <path
+                        d="M10 2V3M10 17V18M18 10H17M3 10H2M15.657 4.343L14.95 5.05M5.05 14.95L4.343 15.657M15.657 15.657L14.95 14.95M5.05 5.05L4.343 4.343"
+                        stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                </svg>
+                <svg class="theme-icon moon-icon" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                    <path
+                        d="M17 10.5C16.9 14.6 13.6 18 9.5 18C5.4 18 2 14.6 2 10.5C2 6.9 4.5 3.9 8 3.1C7.4 3.9 7 4.9 7 6C7 8.8 9.2 11 12 11C13.1 11 14.1 10.6 14.9 10C14.9 10.2 17 10.3 17 10.5Z"
+                        stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+            </button>
+            <button class="btn-primary" id="loginBtn" title="Login or Sign Up"
+                style="padding: 0.5rem 1rem; font-size: var(--font-size-sm); height: 44px; display: flex; align-items: center; gap: var(--spacing-xs);">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                    <circle cx="12" cy="7" r="4" />
+                </svg>
+                <span id="loginBtnText">Login</span>
+            </button>
+            <div class="user-menu-wrapper" id="userMenuWrapper" style="display: none;">
+                <button class="user-avatar-btn" id="userProfileBtn" title="Account">
+                    <img id="userAvatarImg" class="user-avatar-img" src="" alt="" style="display: none;">
+                    <div id="userAvatarFallback" class="user-avatar-fallback">U</div>
+                </button>
+                <div class="user-menu-dropdown" id="userMenuDropdown">
+                    <div class="user-info" id="dropdownUserEmail">Logged in</div>
+                    <button class="dropdown-item" id="editProfileBtn">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                            <circle cx="12" cy="7" r="4" />
+                        </svg>
+                        <span>Edit Profile</span>
+                    </button>
+                    <button class="dropdown-item" id="storeNavLinkBtn" onclick="app.switchPage('store')">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="9" cy="21" r="1" />
+                            <circle cx="20" cy="21" r="1" />
+                            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
+                        </svg>
+                        <span>Rewards Store</span>
+                    </button>
+                    <button class="dropdown-item logout" id="logoutBtn">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                            <polyline points="16 17 21 12 16 7" />
+                            <line x1="21" y1="12" x2="9" y2="12" />
+                        </svg>
+                        <span>Sign Out</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mandatory Auth Overlay -->
+    <div id="authOverlay" class="auth-overlay">
+        <!-- Loader Section -->
+        <div id="authOverlayLoader" class="auth-overlay-loader-container">
+            <div class="auth-overlay-spinner"></div>
+            <p class="auth-overlay-loading-text">Folding Mornigami...</p>
+        </div>
+
+        <!-- Auth Form Section (Hidden by default) -->
+        <div id="authOverlayCard" class="auth-overlay-card" style="display: none;">
+            <div class="auth-header-actions"
+                style="position: absolute; top: var(--spacing-md); right: var(--spacing-md); display: flex; gap: var(--spacing-xs); align-items: center;">
+                <!-- Accent Color Picker -->
+                <div class="accent-picker-wrapper" style="position: relative; display: flex; align-items: center;">
+                    <button class="btn-icon" id="overlayAccentColorBtn" title="Change accent color" type="button">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 22C17.52 22 22 17.52 22 12S17.52 2 12 2 2 6.48 2 12s4.48 10 10 10z" />
+                            <circle cx="7.5" cy="10.5" r="1.5" fill="currentColor" />
+                            <circle cx="11.5" cy="7.5" r="1.5" fill="currentColor" />
+                            <circle cx="16.5" cy="9.5" r="1.5" fill="currentColor" />
+                            <circle cx="15.5" cy="14.5" r="1.5" fill="currentColor" />
+                        </svg>
+                    </button>
+                    <div class="accent-color-dropdown" id="overlayAccentColorDropdown"></div>
+                </div>
+                <!-- Theme Toggle -->
+                <button class="btn-icon auth-theme-toggle" id="overlayThemeToggle" title="Toggle theme" type="button">
+                    <svg class="theme-icon sun-icon" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                        <circle cx="10" cy="10" r="4" stroke="currentColor" stroke-width="1.5" />
+                        <path
+                            d="M10 2V3M10 17V18M18 10H17M3 10H2M15.657 4.343L14.95 5.05M5.05 14.95L4.343 15.657M15.657 15.657L14.95 14.95M5.05 5.05L4.343 4.343"
+                            stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                    </svg>
+                    <svg class="theme-icon moon-icon" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                        <path
+                            d="M17 10.5C16.9 14.6 13.6 18 9.5 18C5.4 18 2 14.6 2 10.5C2 6.9 4.5 3.9 8 3.1C7.4 3.9 7 4.9 7 6C7 8.8 9.2 11 12 11C13.1 11 14.1 10.6 14.9 10C14.9 10.2 17 10.3 17 10.5Z"
+                            stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                </button>
+            </div>
+            <div class="auth-overlay-brand" style="margin-bottom: 8px;">
+                <div class="auth-overlay-brand-icon">
+                    <img src="icon.png" alt="Mornigami Logo" style="width: 48px; height: 48px; object-fit: contain;">
+                </div>
+                <span class="auth-overlay-brand-text">Mornigami</span>
+            </div>
+            <p class="auth-brand-formula"
+                style="font-size: 0.8rem; color: var(--color-text-secondary); text-align: center; margin-top: 0; margin-bottom: 24px; font-weight: 500; font-family: var(--font-body);">
+                Morning + Origami = Mornigami</p>
+
+            <div class="auth-overlay-header">
+                <h2 class="auth-title" id="overlayAuthTitle">Sign In</h2>
+                <p class="auth-subtitle" id="overlayAuthSubtitle">Shape your Morning. Fold your habits into structure.
+                </p>
+            </div>
+
+            <div id="overlayAuthMessage" class="auth-message"></div>
+
+            <form id="overlayAuthForm" class="modal-form" style="padding: 0;">
+                <div class="form-group" id="overlayUsernameGroup" style="display: none;">
+                    <label for="overlayUsernameInput" class="form-label">Username</label>
+                    <input type="text" id="overlayUsernameInput" class="form-input" placeholder="Choose a username"
+                        autocomplete="username">
+                </div>
+
+                <div class="form-group">
+                    <label for="overlayEmailInput" class="form-label" id="overlayEmailLabel">Email or Username</label>
+                    <input type="text" id="overlayEmailInput" class="form-input" placeholder="Email/Username" required
+                        autocomplete="username email">
+                </div>
+
+                <div class="form-group">
+                    <label for="overlayPasswordInput" class="form-label">Password</label>
+                    <input type="password" id="overlayPasswordInput" class="form-input" placeholder="••••••••" required
+                        autocomplete="current-password" minlength="6">
+                </div>
+
+                <button type="submit" class="btn-primary" id="overlaySubmitAuthBtn"
+                    style="width: 100%; justify-content: center; margin-top: var(--spacing-md); height: 48px;">
+                    <span id="overlayAuthSubmitText">Sign In</span>
+                </button>
+            </form>
+
+            <div class="auth-form-footer">
+                <span id="overlayAuthToggleText">Don't have an account? </span>
+                <a class="auth-toggle-link" id="overlayToggleAuthMode">Sign Up</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="app-container">
+        <!-- System Announcement Banner -->
+        <div id="globalAnnouncementBanner" class="announcement-banner" style="display: none;">
+            <div class="announcement-content-wrap">
+                <span class="announcement-icon">📢</span>
+                <span id="announcementText" class="announcement-text">Welcome to Mornigami!</span>
+            </div>
+            <button class="announcement-close" onclick="app.closeAnnouncement()">&times;</button>
+        </div>
+        <!-- Dynamic Content Container -->
+        <div id="pageContent"></div>
+    </div>
+
+    <!-- Habit Modal -->
+    <div id="habitModal" class="modal">
+        <div class="modal-backdrop"></div>
+        <div class="modal-container">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title" id="habitModalTitle">Create New Habit</h2>
+                    <button class="modal-close" id="closeHabitModal">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" />
+                        </svg>
+                    </button>
+                </div>
+
+                <form id="habitForm" class="modal-form">
+                    <input type="hidden" id="habitId">
+
+                    <div class="form-group">
+                        <label for="habitName" class="form-label">Habit Name</label>
+                        <input type="text" id="habitName" class="form-input"
+                            placeholder="e.g., Morning meditation, Read 30 minutes, Exercise" required maxlength="50"
+                            autocomplete="off">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="habitDays" class="form-label">Duration</label>
+                        <div class="input-with-suffix">
+                            <input type="number" id="habitDays" class="form-input" value="21" min="1" max="31" required>
+                            <span class="input-suffix">days</span>
+                        </div>
+                        <p class="form-hint">How many days do you want to track this habit? (1-31)</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Priority</label>
+                        <div class="priority-grid">
+                            <label class="priority-option">
+                                <input type="radio" name="priority" value="low" checked>
+                                <div class="priority-card priority-low">
+                                    <div class="priority-dot"></div>
+                                    <span class="priority-label">Low</span>
+                                </div>
+                            </label>
+                            <label class="priority-option">
+                                <input type="radio" name="priority" value="medium">
+                                <div class="priority-card priority-medium">
+                                    <div class="priority-dot"></div>
+                                    <span class="priority-label">Medium</span>
+                                </div>
+                            </label>
+                            <label class="priority-option">
+                                <input type="radio" name="priority" value="high">
+                                <div class="priority-card priority-high">
+                                    <div class="priority-dot"></div>
+                                    <span class="priority-label">High</span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Card Color</label>
+                        <div class="color-picker-grid">
+                            <label class="color-option">
+                                <input type="radio" name="cardColor" value="default" checked>
+                                <div class="color-swatch color-default" title="Default"></div>
+                            </label>
+                            <label class="color-option">
+                                <input type="radio" name="cardColor" value="rose">
+                                <div class="color-swatch color-rose" title="Rose"></div>
+                            </label>
+                            <label class="color-option">
+                                <input type="radio" name="cardColor" value="amber">
+                                <div class="color-swatch color-amber" title="Amber"></div>
+                            </label>
+                            <label class="color-option">
+                                <input type="radio" name="cardColor" value="emerald">
+                                <div class="color-swatch color-emerald" title="Emerald"></div>
+                            </label>
+                            <label class="color-option">
+                                <input type="radio" name="cardColor" value="sky">
+                                <div class="color-swatch color-sky" title="Sky"></div>
+                            </label>
+                            <label class="color-option">
+                                <input type="radio" name="cardColor" value="violet">
+                                <div class="color-swatch color-violet" title="Violet"></div>
+                            </label>
+                            <label class="color-option">
+                                <input type="radio" name="cardColor" value="slate">
+                                <div class="color-swatch color-slate" title="Slate"></div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn-secondary" id="cancelHabitBtn">Cancel</button>
+                        <button type="submit" class="btn-primary">
+                            <span id="habitSubmitBtnText">Create Habit</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Task Modal -->
+    <div id="taskModal" class="modal">
+        <div class="modal-backdrop"></div>
+        <div class="modal-container">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title" id="taskModalTitle">Create New Task</h2>
+                    <button class="modal-close" id="closeTaskModal">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" />
+                        </svg>
+                    </button>
+                </div>
+
+                <form id="taskForm" class="modal-form">
+                    <input type="hidden" id="taskId">
+
+                    <div class="form-group">
+                        <label for="taskName" class="form-label">Task Name</label>
+                        <input type="text" id="taskName" class="form-input"
+                            placeholder="e.g., Finish project report, Buy groceries" required maxlength="100"
+                            autocomplete="off">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="taskDueDate" class="form-label">Due Date</label>
+                        <input type="date" id="taskDueDate" class="form-input" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Priority</label>
+                        <div class="priority-grid">
+                            <label class="priority-option">
+                                <input type="radio" name="taskPriority" value="low" checked>
+                                <div class="priority-card priority-low">
+                                    <div class="priority-dot"></div>
+                                    <span class="priority-label">Low</span>
+                                </div>
+                            </label>
+                            <label class="priority-option">
+                                <input type="radio" name="taskPriority" value="medium">
+                                <div class="priority-card priority-medium">
+                                    <div class="priority-dot"></div>
+                                    <span class="priority-label">Medium</span>
+                                </div>
+                            </label>
+                            <label class="priority-option">
+                                <input type="radio" name="taskPriority" value="high">
+                                <div class="priority-card priority-high">
+                                    <div class="priority-dot"></div>
+                                    <span class="priority-label">High</span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn-secondary" id="cancelTaskBtn">Cancel</button>
+                        <button type="submit" class="btn-primary">
+                            <span id="taskSubmitBtnText">Create Task</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pomodoro Settings Modal -->
+    <div id="pomodoroSettingsModal" class="modal">
+        <div class="modal-backdrop"></div>
+        <div class="modal-container">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title">Timer Settings</h2>
+                    <button class="modal-close" id="closePomodoroSettings">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" />
+                        </svg>
+                    </button>
+                </div>
+
+                <form id="pomodoroSettingsForm" class="modal-form">
+                    <div class="form-group">
+                        <label for="workDuration" class="form-label">Work Duration</label>
+                        <div class="input-with-suffix">
+                            <input type="number" id="workDuration" class="form-input" value="25" min="1" max="60"
+                                required>
+                            <span class="input-suffix">minutes</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="shortBreakDuration" class="form-label">Short Break Duration</label>
+                        <div class="input-with-suffix">
+                            <input type="number" id="shortBreakDuration" class="form-input" value="5" min="1" max="30"
+                                required>
+                            <span class="input-suffix">minutes</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="longBreakDuration" class="form-label">Long Break Duration</label>
+                        <div class="input-with-suffix">
+                            <input type="number" id="longBreakDuration" class="form-input" value="15" min="1" max="60"
+                                required>
+                            <span class="input-suffix">minutes</span>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn-secondary" id="cancelPomodoroSettings">Cancel</button>
+                        <button type="submit" class="btn-primary">Save Settings</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Playlist Modal -->
+    <div id="playlistModal" class="modal">
+        <div class="modal-backdrop"></div>
+        <div class="modal-container">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title">Add Playlist</h2>
+                    <button class="modal-close" id="closePlaylistModal">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" />
+                        </svg>
+                    </button>
+                </div>
+
+                <form id="playlistForm" class="modal-form">
+                    <div class="form-group">
+                        <label for="playlistUrl" class="form-label">YouTube Playlist URL</label>
+                        <input type="url" id="playlistUrl" class="form-input"
+                            placeholder="https://www.youtube.com/playlist?list=..." required autocomplete="off">
+                        <p class="form-hint">Paste the full link to the YouTube playlist.</p>
+                    </div>
+
+
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn-secondary" id="cancelPlaylistBtn">Cancel</button>
+                        <button type="submit" class="btn-primary" id="playlistSubmitBtn">
+                            <span>Import Playlist</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Video Modal (To see details or just a simple list expansion? I'll probably just use the main page for the list) -->
+    <!-- I'll skip a specific video modal for now and render videos in the main view -->
+
+    <!-- Playlist Group Modal -->
+    <div id="playlistGroupModal" class="modal">
+        <div class="modal-backdrop" onclick="app.closeModal('playlistGroupModal')"></div>
+        <div class="modal-container">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title" id="playlistGroupModalTitle">Create Group</h2>
+                    <button class="modal-close" onclick="app.closeModal('playlistGroupModal')">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" />
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="modal-tabs"
+                    style="display: flex; gap: var(--spacing-sm); margin-bottom: var(--spacing-lg); border-bottom: 1.5px solid var(--color-border); padding-bottom: var(--spacing-sm);">
+                    <button type="button" class="tab-btn active" id="groupTabSingle"
+                        onclick="app.switchGroupTab('single')"
+                        style="background: none; border: none; padding: 6px 12px; cursor: pointer; font-weight: 600; color: var(--color-primary); border-bottom: 2px solid var(--color-primary); font-size: var(--font-size-sm); font-family: inherit;">Single
+                        Group</button>
+                    <button type="button" class="tab-btn" id="groupTabQuick" onclick="app.switchGroupTab('quick')"
+                        style="background: none; border: none; padding: 6px 12px; cursor: pointer; font-weight: 600; color: var(--color-text-tertiary); font-size: var(--font-size-sm); font-family: inherit;">Quick
+                        Ranges Split</button>
+                </div>
+
+                <form id="playlistGroupForm" class="modal-form" onsubmit="app.handleGroupSubmit(event)">
+                    <input type="hidden" id="groupPlaylistId">
+                    <input type="hidden" id="groupId">
+
+                    <!-- Tab Content: Single Group -->
+                    <div id="groupTabContentSingle">
+                        <div class="form-group">
+                            <label for="groupName" class="form-label">Group Name</label>
+                            <input type="text" id="groupName" class="form-input"
+                                placeholder="e.g., Module 1: Introduction" required maxlength="100" autocomplete="off">
+                        </div>
+
+                        <div style="display: flex; gap: var(--spacing-md);">
+                            <div class="form-group" style="flex: 1;">
+                                <label for="groupStart" class="form-label">Start Video #</label>
+                                <input type="number" id="groupStart" class="form-input" min="1" required>
+                            </div>
+                            <div class="form-group" style="flex: 1;">
+                                <label for="groupEnd" class="form-label">End Video #</label>
+                                <input type="number" id="groupEnd" class="form-input" min="1" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Card Color</label>
+                            <div class="color-picker-grid" id="groupColorGrid">
+                                <label class="color-option">
+                                    <input type="radio" name="groupColor" value="default" checked>
+                                    <div class="color-swatch color-default" title="Default"></div>
+                                </label>
+                                <label class="color-option">
+                                    <input type="radio" name="groupColor" value="rose">
+                                    <div class="color-swatch color-rose" title="Rose"></div>
+                                </label>
+                                <label class="color-option">
+                                    <input type="radio" name="groupColor" value="amber">
+                                    <div class="color-swatch color-amber" title="Amber"></div>
+                                </label>
+                                <label class="color-option">
+                                    <input type="radio" name="groupColor" value="emerald">
+                                    <div class="color-swatch color-emerald" title="Emerald"></div>
+                                </label>
+                                <label class="color-option">
+                                    <input type="radio" name="groupColor" value="sky">
+                                    <div class="color-swatch color-sky" title="Sky"></div>
+                                </label>
+                                <label class="color-option">
+                                    <input type="radio" name="groupColor" value="violet">
+                                    <div class="color-swatch color-violet" title="Violet"></div>
+                                </label>
+                                <label class="color-option">
+                                    <input type="radio" name="groupColor" value="slate">
+                                    <div class="color-swatch color-slate" title="Slate"></div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab Content: Quick Ranges Split -->
+                    <div id="groupTabContentQuick" style="display: none;">
+                        <div class="form-group">
+                            <label for="groupRangesInput" class="form-label">Specify Ranges</label>
+                            <input type="text" id="groupRangesInput" class="form-input"
+                                placeholder="e.g., 1-10, 11-20, 21-30 or ((1:10)-(11:20)-(21:30))">
+                            <p class="form-hint"
+                                style="margin-top: 4px; font-size: var(--font-size-xs); color: var(--color-text-tertiary);">
+                                Specify ranges separated by commas or dashes. Video indexes start at 1.</p>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn-secondary"
+                            onclick="app.closeModal('playlistGroupModal')">Cancel</button>
+                        <button type="submit" class="btn-primary">
+                            <span id="groupSubmitBtnText">Save Group</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Savings Vault Modal -->
+    <!-- General Actions Modal -->
+    <div id="generalActionsModal" class="modal">
+        <div class="modal-backdrop" onclick="app.closeModal('generalActionsModal')"></div>
+        <div class="modal-container" style="max-width: 500px;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title">🏦 Fund Transactions</h2>
+                    <button type="button" class="modal-close" onclick="app.closeModal('generalActionsModal')">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Balances Grid -->
+                <div style="padding: 0 var(--spacing-xl); margin-top: var(--spacing-lg);">
+                    <div style="background: var(--color-bg); border: 1.5px solid var(--color-border); border-radius: var(--radius-lg); padding: var(--spacing-sm) var(--spacing-md); display: grid; grid-template-columns: 1fr 1fr 1fr; gap: var(--spacing-xs); text-align: center; font-size: var(--font-size-xs);">
+                        <div>
+                            <span style="font-weight: 700; color: var(--color-text-secondary); text-transform: uppercase; font-size: 9px; letter-spacing: 0.5px; display: block;">Visa</span>
+                            <span id="modalVisaBalanceText" style="font-weight: 800; font-size: var(--font-size-sm); color: #0284c7; display: block; margin-top: 2px;">EGP 0.00</span>
+                        </div>
+                        <div style="border-left: 1.5px solid var(--color-border); border-right: 1.5px solid var(--color-border);">
+                            <span style="font-weight: 700; color: var(--color-text-secondary); text-transform: uppercase; font-size: 9px; letter-spacing: 0.5px; display: block;">Wallet</span>
+                            <span id="modalWalletBalanceText" style="font-weight: 800; font-size: var(--font-size-sm); color: #d97706; display: block; margin-top: 2px;">EGP 0.00</span>
+                        </div>
+                        <div>
+                            <span style="font-weight: 700; color: var(--color-text-secondary); text-transform: uppercase; font-size: 9px; letter-spacing: 0.5px; display: block;">Savings Vault</span>
+                            <span id="modalVaultBalanceText" style="font-weight: 800; font-size: var(--font-size-sm); color: var(--color-success); display: block; margin-top: 2px;">EGP 0.00</span>
+                        </div>
+                    </div>
+                </div>
+
+                <form id="generalActionsModalForm" class="modal-form" onsubmit="app.handleGeneralActionsSubmit(event)">
+                    <!-- Action Type selector -->
+                    <div class="form-group">
+                        <label class="form-label">Transaction Type</label>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 6px;">
+                            <button type="button" id="actionTypeAddBtn" class="form-classify-btn active" onclick="app.setGeneralActionType('add')" style="padding: 10px var(--spacing-xs); font-size: 10px; font-weight: 700; border-radius: var(--radius-md); cursor: pointer; border: 1.5px solid var(--color-border); background: var(--color-surface); transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 4px;">
+                                📥 Add Funds
+                            </button>
+                            <button type="button" id="actionTypeRemoveBtn" class="form-classify-btn" onclick="app.setGeneralActionType('remove')" style="padding: 10px var(--spacing-xs); font-size: 10px; font-weight: 700; border-radius: var(--radius-md); cursor: pointer; border: 1.5px solid var(--color-border); background: var(--color-surface); transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 4px;">
+                                📤 Remove
+                            </button>
+                            <button type="button" id="actionTypeTransferBtn" class="form-classify-btn" onclick="app.setGeneralActionType('transfer')" style="padding: 10px var(--spacing-xs); font-size: 10px; font-weight: 700; border-radius: var(--radius-md); cursor: pointer; border: 1.5px solid var(--color-border); background: var(--color-surface); transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 4px;">
+                                ⇄ Transfer
+                            </button>
+                            <button type="button" id="actionTypeBudgetBtn" class="form-classify-btn" onclick="app.setGeneralActionType('budget')" style="padding: 10px var(--spacing-xs); font-size: 10px; font-weight: 700; border-radius: var(--radius-md); cursor: pointer; border: 1.5px solid var(--color-border); background: var(--color-surface); transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 4px;">
+                                ⚙️ Set Budget
+                            </button>
+                        </div>
+                        <input type="hidden" id="generalActionType" value="add">
+                    </div>
+
+                    <!-- Single Account Selector (For Add / Remove) -->
+                    <div id="generalActionsSingleAccountGroup" class="form-group">
+                        <label id="generalActionsSingleAccountLabel" class="form-label">Target Account</label>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px;">
+                            <button type="button" id="singleAccountVisaBtn" class="form-classify-btn active" onclick="app.setGeneralActionsSingleAccount('visa')" style="padding: 10px var(--spacing-sm); font-size: var(--font-size-xs); font-weight: 700; border-radius: var(--radius-md); cursor: pointer; border: 1.5px solid var(--color-border); background: var(--color-surface); transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 4px;">
+                                💳 Visa
+                            </button>
+                            <button type="button" id="singleAccountWalletBtn" class="form-classify-btn" onclick="app.setGeneralActionsSingleAccount('wallet')" style="padding: 10px var(--spacing-sm); font-size: var(--font-size-xs); font-weight: 700; border-radius: var(--radius-md); cursor: pointer; border: 1.5px solid var(--color-border); background: var(--color-surface); transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 4px;">
+                                💵 Wallet
+                            </button>
+                            <button type="button" id="singleAccountVaultBtn" class="form-classify-btn" onclick="app.setGeneralActionsSingleAccount('vault')" style="padding: 10px var(--spacing-sm); font-size: var(--font-size-xs); font-weight: 700; border-radius: var(--radius-md); cursor: pointer; border: 1.5px solid var(--color-border); background: var(--color-surface); transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 4px;">
+                                🏦 Vault
+                            </button>
+                        </div>
+                        <input type="hidden" id="generalActionsSingleAccount" value="visa">
+                    </div>
+
+                    <!-- Dual Account Selectors (For Transfer) -->
+                    <div id="generalActionsTransferGroup" class="form-group" style="display: none;">
+                        <div style="margin-bottom: var(--spacing-sm);">
+                            <label class="form-label">Source Account (From)</label>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px;">
+                                <button type="button" id="transferSrcVisaBtn" class="form-classify-btn active" onclick="app.setGeneralActionsTransferSrc('visa')" style="padding: 10px var(--spacing-sm); font-size: var(--font-size-xs); font-weight: 700; border-radius: var(--radius-md); cursor: pointer; border: 1.5px solid var(--color-border); background: var(--color-surface); transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 4px;">
+                                    💳 Visa
+                                </button>
+                                <button type="button" id="transferSrcWalletBtn" class="form-classify-btn" onclick="app.setGeneralActionsTransferSrc('wallet')" style="padding: 10px var(--spacing-sm); font-size: var(--font-size-xs); font-weight: 700; border-radius: var(--radius-md); cursor: pointer; border: 1.5px solid var(--color-border); background: var(--color-surface); transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 4px;">
+                                    💵 Wallet
+                                </button>
+                                <button type="button" id="transferSrcVaultBtn" class="form-classify-btn" onclick="app.setGeneralActionsTransferSrc('vault')" style="padding: 10px var(--spacing-sm); font-size: var(--font-size-xs); font-weight: 700; border-radius: var(--radius-md); cursor: pointer; border: 1.5px solid var(--color-border); background: var(--color-surface); transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 4px;">
+                                    🏦 Vault
+                                </button>
+                            </div>
+                            <input type="hidden" id="generalActionsTransferSrc" value="visa">
+                        </div>
+
+                        <div>
+                            <label class="form-label">Destination Account (To)</label>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px;">
+                                <button type="button" id="transferDstVisaBtn" class="form-classify-btn" onclick="app.setGeneralActionsTransferDst('visa')" style="padding: 10px var(--spacing-sm); font-size: var(--font-size-xs); font-weight: 700; border-radius: var(--radius-md); cursor: pointer; border: 1.5px solid var(--color-border); background: var(--color-surface); transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 4px;">
+                                    💳 Visa
+                                </button>
+                                <button type="button" id="transferDstWalletBtn" class="form-classify-btn active" onclick="app.setGeneralActionsTransferDst('wallet')" style="padding: 10px var(--spacing-sm); font-size: var(--font-size-xs); font-weight: 700; border-radius: var(--radius-md); cursor: pointer; border: 1.5px solid var(--color-border); background: var(--color-surface); transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 4px;">
+                                    💵 Wallet
+                                </button>
+                                <button type="button" id="transferDstVaultBtn" class="form-classify-btn" onclick="app.setGeneralActionsTransferDst('vault')" style="padding: 10px var(--spacing-sm); font-size: var(--font-size-xs); font-weight: 700; border-radius: var(--radius-md); cursor: pointer; border: 1.5px solid var(--color-border); background: var(--color-surface); transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 4px;">
+                                    🏦 Vault
+                                </button>
+                            </div>
+                            <input type="hidden" id="generalActionsTransferDst" value="wallet">
+                        </div>
+                    </div>
+
+                    <!-- Budget Settings Group (For Set Budget) -->
+                    <div id="generalActionsBudgetGroup" class="form-group" style="display: none;">
+                        <div style="margin-bottom: var(--spacing-sm);">
+                            <label for="generalActionsVisaIncludeSelect" class="form-label">Include Visa in Spending Budget?</label>
+                            <select id="generalActionsVisaIncludeSelect" class="form-input" onchange="app.toggleModalVisaAlloc(this.value)" style="height: 48px; background: var(--color-bg);">
+                                <option value="no">❌ No (Exclude Visa)</option>
+                                <option value="yes">✅ Yes (Include Visa)</option>
+                            </select>
+                        </div>
+
+                        <div id="generalActionsVisaAllocGroup" style="display: none; margin-bottom: var(--spacing-sm);">
+                            <label for="generalActionsVisaAllocInput" class="form-label">Visa Spending Budget Allocation</label>
+                            <input type="number" id="generalActionsVisaAllocInput" class="form-input" placeholder="e.g. 500" min="0" value="0">
+                        </div>
+
+                        <div>
+                            <label for="generalActionsWalletAllocInput" class="form-label">Wallet Spending Budget Allocation</label>
+                            <input type="number" id="generalActionsWalletAllocInput" class="form-input" placeholder="e.g. 500" min="0" value="0">
+                        </div>
+                    </div>
+
+                    <!-- Amount Group -->
+                    <div id="generalActionsAmountGroup" class="form-group">
+                        <label for="generalActionsAmount" class="form-label">Amount</label>
+                        <div class="input-with-suffix">
+                            <input type="number" id="generalActionsAmount" class="form-input" placeholder="0.00" step="0.01" min="0.01" required autocomplete="off">
+                            <span class="input-suffix" id="generalActionsCurrencySuffix">EGP</span>
+                        </div>
+                    </div>
+
+                    <!-- Modal Action Buttons -->
+                    <div class="modal-footer">
+                        <button type="button" class="btn-secondary" onclick="app.closeModal('generalActionsModal')">Cancel</button>
+                        <button type="submit" class="btn-primary" id="generalActionsSubmitBtn" style="background: var(--color-success); border-color: var(--color-success);">
+                            <span id="generalActionsSubmitBtnText">Confirm Addition</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Page Templates -->
+    <template id="homePageTemplate">
+        <header class="app-header">
+            <div class="header-content">
+                <div class="brand-text">
+                    <h1 class="brand-title">Mornigami Dashboard</h1>
+                    <p class="brand-subtitle">Shape your morning and fold your habits into structure.</p>
+                </div>
+            </div>
+        </header>
+
+        <main class="app-main">
+            <!-- Welcome Hero Widget -->
+            <section class="welcome-hero-card">
+                <div class="welcome-hero-content">
+                    <h2 class="welcome-hero-title">Good morning! Ready to shape your day?</h2>
+                    <p class="welcome-hero-desc">Every habit folded, task completed, and timer run brings you closer to
+                        your goals. Unfold your potential crease by crease.</p>
+                </div>
+                <div class="welcome-hero-sun">☀️</div>
+            </section>
+
+            <!-- Daily Bounties Panel -->
+            <section class="daily-bounties-section" id="dailyBountiesSection" style="margin-bottom: var(--spacing-xl);">
+                <div class="daily-bounties-card" style="background: linear-gradient(135deg, rgba(245, 158, 11, 0.08), rgba(239, 68, 68, 0.08)); border: 2px solid var(--color-warning); border-radius: var(--radius-xl); padding: var(--spacing-lg);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-md); flex-wrap: wrap; gap: var(--spacing-sm);">
+                        <div style="display: flex; align-items: center; gap: var(--spacing-sm);">
+                            <span style="font-size: 1.5rem;">🔥</span>
+                            <div>
+                                <h3 style="font-family: var(--font-display); font-size: var(--font-size-lg); font-weight: 700; color: var(--color-text-primary); margin: 0;">Daily Bounties</h3>
+                                <p style="font-size: 0.75rem; color: var(--color-text-secondary); margin: 0;">Complete today's challenges for massive XP bonuses!</p>
+                            </div>
+                        </div>
+                        <div id="bountyCountdownWrapper" style="display: flex; align-items: center; gap: 6px; background: var(--color-surface); padding: 4px 12px; border-radius: var(--radius-full); border: 1.5px solid var(--color-border); font-size: var(--font-size-xs); font-weight: 700; color: var(--color-danger);">
+                            ⏱️ Expires in: <span id="bountyCountdown">00:00:00</span>
+                        </div>
+                    </div>
+                    <div id="dailyBountiesList" style="display: flex; flex-direction: column; gap: var(--spacing-sm);">
+                        <!-- Rendered dynamically -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Portals Grid -->
+            <section class="portals-grid">
+                <!-- Habit Tracker Card -->
+                <div class="portal-card habits" onclick="app.switchPage('habits')">
+                    <div class="portal-icon-wrapper habits">📅</div>
+                    <div class="portal-card-body">
+                        <h3 class="portal-card-title">Habit Tracker</h3>
+                        <p class="portal-card-desc">Crease your routines, track consistency, and fold daily micro-habits
+                            into structure.</p>
+                    </div>
+                    <div class="portal-card-footer habits">Open Habit Folds →</div>
+                </div>
+
+                <!-- To-Do List Card -->
+                <div class="portal-card todo" onclick="app.switchPage('todo')">
+                    <div class="portal-icon-wrapper todo">📋</div>
+                    <div class="portal-card-body">
+                        <h3 class="portal-card-title">To-Do List</h3>
+                        <p class="portal-card-desc">Break your morning down into task creases. Track and prioritize
+                            essential checklists.</p>
+                    </div>
+                    <div class="portal-card-footer todo">Open Task Creases →</div>
+                </div>
+
+                <!-- Pomodoro Timer Card -->
+                <div class="portal-card pomodoro" onclick="app.switchPage('pomodoro')">
+                    <div class="portal-icon-wrapper pomodoro">🍅</div>
+                    <div class="portal-card-body">
+                        <h3 class="portal-card-title">Pomogami</h3>
+                        <p class="portal-card-desc">Shape your focus blocks, creasing distractions away. Run focus
+                            sessions and break intervals.</p>
+                    </div>
+                    <div class="portal-card-footer pomodoro">Start Focus Timer →</div>
+                </div>
+
+                <!-- Playlist Tracker Card -->
+                <div class="portal-card playlist" onclick="app.switchPage('playlist')">
+                    <div class="portal-icon-wrapper playlist">▶</div>
+                    <div class="portal-card-body">
+                        <h3 class="portal-card-title">Playlist Tracker</h3>
+                        <p class="portal-card-desc">Import course playlists, watch lessons, track video duration
+                            milestones, and level up.</p>
+                    </div>
+                    <div class="portal-card-footer playlist">Explore Playlists →</div>
+                </div>
+
+                <!-- Finance Tracker Card -->
+                <div class="portal-card finance" onclick="app.switchPage('finance')">
+                    <div class="portal-icon-wrapper finance">💰</div>
+                    <div class="portal-card-body">
+                        <h3 class="portal-card-title">Finance Tracker</h3>
+                        <p class="portal-card-desc">Track income, set a daily budget, log expenses, and earn XP for staying under your spending limit.</p>
+                    </div>
+                    <div class="portal-card-footer finance">Open Finance Tracker →</div>
+                </div>
+            </section>
+        </main>
+    </template>
+
+    <template id="financePageTemplate">
+        <header class="app-header">
+            <div class="header-content">
+                <div class="brand-text">
+                    <h1 class="brand-title">Finance Tracker</h1>
+                    <p class="brand-subtitle" id="financeCycleSubtitle">Track income, set a daily budget, log expenses, and earn XP for staying under your spending limit.</p>
+                </div>
+                <div class="header-actions" id="financeHeaderActions" style="display: none; gap: var(--spacing-sm); align-items: center;">
+                    <button class="btn-secondary" onclick="app.exportFinanceToCSV()" title="Export all logged purchases to CSV/Excel" style="display: flex; align-items: center; gap: 6px;">
+                        📥 Export Data
+                    </button>
+                    <button class="btn-secondary" onclick="app.resetFinanceMonth()" title="Reset current month budget" style="display: flex; align-items: center; gap: 4px;">
+                        🔄 Reset Month
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <main class="app-main">
+            <!-- Setup Section -->
+            <div id="financeSetupContainer" class="finance-card" style="max-width: 500px; margin: var(--spacing-xl) auto; text-align: center; display: none;">
+                <div style="font-size: 4rem; margin-bottom: var(--spacing-md); line-height: 1;">🌱💰</div>
+                <h2 style="font-family: var(--font-display); font-size: var(--font-size-2xl); font-weight: 800; color: var(--color-primary); margin-bottom: var(--spacing-sm);">Welcome to a New Month!</h2>
+                <p style="color: var(--color-text-secondary); margin-bottom: var(--spacing-xl); font-size: var(--font-size-sm);">Let's shape your financial routine crease by crease. Set your incoming funds (allowance, salary, or budget) for this month to calculate a recommended daily spending limit.</p>
+                
+                <form id="financeSetupForm" onsubmit="app.handleFinanceSetup(event)" style="display: flex; flex-direction: column; gap: var(--spacing-md); text-align: left;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-md);">
+                        <div class="form-group">
+                            <label for="financeSetupVisaInput" class="form-label">Starting Visa Balance</label>
+                            <input type="number" id="financeSetupVisaInput" class="form-input" placeholder="e.g. 500" min="0" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="financeSetupWalletInput" class="form-label">Starting Wallet Balance</label>
+                            <input type="number" id="financeSetupWalletInput" class="form-input" placeholder="e.g. 800" min="0" required>
+                        </div>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-md);">
+                        <div class="form-group">
+                            <label for="financeSetupWalletVaultAllocInput" class="form-label">Savings Vault Allocation</label>
+                            <input type="number" id="financeSetupWalletVaultAllocInput" class="form-input" placeholder="e.g. 300" min="0" required>
+                            <span style="font-size: 10px; color: var(--color-text-secondary); margin-top: 4px; display: block;">Remainder is allocated to the spending budget</span>
+                        </div>
+                        <div class="form-group">
+                            <label for="financeSetupVisaIncludeSelect" class="form-label">Include Visa in Spending Budget?</label>
+                            <select id="financeSetupVisaIncludeSelect" class="form-input" onchange="app.toggleSetupVisaAlloc(this.value)" style="height: 48px; background: var(--color-bg);">
+                                <option value="no">❌ No (Exclude Visa)</option>
+                                <option value="yes">✅ Yes (Include Visa)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div id="financeSetupVisaAllocGroup" class="form-group" style="display: none;">
+                        <label for="financeSetupVisaAllocInput" class="form-label">Visa Budget Allocation</label>
+                        <input type="number" id="financeSetupVisaAllocInput" class="form-input" placeholder="e.g. 500" min="0" value="0">
+                        <span style="font-size: 10px; color: var(--color-text-secondary); margin-top: 4px; display: block;">Specify how much Visa money to include in your spending budget</span>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-md);">
+                        <div class="form-group">
+                            <label for="financeStartDateInput" class="form-label">Starting Entry Date</label>
+                            <input type="date" id="financeStartDateInput" class="form-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="financeCurrencySelect" class="form-label">Select Currency</label>
+                            <select id="financeCurrencySelect" class="form-input" style="height: 48px; padding: 0 1rem; font-weight: 600; background: var(--color-bg);">
+                                <option value="EGP">EGP (Egyptian Pounds)</option>
+                                <option value="USD">USD (US Dollars)</option>
+                                <option value="EUR">EUR (Euros)</option>
+                                <option value="GBP">GBP (British Pounds)</option>
+                                <option value="SAR">SAR (Saudi Riyals)</option>
+                                <option value="AED">AED (UAE Dirhams)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-primary" style="justify-content: center; height: 48px; font-weight: 700; margin-top: var(--spacing-sm);">
+                        Initialize Dynamic Budget
+                    </button>
+                </form>
+            </div>
+
+            <!-- Dashboard Section -->
+            <div id="financeDashboardContainer" style="display: none;">
+                <!-- Stats Row -->
+                <section class="stats-section" style="margin-bottom: var(--spacing-xl);">
+                    <!-- Total Money Stat -->
+                    <div class="stat-card">
+                        <div class="stat-icon stat-icon-blue">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="2" y="4" width="20" height="16" rx="2" />
+                                <line x1="12" y1="10" x2="12" y2="10" />
+                                <line x1="8" y1="10" x2="8" y2="10" />
+                                <line x1="16" y1="10" x2="16" y2="10" />
+                            </svg>
+                        </div>
+                        <div class="stat-content">
+                            <p class="stat-label">Total Money</p>
+                            <p class="stat-value" id="financeMonthlyBudgetVal" style="margin-bottom: 0;">EGP 0.00</p>
+                        </div>
+                    </div>
+
+                    <!-- Savings Vault Stat -->
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #DCFCE7, #86EFAC); color: #15803D;">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                            </svg>
+                        </div>
+                        <div class="stat-content">
+                            <p class="stat-label">Savings Vault</p>
+                            <p class="stat-value financeSavingsVaultVal" id="financeSavingsVaultVal" style="margin-bottom: 0;">EGP 0.00</p>
+                        </div>
+                    </div>
+
+                    <!-- Money in Visa Stat -->
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #E0F2FE, #BAE6FD); color: #0284c7;">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="2" y="5" width="20" height="14" rx="2" ry="2" />
+                                <line x1="2" y1="10" x2="22" y2="10" />
+                            </svg>
+                        </div>
+                        <div class="stat-content">
+                            <p class="stat-label">Money in Visa</p>
+                            <p class="stat-value" id="financeVisaBalanceVal" style="margin-bottom: 0;">EGP 0.00</p>
+                        </div>
+                    </div>
+
+                    <!-- Money in Wallet Stat -->
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #FEF3C7, #FDE68A); color: #d97706;">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 12V7H5a2 2 0 0 1 0-4h14v4" />
+                                <path d="M3 5v14a2 2 0 0 0 2 2h16v-5" />
+                                <path d="M18 12a2 2 0 0 0 0 4h4v-4Z" />
+                            </svg>
+                        </div>
+                        <div class="stat-content">
+                            <p class="stat-label">Money in Wallet</p>
+                            <p class="stat-value" id="financeWalletBalanceVal" style="margin-bottom: 0;">EGP 0.00</p>
+                        </div>
+                    </div>
+
+                    <!-- General Actions Stat -->
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #F3F4F6, #D1D5DB); color: #374151;">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="3" />
+                                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+                            </svg>
+                        </div>
+                        <div class="stat-content" style="flex: 1; display: flex; flex-direction: column;">
+                            <p class="stat-label" style="margin-bottom: var(--spacing-xs);">General Actions</p>
+                            <button type="button" onclick="app.showGeneralActionsPrompt()" class="btn-primary" style="font-size: 11px; padding: 4px 10px; height: 26px; border-radius: var(--radius-md); font-weight: 700; background: var(--color-primary); border: none; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; width: fit-content; color: white;">Open menu</button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Gamification Reward Card -->
+                <div class="finance-card xp-claim-card" id="financeXPRewardCard" style="text-align: center; margin-bottom: var(--spacing-lg);">
+                    <h3 style="font-family: var(--font-display); font-size: var(--font-size-md); font-weight: 700; color: var(--color-success); margin-bottom: 4px; display: flex; align-items: center; justify-content: center; gap: 6px;">
+                        🎮 Yesterday's Budget Reward
+                    </h3>
+                    <p style="font-size: var(--font-size-xs); color: var(--color-text-secondary); margin-bottom: var(--spacing-md); line-height: 1.4;">
+                        Stay under your daily recommended limit yesterday to earn a bonus of <strong>+250 XP</strong>.
+                    </p>
+                    <div style="margin-bottom: var(--spacing-md);">
+                        <span id="financeXPRewardStatusText" style="font-weight: 700; font-size: var(--font-size-sm); color: var(--color-text-primary);">XP reward loading...</span>
+                    </div>
+                    <button id="claimFinanceXPBtn" class="btn-primary" onclick="app.claimFinanceXP()" style="width: 100%; justify-content: center; font-weight: 700; background: var(--color-success); border-color: var(--color-success);">
+                        Claim Yesterday's Budget Bonus (+250 XP)
+                    </button>
+                </div>
+
+                <!-- Grid Split -->
+                <div class="finance-grid">
+                    <!-- Left Column: Forms and XP claiming -->
+                    <div style="display: flex; flex-direction: column; gap: var(--spacing-lg);">
+                        <!-- Quick Log Form -->
+                        <div class="finance-card">
+                            <h3 class="finance-card-title">✍️ Daily Quick-Log</h3>
+                            <form id="logExpenseForm" onsubmit="app.handleLogExpense(event)" style="display: flex; flex-direction: column; gap: var(--spacing-sm);">
+                                <div class="form-group" style="margin-bottom: var(--spacing-xs);">
+                                    <label for="expenseNameInput" class="form-label">Purchase / Item Name</label>
+                                    <input type="text" id="expenseNameInput" class="form-input" required autocomplete="off" oninput="app.autoSetFormClassification()">
+                                </div>
+                                <div class="form-group" style="margin-bottom: var(--spacing-xs);">
+                                    <label for="expenseDescInput" class="form-label">Description / Detail</label>
+                                    <input type="text" id="expenseDescInput" class="form-input" required autocomplete="off">
+                                </div>
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-md); margin-bottom: var(--spacing-xs);">
+                                    <div class="form-group" style="margin-bottom: 0;">
+                                        <label for="expenseAmountInput" class="form-label">Amount</label>
+                                        <input type="number" id="expenseAmountInput" class="form-input" step="0.01" min="0.01" placeholder="0.00" required>
+                                    </div>
+                                    <div class="form-group" style="margin-bottom: 0;">
+                                        <label for="expenseDateInput" class="form-label">Date of Purchase</label>
+                                        <input type="date" id="expenseDateInput" class="form-input" required>
+                                    </div>
+                                </div>
+
+                                <!-- Payment Method Selector -->
+                                <div class="form-group" style="margin-bottom: var(--spacing-xs);">
+                                    <label class="form-label" style="font-size: 11px; margin-bottom: 4px;">Payment Method</label>
+                                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                                        <button type="button" id="expensePaymentVisaBtn" class="form-classify-btn active" onclick="app.setExpensePaymentMethod('visa')" style="padding: 8px 12px; font-size: var(--font-size-xs); font-weight: 700; border-radius: var(--radius-md); cursor: pointer; border: 1.5px solid var(--color-border); background: var(--color-surface); transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 6px;">
+                                            💳 Visa
+                                        </button>
+                                        <button type="button" id="expensePaymentWalletBtn" class="form-classify-btn" onclick="app.setExpensePaymentMethod('wallet')" style="padding: 8px 12px; font-size: var(--font-size-xs); font-weight: 700; border-radius: var(--radius-md); cursor: pointer; border: 1.5px solid var(--color-border); background: var(--color-surface); transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 6px;">
+                                            💵 Wallet
+                                        </button>
+                                    </div>
+                                    <input type="hidden" id="selectedExpensePaymentMethod" value="visa">
+                                </div>
+                                
+                                <div class="form-group" style="margin-bottom: var(--spacing-xs);">
+                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px;">
+                                        <label class="form-label" style="margin-bottom: 0;">Quick Category Tags</label>
+                                        <a href="#" onclick="app.toggleCategoryCustomizer(event)" style="font-size: 11px; color: var(--color-primary); font-weight: 700; text-decoration: underline; cursor: pointer;">⚙️ Customize Tags</a>
+                                    </div>
+                                    
+                                    <!-- Category Customizer Panel (Initially Hidden) -->
+                                    <div id="categoryCustomizer" style="display: none; background: var(--color-bg); padding: var(--spacing-sm); border-radius: var(--radius-md); border: 1.5px solid var(--color-border); margin-bottom: var(--spacing-sm);">
+                                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-xs);">
+                                            <span style="font-size: 11px; font-weight: 700; color: var(--color-text-secondary);">Manage Custom Tags</span>
+                                        </div>
+                                        <div id="customizerCategoriesList" class="preset-tags-grid" style="margin-bottom: var(--spacing-sm); gap: 4px;">
+                                            <!-- Populated dynamically -->
+                                        </div>
+                                        <div style="display: flex; gap: var(--spacing-xs);">
+                                            <input type="text" id="newCategoryInput" class="form-input" placeholder="e.g. Snacks 🍿" style="flex: 1; padding: 6px 12px; font-size: var(--font-size-xs); height: 32px; border-radius: var(--radius-md); border: 1px solid var(--color-border); background: var(--color-surface);">
+                                            <button type="button" class="btn-primary" onclick="app.addCustomCategory()" style="font-size: var(--font-size-xs); padding: 0 12px; height: 32px;">Add</button>
+                                        </div>
+                                    </div>
+
+                                    <div class="preset-tags-grid" id="financePresetTagsGrid">
+                                        <!-- Populated dynamically -->
+                                    </div>
+                                    <input type="hidden" id="selectedExpenseCategory" value="">
+                                </div>
+
+                                 <!-- Needs vs. Wants Selector Override -->
+                                 <div class="form-group" style="margin-bottom: var(--spacing-xs);">
+                                     <label class="form-label" style="font-size: 11px; margin-bottom: 4px;">Wants / Needs Classification</label>
+                                     <div class="classification-toggle-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                                         <button type="button" id="formClassifyNeedBtn" class="form-classify-btn active" onclick="app.setFormExpenseClassification(true)" style="padding: 8px 12px; font-size: var(--font-size-xs); font-weight: 700; border-radius: var(--radius-md); cursor: pointer; border: 1.5px solid var(--color-border); background: var(--color-surface); transition: all 0.2s;">
+                                             ⭐️ Need (Essential)
+                                         </button>
+                                         <button type="button" id="formClassifyWantBtn" class="form-classify-btn" onclick="app.setFormExpenseClassification(false)" style="padding: 8px 12px; font-size: var(--font-size-xs); font-weight: 700; border-radius: var(--radius-md); cursor: pointer; border: 1.5px solid var(--color-border); background: var(--color-surface); transition: all 0.2s;">
+                                             💭 Want (Lifestyle)
+                                         </button>
+                                     </div>
+                                     <input type="hidden" id="formExpenseIsEssential" value="true">
+                                 </div>
+
+                                <button type="submit" class="btn-primary" style="justify-content: center; height: 44px; font-weight: 700; margin-top: var(--spacing-xs);">
+                                    Log Purchase
+                                </button>
+                            </form>
+                        </div>
+
+                        <!-- Savings Goal Planner -->
+                        <div class="finance-card">
+                            <h3 class="finance-card-title">🎯 Save Up to Goal</h3>
+                            <p style="font-size: var(--font-size-xs); color: var(--color-text-secondary); margin-bottom: var(--spacing-md); line-height: 1.4;">
+                                Set target items and let the smart engine suggest monthly savings configurations.
+                            </p>
+                            
+                            <!-- Active Goal Progress Display -->
+                            <div id="financeActiveGoalContainer" style="display: none; background: var(--color-bg); padding: var(--spacing-md); border-radius: var(--radius-lg); border: 1.5px solid var(--color-border); margin-bottom: var(--spacing-md);">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                                    <span id="financeActiveGoalName" style="font-weight: 700; color: var(--color-text-primary); font-size: var(--font-size-sm);">Active Goal: iPad Pro</span>
+                                    <div style="display: flex; align-items: center; gap: var(--spacing-xs);">
+                                        <a href="#" onclick="app.editActiveGoal(event)" style="font-size: 11px; color: var(--color-primary); font-weight: 700; text-decoration: underline; cursor: pointer; margin-right: 6px;">✏️ Edit</a>
+                                        <a href="#" onclick="app.deleteActiveGoal(event)" style="font-size: 11px; color: var(--color-danger); font-weight: 700; text-decoration: underline; cursor: pointer; margin-right: 12px;">🗑️ Remove</a>
+                                        <span id="financeActiveGoalProgressPct" style="font-weight: 700; color: var(--color-primary); font-size: var(--font-size-xs);">25%</span>
+                                    </div>
+                                </div>
+                                <div style="background: var(--color-border); height: 8px; border-radius: 4px; overflow: hidden; margin-bottom: 6px;">
+                                    <div id="financeActiveGoalProgressBar" style="background: var(--color-primary); height: 100%; width: 25%; transition: width 0.3s;"></div>
+                                </div>
+                                <p id="financeActiveGoalStatus" style="font-size: 11px; color: var(--color-text-secondary); margin-bottom: 0;"></p>
+                            </div>
+
+                            <form id="goalPlannerForm" onsubmit="app.handleSetActiveGoal(event)" style="display: flex; flex-direction: column; gap: var(--spacing-sm);">
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label for="goalNameInput" class="form-label" style="font-size: 11px;">Goal / Item Name</label>
+                                    <input type="text" id="goalNameInput" class="form-input" placeholder="e.g. New Laptop, Vacation" required style="height: 38px; padding: 6px 12px; font-size: var(--font-size-xs);">
+                                </div>
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-md);">
+                                    <div class="form-group" style="margin-bottom: 0;">
+                                        <label for="goalTargetInput" class="form-label" style="font-size: 11px;">Target Amount</label>
+                                        <input type="number" id="goalTargetInput" class="form-input" placeholder="0.00" min="1" required style="height: 38px; padding: 6px 12px; font-size: var(--font-size-xs);" oninput="app.updateGoalSuggestions()">
+                                    </div>
+                                    <div class="form-group" style="margin-bottom: 0;">
+                                        <label for="goalDurationInput" class="form-label" style="font-size: 11px;">Desired Duration (Months)</label>
+                                        <input type="number" id="goalDurationInput" class="form-input" placeholder="e.g. 6" min="1" required style="height: 38px; padding: 6px 12px; font-size: var(--font-size-xs);" oninput="app.updateGoalSuggestions()">
+                                    </div>
+                                </div>
+                                
+                                <!-- Suggestions Engine Panel -->
+                                <div id="goalSuggestionsPanel" style="display: none; background: var(--color-bg); padding: var(--spacing-sm); border-radius: var(--radius-md); border: 1.5px dashed var(--color-border); font-size: 11px; line-height: 1.4;">
+                                    <!-- Rendered dynamically -->
+                                </div>
+
+                                <button type="submit" class="btn-primary" style="justify-content: center; height: 38px; font-weight: 700; margin-top: var(--spacing-xs); font-size: var(--font-size-xs);">
+                                    Set Active Goal
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Right Column: Visual Analytics and History -->
+                    <div style="display: flex; flex-direction: column; gap: var(--spacing-lg);">
+                        <!-- Visual Analytics -->
+                        <div class="finance-card">
+                            <h3 class="finance-card-title">📊 Visual Analytics</h3>
+                            
+                            <!-- Circle Progress Ring -->
+                            <div class="finance-progress-circle-wrapper">
+                                <svg class="finance-progress-circle" width="160" height="160" viewBox="0 0 160 160">
+                                    <circle class="circle-bg" cx="80" cy="80" r="70"></circle>
+                                    <circle id="financeProgressCircleFill" class="circle-fill" cx="80" cy="80" r="70" stroke-dasharray="439.8" stroke-dashoffset="439.8"></circle>
+                                </svg>
+                                <div class="circle-text">
+                                    <span id="financePercentSpentText" class="circle-percent">0%</span>
+                                    <span class="circle-label">Spent</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Spent vs Remaining values -->
+                            <div style="display: flex; justify-content: space-between; text-align: center; margin-top: var(--spacing-md); border-top: 1px solid var(--color-border); padding-top: var(--spacing-md); margin-bottom: var(--spacing-md);">
+                                <div style="flex: 1;">
+                                    <p style="font-size: 10px; font-weight: 700; color: var(--color-text-secondary); text-transform: uppercase;">Total Spent</p>
+                                    <p id="financeTotalSpentText" style="font-weight: 800; font-size: var(--font-size-lg); color: var(--color-danger);">$0.00</p>
+                                </div>
+                                <div style="width: 1px; background: var(--color-border);"></div>
+                                <div style="flex: 1;">
+                                    <p style="font-size: 10px; font-weight: 700; color: var(--color-text-secondary); text-transform: uppercase;">Remaining Balance</p>
+                                    <p id="financeRemainingText" style="font-weight: 800; font-size: var(--font-size-lg); color: var(--color-success);">$0.00</p>
+                                </div>
+                            </div>
+
+                            <!-- Alert Banner placeholder -->
+                            <div id="financeAlertBanner" class="finance-alert success" style="margin-bottom: 0;">
+                                <!-- Rendered dynamically -->
+                            </div>
+                        </div>
+
+                        <!-- Logged Transactions List -->
+                        <div class="finance-card">
+                            <h3 class="finance-card-title">📋 Logged Transactions</h3>
+                            <div class="expense-list-container">
+                                <div id="expenseListEmpty" style="padding: var(--spacing-xl) 0; text-align: center; color: var(--color-text-tertiary); font-size: var(--font-size-sm);">
+                                    <div style="font-size: 2.5rem; margin-bottom: var(--spacing-sm);">🛒</div>
+                                    <p>No transactions logged yet this month.</p>
+                                </div>
+                                <div id="expenseListContent" style="display: flex; flex-direction: column;">
+                                    <!-- Rendered dynamically -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Smart Savings Recommendations -->
+                        <div class="finance-card">
+                            <h3 class="finance-card-title">💡 Smart Savings Suggestions</h3>
+                            <p style="font-size: var(--font-size-xs); color: var(--color-text-secondary); margin-bottom: var(--spacing-md); line-height: 1.4;">
+                                Our smart engine analyzes your logged lifestyle purchases (Wants) to suggest adjustments that help you reach your goals.
+                            </p>
+                            
+                            <div id="financeRecommendationsContainer">
+                                <!-- Populated dynamically by app.renderSavingsRecommendations() -->
+                                <div style="padding: var(--spacing-md); text-align: center; color: var(--color-text-tertiary); font-size: var(--font-size-sm);">
+                                    <div style="font-size: 1.75rem; margin-bottom: 4px;">💡</div>
+                                    <p style="margin: 0;">Log a few more purchases to receive personalized smart savings suggestions.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </div>
+        </main>
+    </template>
+
+    <template id="habitsPageTemplate">
+        <header class="app-header">
+            <div class="header-content">
+                <div class="brand-text">
+                    <h1 class="brand-title">Habit Folds</h1>
+                    <p class="brand-subtitle">Crease your routines, fold your day into structure.</p>
+                </div>
+                <div class="header-actions">
+                    <button class="btn-primary" id="addHabitBtn">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                            <path d="M10 4V16M4 10H16" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                        </svg>
+                        <span>New Habit</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <main class="app-main">
+            <section class="stats-section">
+                <div class="stat-card">
+                    <div class="stat-icon stat-icon-blue">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <path
+                                d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"
+                                fill="currentColor" />
+                        </svg>
+                    </div>
+                    <div class="stat-content">
+                        <p class="stat-label">Active Habits</p>
+                        <p class="stat-value" id="activeHabitsCount">0</p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon stat-icon-green">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <path
+                                d="M22 11.08V12C21.9988 14.1564 21.3005 16.2547 20.0093 17.9818C18.7182 19.7088 16.9033 20.9725 14.8354 21.5839C12.7674 22.1953 10.5573 22.1219 8.53447 21.3746C6.51168 20.6273 4.78465 19.2461 3.61096 17.4371C2.43727 15.628 1.87979 13.4881 2.02168 11.3363C2.16356 9.18455 2.99721 7.13631 4.39828 5.49706C5.79935 3.85781 7.69279 2.71537 9.79619 2.24013C11.8996 1.7649 14.1003 1.98232 16.07 2.85999"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                            <path d="M22 4L12 14.01L9 11.01" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                    </div>
+                    <div class="stat-content">
+                        <p class="stat-label">Completed Today</p>
+                        <p class="stat-value" id="completedTodayCount">0</p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon stat-icon-orange">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <path d="M13 2L3 14H12L11 22L21 10H12L13 2Z" fill="currentColor" />
+                        </svg>
+                    </div>
+                    <div class="stat-content">
+                        <p class="stat-label">Current Streak</p>
+                        <p class="stat-value" id="currentStreak">0</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="habits-section">
+                <div class="section-header">
+                    <h2 class="section-title">Your Habits</h2>
+                    <div class="view-controls">
+                        <button class="view-btn active" id="gridViewBtn" data-view="grid" title="Grid view">
+                            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                                <rect x="2" y="2" width="6" height="6" rx="1.5" fill="currentColor" />
+                                <rect x="10" y="2" width="6" height="6" rx="1.5" fill="currentColor" />
+                                <rect x="2" y="10" width="6" height="6" rx="1.5" fill="currentColor" />
+                                <rect x="10" y="10" width="6" height="6" rx="1.5" fill="currentColor" />
+                            </svg>
+                        </button>
+                        <button class="view-btn" id="listViewBtn" data-view="list" title="List view">
+                            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                                <rect x="2" y="3" width="14" height="3" rx="1.5" fill="currentColor" />
+                                <rect x="2" y="8" width="14" height="3" rx="1.5" fill="currentColor" />
+                                <rect x="2" y="13" width="14" height="3" rx="1.5" fill="currentColor" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div id="emptyState" class="empty-state" style="display: none;">
+                    <div class="empty-icon" onclick="app.openModal('habitModal')" title="Create habit">
+                        <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+                            <circle cx="40" cy="40" r="38" stroke="currentColor" stroke-width="2" stroke-dasharray="8 8"
+                                opacity="0.2" />
+                            <path d="M40 25V55M25 40H55" stroke="currentColor" stroke-width="3" stroke-linecap="round"
+                                opacity="0.3" />
+                        </svg>
+                    </div>
+                    <h3 class="empty-title">No habits yet</h3>
+                    <p class="empty-description">Start building better routines by creating your first habit.</p>
+                </div>
+
+                <div id="habitsGrid" class="habits-grid"></div>
+            </section>
+        </main>
+    </template>
+
+    <template id="todoPageTemplate">
+        <header class="app-header">
+            <div class="header-content">
+                <div class="brand-text">
+                    <h1 class="brand-title">Task Creases</h1>
+                    <p class="brand-subtitle">Shape your mornings with structured tasks, crease by crease.</p>
+                </div>
+                <div class="header-actions">
+                    <button class="btn-primary" id="addTaskBtn">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                            <path d="M10 4V16M4 10H16" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                        </svg>
+                        <span>New Task</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <main class="app-main">
+            <section class="stats-section">
+                <div class="stat-card">
+                    <div class="stat-icon stat-icon-blue">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <path d="M9 11L12 14L22 4" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                            <path d="M21 12V19C21 20.1 20.1 21 19 21H5C3.9 21 3 20.1 3 19V5C3 3.9 3.9 3 5 3H16"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                    </div>
+                    <div class="stat-content">
+                        <p class="stat-label">Total Tasks</p>
+                        <p class="stat-value" id="totalTasksCount">0</p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon stat-icon-green">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <path
+                                d="M22 11.08V12C21.9988 14.1564 21.3005 16.2547 20.0093 17.9818C18.7182 19.7088 16.9033 20.9725 14.8354 21.5839C12.7674 22.1953 10.5573 22.1219 8.53447 21.3746C6.51168 20.6273 4.78465 19.2461 3.61096 17.4371C2.43727 15.628 1.87979 13.4881 2.02168 11.3363C2.16356 9.18455 2.99721 7.13631 4.39828 5.49706C5.79935 3.85781 7.69279 2.71537 9.79619 2.24013C11.8996 1.7649 14.1003 1.98232 16.07 2.85999"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                            <path d="M22 4L12 14.01L9 11.01" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                    </div>
+                    <div class="stat-content">
+                        <p class="stat-label">Completed</p>
+                        <p class="stat-value" id="completedTasksCount">0</p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon stat-icon-orange">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" />
+                            <path d="M12 6V12L16 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                        </svg>
+                    </div>
+                    <div class="stat-content">
+                        <p class="stat-label">Pending</p>
+                        <p class="stat-value" id="pendingTasksCount">0</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="tasks-section">
+                <div class="section-header">
+                    <h2 class="section-title">Your Tasks</h2>
+                    <div class="controls-wrapper" style="display: flex; gap: 12px; align-items: center;">
+                        <!-- View Switches -->
+                        <div class="view-controls">
+                            <button class="view-btn active" id="taskListViewBtn" data-view="list" title="List view">
+                                <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                                    <rect x="2" y="3" width="14" height="3" rx="1.5" fill="currentColor" />
+                                    <rect x="2" y="8" width="14" height="3" rx="1.5" fill="currentColor" />
+                                    <rect x="2" y="13" width="14" height="3" rx="1.5" fill="currentColor" />
+                                </svg>
+                            </button>
+                            <button class="view-btn" id="taskGridViewBtn" data-view="grid" title="Grid view">
+                                <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                                    <rect x="2" y="2" width="6" height="6" rx="1.5" fill="currentColor" />
+                                    <rect x="10" y="2" width="6" height="6" rx="1.5" fill="currentColor" />
+                                    <rect x="2" y="10" width="6" height="6" rx="1.5" fill="currentColor" />
+                                    <rect x="10" y="10" width="6" height="6" rx="1.5" fill="currentColor" />
+                                </svg>
+                            </button>
+                        </div>
+
+                        <!-- Sort -->
+                        <select id="taskSortSelect" class="sort-select">
+                            <option value="default">Sort by...</option>
+                            <option value="priority-high">Priority (High to Low)</option>
+                            <option value="priority-low">Priority (Low to High)</option>
+                        </select>
+
+                        <!-- Filters -->
+                        <div class="filter-controls">
+                            <button class="filter-btn active" data-filter="pending">Pending</button>
+                            <button class="filter-btn" data-filter="completed">Completed</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tasksList" class="tasks-list"></div>
+
+                <div id="emptyTasksState" class="empty-state" style="display: none;">
+                    <div class="empty-icon clickable" id="emptyStateAddBtn">
+                        <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+                            <rect x="15" y="15" width="50" height="50" rx="8" stroke="currentColor" stroke-width="2"
+                                stroke-dasharray="8 8" opacity="0.2" />
+                            <path d="M40 30V50M30 40H50" stroke="currentColor" stroke-width="3" stroke-linecap="round"
+                                opacity="0.3" class="plus-path" />
+                        </svg>
+                    </div>
+                    <h3 class="empty-title">Come on, Create your first task!</h3>
+                </div>
+
+                <div id="emptyCompletedState" class="empty-state" style="display: none;">
+                    <h3 class="empty-title">Come on, Finish your first task!</h3>
+                </div>
+            </section>
+        </main>
+    </template>
+
+    <template id="pomodoroPageTemplate">
+        <header class="app-header">
+            <div class="header-content">
+                <div class="brand-text">
+                    <h1 class="brand-title">Pomogami</h1>
+                    <p class="brand-subtitle">Shape your focus time, creasing distractions away.</p>
+                </div>
+            </div>
+        </header>
+
+        <main class="app-main">
+            <section class="stats-section">
+                <div class="stat-card">
+                    <div class="stat-icon stat-icon-blue">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" />
+                            <path d="M12 6V12L16 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                        </svg>
+                    </div>
+                    <div class="stat-content">
+                        <p class="stat-label">Sessions Today</p>
+                        <p class="stat-value" id="sessionsToday">0</p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon stat-icon-green">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <path d="M13 2L3 14H12L11 22L21 10H12L13 2Z" fill="currentColor" />
+                        </svg>
+                    </div>
+                    <div class="stat-content">
+                        <p class="stat-label">Focus Time</p>
+                        <p class="stat-value" id="totalFocusTime">0m</p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon stat-icon-orange">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <path
+                                d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"
+                                fill="currentColor" />
+                        </svg>
+                    </div>
+                    <div class="stat-content">
+                        <p class="stat-label">Current Streak</p>
+                        <p class="stat-value" id="currentStreak">0</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="pomodoro-section">
+                <div class="pomodoro-card">
+                    <div class="pomodoro-header-row">
+                        <div class="mode-selector">
+                            <button class="mode-btn active" data-mode="work">Work</button>
+                            <button class="mode-btn" data-mode="short">Short Break</button>
+                            <button class="mode-btn" data-mode="long">Long Break</button>
+                        </div>
+                        <button class="btn-settings-icon" id="settingsBtn" title="Pomodoro Settings">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="3" />
+                                <path
+                                    d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <div class="timer-display">
+                        <svg class="timer-ring" width="320" height="320" viewBox="0 0 320 320">
+                            <circle class="timer-ring-bg" cx="160" cy="160" r="140" />
+                            <circle class="timer-ring-progress" cx="160" cy="160" r="140" id="timerProgress" />
+                        </svg>
+                        <div class="timer-content">
+                            <div class="timer-time" id="timerDisplay">25:00</div>
+                            <div class="timer-label" id="timerLabel">Focus Time</div>
+                        </div>
+                    </div>
+
+                    <div class="timer-controls">
+                        <button class="btn-timer-primary" id="startBtn">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                <path d="M8 5V19L19 12L8 5Z" fill="currentColor" />
+                            </svg>
+                            <span>Start</span>
+                        </button>
+                        <button class="btn-timer-secondary" id="resetBtn">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                <path
+                                    d="M4 12C4 16.4183 7.58172 20 12 20C16.4183 20 20 16.4183 20 12C20 7.58172 16.4183 4 12 4C9.25 4 6.82 5.38 5.38 7.5"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                                <path d="M4 4V8H8" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" />
+                            </svg>
+                            <span>Reset</span>
+                        </button>
+                    </div>
+
+                    <!-- Sleek Focus Audio Player -->
+                    <div class="focus-audio-player" style="width: 100%; border-top: 1.5px solid var(--color-border); padding-top: var(--spacing-lg); margin-top: var(--spacing-sm); display: flex; flex-direction: column; gap: var(--spacing-sm);">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span style="font-size: var(--font-size-sm); font-weight: 700; color: var(--color-text-secondary); display: flex; align-items: center; gap: 6px;">
+                                🎧 Focus Ambience
+                            </span>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <button class="btn-icon" id="audioPlayPauseBtn" onclick="app.toggleFocusAudio()" title="Play/Pause Ambience" style="width: 32px; height: 32px; font-size: 0.8rem; border: 1.5px solid var(--color-border); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; background: var(--color-surface);">
+                                    ▶
+                                </button>
+                                <div style="display: flex; align-items: center; gap: 4px;">
+                                    <span style="font-size: 0.8rem;">🔈</span>
+                                    <input type="range" id="audioVolumeSlider" min="0" max="1" step="0.1" value="0.5" oninput="app.setFocusAudioVolume(this.value)" style="width: 60px; height: 4px; accent-color: var(--color-primary); cursor: pointer;">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="audio-tracks" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--spacing-xs);">
+                            <button class="audio-track-btn" id="trackLofi" onclick="app.selectFocusAudioTrack('lofi')" style="padding: 6px; border: 1.5px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-surface); font-size: var(--font-size-xs); font-weight: 600; cursor: pointer; transition: all var(--transition-fast);">🎵 Lo-Fi</button>
+                            <button class="audio-track-btn" id="trackRain" onclick="app.selectFocusAudioTrack('rain')" style="padding: 6px; border: 1.5px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-surface); font-size: var(--font-size-xs); font-weight: 600; cursor: pointer; transition: all var(--transition-fast);">🌧️ Rain</button>
+                            <button class="audio-track-btn" id="trackCafe" onclick="app.selectFocusAudioTrack('cafe')" style="padding: 6px; border: 1.5px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-surface); font-size: var(--font-size-xs); font-weight: 600; cursor: pointer; transition: all var(--transition-fast);">☕ Cafe</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </template>
+
+    <template id="playlistPageTemplate">
+        <header class="app-header">
+            <div class="header-content">
+                <div class="brand-text">
+                    <h1 class="brand-title">Playlist Tracker</h1>
+                    <p class="brand-subtitle">Unfold focus tracks to flow with your morning folding.</p>
+                </div>
+                <div class="header-actions" style="display: flex; gap: var(--spacing-md); align-items: center;">
+                    <div id="playlistStreakWrapper" class="motivational-toggle-wrapper"
+                        style="display: flex; align-items: center; gap: var(--spacing-sm); background: var(--color-surface); padding: 0.5rem 1rem; border-radius: var(--radius-full); border: 1.5px solid var(--color-border); font-size: var(--font-size-sm); font-weight: 500; transition: opacity var(--transition-fast);">
+                        <span style="color: var(--color-text-secondary);">Streak:</span>
+                        <span id="StreakCounter" style="font-weight: 700; color: var(--color-primary);"></span>
+                        <button id="resetStreakBtn" title="Reset Streak" onclick="app.resetPlaylistStreak()"
+                            style="background: transparent; border: none; padding: 2px; cursor: pointer; color: var(--color-text-tertiary); display: none; align-items: center; justify-content: center; transition: color var(--transition-fast); margin-left: 2px; margin-right: 2px;"
+                            onmouseover="this.style.color='var(--color-primary)'"
+                            onmouseout="this.style.color='var(--color-text-tertiary)'">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67" />
+                            </svg>
+                        </button>
+                        <label class="switch">
+                            <input type="checkbox" id="toggleMotivationalQuotes"
+                                onchange="app.toggleMotivationalQuotesSetting(this.checked)">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <button class="btn-primary" id="addPlaylistBtn">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                            <path d="M10 4V16M4 10H16" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                        </svg>
+                        <span>Add Playlist</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <main class="app-main">
+            <section class="playlists-section">
+                <div id="playlistsContainer"></div>
+
+                <div id="playlistEmptyState" class="playlist-empty-state" style="display: none;">
+                    <div class="empty-icon">
+                        <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+                            <rect x="10" y="20" width="60" height="40" rx="4" stroke="currentColor" stroke-width="2"
+                                stroke-dasharray="8 8" opacity="0.2" />
+                            <path d="M35 30L50 40L35 50V30Z" stroke="currentColor" stroke-width="3"
+                                stroke-linecap="round" opacity="0.3" />
+                        </svg>
+                    </div>
+                    <h3 class="empty-title">No Playlists Yet</h3>
+                    <p class="empty-description">Import a YouTube playlist to start tracking your progress.</p>
+                    <button class="btn-secondary" onclick="app.openModal('playlistModal')">
+                        Import Playlist
+                    </button>
+                </div>
+            </section>
+        </main>
+    </template>
+
+    <template id="authPageTemplate">
+        <div class="auth-container">
+            <div class="auth-header-actions"
+                style="position: absolute; top: var(--spacing-md); right: var(--spacing-md); display: flex; gap: var(--spacing-xs); align-items: center;">
+                <!-- Accent Color Picker -->
+                <div class="accent-picker-wrapper" style="position: relative; display: flex; align-items: center;">
+                    <button class="btn-icon" id="pageAccentColorBtn" title="Change accent color" type="button">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 22C17.52 22 22 17.52 22 12S17.52 2 12 2 2 6.48 2 12s4.48 10 10 10z" />
+                            <circle cx="7.5" cy="10.5" r="1.5" fill="currentColor" />
+                            <circle cx="11.5" cy="7.5" r="1.5" fill="currentColor" />
+                            <circle cx="16.5" cy="9.5" r="1.5" fill="currentColor" />
+                            <circle cx="15.5" cy="14.5" r="1.5" fill="currentColor" />
+                        </svg>
+                    </button>
+                    <div class="accent-color-dropdown" id="pageAccentColorDropdown"></div>
+                </div>
+                <!-- Theme Toggle -->
+                <button class="btn-icon auth-theme-toggle" id="pageThemeToggle" title="Toggle theme" type="button">
+                    <svg class="theme-icon sun-icon" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                        <circle cx="10" cy="10" r="4" stroke="currentColor" stroke-width="1.5" />
+                        <path
+                            d="M10 2V3M10 17V18M18 10H17M3 10H2M15.657 4.343L14.95 5.05M5.05 14.95L4.343 15.657M15.657 15.657L14.95 14.95M5.05 5.05L4.343 4.343"
+                            stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                    </svg>
+                    <svg class="theme-icon moon-icon" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                        <path
+                            d="M17 10.5C16.9 14.6 13.6 18 9.5 18C5.4 18 2 14.6 2 10.5C2 6.9 4.5 3.9 8 3.1C7.4 3.9 7 4.9 7 6C7 8.8 9.2 11 12 11C13.1 11 14.1 10.6 14.9 10C14.9 10.2 17 10.3 17 10.5Z"
+                            stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                </button>
+            </div>
+            <div class="auth-header">
+                <h2 class="auth-title" id="authTitle">Sign In</h2>
+                <p class="auth-subtitle" id="authSubtitle">Access your productivity hub</p>
+            </div>
+
+            <div id="authMessage" class="auth-message"></div>
+
+            <form id="authForm" class="modal-form" style="padding: 0;">
+                <div class="form-group" id="usernameGroup" style="display: none;">
+                    <label for="usernameInput" class="form-label">Username</label>
+                    <input type="text" id="usernameInput" class="form-input" placeholder="Enter Username"
+                        autocomplete="username">
+                </div>
+
+                <div class="form-group">
+                    <label for="emailInput" class="form-label" id="emailLabel">Email or Username</label>
+                    <input type="text" id="emailInput" class="form-input" placeholder="Email/Username" required
+                        autocomplete="username email">
+                </div>
+
+                <div class="form-group">
+                    <label for="passwordInput" class="form-label">Password</label>
+                    <input type="password" id="passwordInput" class="form-input" placeholder="••••••••" required
+                        autocomplete="current-password" minlength="6">
+                </div>
+
+                <button type="submit" class="btn-primary" id="submitAuthBtn"
+                    style="width: 100%; justify-content: center; margin-top: var(--spacing-md); height: 48px;">
+                    <span id="authSubmitText">Sign In</span>
+                </button>
+            </form>
+
+            <div class="auth-form-footer">
+                <span id="authToggleText">Don't have an account? </span>
+                <a class="auth-toggle-link" id="toggleAuthMode">Sign Up</a>
+            </div>
+        </div>
+    </template>
+
+    <template id="settingsPageTemplate">
+        <header class="app-header">
+            <div class="header-content">
+                <div class="brand-text">
+                    <h1 class="brand-title">Settings</h1>
+                    <p class="brand-subtitle">Manage your profile</p>
+                </div>
+                <div class="header-actions">
+                    <button class="btn-secondary" id="settingsBackBtn">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                            <path d="M15 10H5M5 10L9 6M5 10L9 14" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                        <span>Back</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <main class="app-main">
+            <!-- Badges Inventory Widget for Normal Users -->
+            <div class="badges-showcase-section" id="userBadgesShowcaseCard"
+                style="display: none; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-xl); padding: var(--spacing-lg) var(--spacing-xl); margin-bottom: var(--spacing-lg);">
+                <h3 class="settings-section-title"
+                    style="margin-bottom: var(--spacing-md); display: flex; align-items: center; gap: 8px;">
+                    🏅 Badges Chest
+                </h3>
+                <div class="badges-grid-container" id="userBadgesContainer"
+                    style="display: flex; flex-wrap: wrap; gap: var(--spacing-sm);">
+                    <!-- Dynamic Badges -->
+                </div>
+            </div>
+
+            <div class="settings-container">
+                <!-- User ID Badge Card -->
+                <div class="settings-section" style="padding: var(--spacing-md) var(--spacing-lg); display: flex; align-items: center; justify-content: space-between; background: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(99, 102, 241, 0.02)); border: 1px solid var(--color-border-light);">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span style="font-size: 20px;">🆔</span>
+                        <div>
+                            <div style="font-size: var(--font-size-xs); color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700;">Account Number</div>
+                            <div style="font-family: var(--font-display); font-size: var(--font-size-md); font-weight: 800; color: var(--color-primary);">Member #<span id="settingsUserNumber">—</span></div>
+                        </div>
+                    </div>
+                    <div style="font-size: var(--font-size-xs); color: var(--color-text-secondary);" id="settingsAccountCreated"></div>
+                </div>
+
+                <!-- Profile Picture -->
+                <div class="settings-section">
+                    <h3 class="settings-section-title">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                            <circle cx="8.5" cy="8.5" r="1.5" />
+                            <polyline points="21 15 16 10 5 21" />
+                        </svg>
+                        Profile Picture
+                    </h3>
+                    <div class="settings-avatar-area">
+                        <div class="settings-avatar-preview" id="settingsAvatarPreview">
+                        </div>
+                        <div class="settings-avatar-actions">
+                            <input type="file" id="pictureFileInput" accept="image/*" style="display: none;">
+                            <button class="btn-primary" id="uploadPictureBtn">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                    <polyline points="17 8 12 3 7 8" />
+                                    <line x1="12" y1="3" x2="12" y2="15" />
+                                </svg>
+                                Upload Picture
+                            </button>
+                            <button class="btn-danger-outline" id="removePictureBtn">Remove Picture</button>
+                        </div>
+                    </div>
+                    <div id="pictureMsg" class="settings-msg"></div>
+                </div>
+
+                <!-- Username -->
+                <div class="settings-section">
+                    <h3 class="settings-section-title">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                            <circle cx="12" cy="7" r="4" />
+                        </svg>
+                        Username
+                    </h3>
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <input type="text" id="settingsUsername" class="form-input" placeholder="Enter your username"
+                            maxlength="30" autocomplete="username">
+                    </div>
+                    <div class="settings-action-row">
+                        <button class="btn-primary" id="saveUsernameBtn">Save Username</button>
+                    </div>
+                    <div id="usernameMsg" class="settings-msg"></div>
+                </div>
+
+                <!-- Email -->
+                <div class="settings-section">
+                    <h3 class="settings-section-title">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                            <polyline points="22,6 12,13 2,6" />
+                        </svg>
+                        Email Address
+                    </h3>
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <input type="email" id="settingsEmail" class="form-input" placeholder="your@email.com"
+                            autocomplete="email">
+                    </div>
+                    <div class="form-group" style="margin-bottom: 0; margin-top: var(--spacing-md);">
+                        <label for="emailReauthPassword" class="form-label">Current Password (required to change
+                            email)</label>
+                        <div class="password-input-wrapper">
+                            <input type="password" id="emailReauthPassword" class="form-input"
+                                placeholder="Enter current password" autocomplete="current-password">
+                            <button type="button" class="password-toggle-btn" data-target="emailReauthPassword"><svg
+                                    width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path
+                                        d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
+                                    <line x1="1" y1="1" x2="23" y2="23" />
+                                </svg></button>
+                        </div>
+                    </div>
+                    <div class="settings-action-row">
+                        <button class="btn-primary" id="saveEmailBtn">Save Email</button>
+                    </div>
+                    <div id="emailMsg" class="settings-msg"></div>
+                </div>
+
+                <!-- Change Password -->
+                <div class="settings-section">
+                    <h3 class="settings-section-title">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                        </svg>
+                        Change Password
+                    </h3>
+                    <div class="form-group">
+                        <label for="currentPassword" class="form-label">Current Password</label>
+                        <div class="password-input-wrapper">
+                            <input type="password" id="currentPassword" class="form-input"
+                                placeholder="Enter current password" autocomplete="current-password">
+                            <button type="button" class="password-toggle-btn" data-target="currentPassword"><svg
+                                    width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path
+                                        d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
+                                    <line x1="1" y1="1" x2="23" y2="23" />
+                                </svg></button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="newPassword" class="form-label">New Password</label>
+                        <div class="password-input-wrapper">
+                            <input type="password" id="newPassword" class="form-input" placeholder="Enter new password"
+                                minlength="6" autocomplete="new-password">
+                            <button type="button" class="password-toggle-btn" data-target="newPassword"><svg width="18"
+                                    height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round">
+                                    <path
+                                        d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
+                                    <line x1="1" y1="1" x2="23" y2="23" />
+                                </svg></button>
+                        </div>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label for="confirmPassword" class="form-label">Confirm New Password</label>
+                        <div class="password-input-wrapper">
+                            <input type="password" id="confirmPassword" class="form-input"
+                                placeholder="Confirm new password" minlength="6" autocomplete="new-password">
+                            <button type="button" class="password-toggle-btn" data-target="confirmPassword"><svg
+                                    width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path
+                                        d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
+                                    <line x1="1" y1="1" x2="23" y2="23" />
+                                </svg></button>
+                        </div>
+                    </div>
+                    <div class="settings-action-row">
+                        <button class="btn-primary" id="changePasswordBtn">Update Password</button>
+                    </div>
+                    <div id="passwordMsg" class="settings-msg"></div>
+                </div>
+
+                <!-- Consistency Monthly Wrap-Up Info -->
+                <div class="settings-section">
+                    <h3 class="settings-section-title">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10" />
+                            <path d="M12 8v4l3 3" />
+                        </svg>
+                        Consistency Monthly Wrap-Up
+                    </h3>
+                    <p style="font-size: var(--font-size-xs); color: var(--color-text-secondary); margin-bottom: var(--spacing-md); line-height: 1.4;">
+                        Here is your consistency fold summary for the past month!
+                    </p>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-md); margin-bottom: var(--spacing-lg);">
+                        <div style="background: var(--color-bg); border: 1.5px solid var(--color-border); padding: var(--spacing-md); border-radius: var(--radius-lg); text-align: center;">
+                            <div style="font-size: 1.5rem;">⏱️</div>
+                            <div id="wrapUpFocusTime" style="font-size: var(--font-size-lg); font-weight: 700; color: var(--color-text-primary); margin-top: 4px;">0h</div>
+                            <div style="font-size: 10px; color: var(--color-text-secondary); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 4px;">Focus Time</div>
+                        </div>
+                        <div style="background: var(--color-bg); border: 1.5px solid var(--color-border); padding: var(--spacing-md); border-radius: var(--radius-lg); text-align: center;">
+                            <div style="font-size: 1.5rem;">⚡</div>
+                            <div id="wrapUpHabitsKept" style="font-size: var(--font-size-lg); font-weight: 700; color: var(--color-text-primary); margin-top: 4px;">0</div>
+                            <div style="font-size: 10px; color: var(--color-text-secondary); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 4px;">Habits Kept</div>
+                        </div>
+                        <div style="background: var(--color-bg); border: 1.5px solid var(--color-border); padding: var(--spacing-md); border-radius: var(--radius-lg); text-align: center;">
+                            <div style="font-size: 1.5rem;">📋</div>
+                            <div id="wrapUpTasksDone" style="font-size: var(--font-size-lg); font-weight: 700; color: var(--color-text-primary); margin-top: 4px;">0</div>
+                            <div style="font-size: 10px; color: var(--color-text-secondary); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 4px;">Tasks Finished</div>
+                        </div>
+                        <div style="background: var(--color-bg); border: 1.5px solid var(--color-border); padding: var(--spacing-md); border-radius: var(--radius-lg); text-align: center;">
+                            <div style="font-size: 1.5rem;">✨</div>
+                            <div id="wrapUpXPGained" style="font-size: var(--font-size-lg); font-weight: 700; color: var(--color-text-primary); margin-top: 4px;">0 XP</div>
+                            <div style="font-size: 10px; color: var(--color-text-secondary); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 4px;">XP Gained</div>
+                        </div>
+                    </div>
+
+                    <div class="wrapup-honor-badge" style="background: linear-gradient(135deg, rgba(245, 158, 11, 0.08), rgba(16, 185, 129, 0.08)); border: 1.5px dashed var(--color-primary); padding: var(--spacing-md); border-radius: var(--radius-lg); text-align: center;">
+                        <div style="font-size: var(--font-size-xs); font-weight: 700; color: var(--color-primary); margin-bottom: 2px;">🎖️ Honor Status</div>
+                        <p id="wrapUpHonorStatus" style="font-size: var(--font-size-xs); color: var(--color-text-secondary); margin: 0; line-height: 1.4;">Unfolding like a master! Keep up the daily fold consistency to rise higher.</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </template>
+
+
+    <!-- Playlist Detail Template -->
+    <template id="playlistDetailPageTemplate">
+        <header class="app-header">
+            <div class="header-content">
+                <div class="brand-text">
+                    <h1 class="brand-title" id="detailPlaylistTitle">Playlist Course</h1>
+                    <p class="brand-subtitle" id="detailPlaylistSub">Track your lesson progression</p>
+                </div>
+                <div class="header-actions" style="display: flex; gap: var(--spacing-sm);">
+                    <button class="btn-danger-outline" id="deletePlaylistBtn">Delete Course</button>
+                    <button class="btn-secondary" id="playlistDetailBackBtn">Back to Courses</button>
+                </div>
+            </div>
+        </header>
+
+        <main class="app-main">
+            <div class="playlist-course-layout">
+                <div class="playlist-progress-area"
+                    style="background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-xl); padding: var(--spacing-xl); margin-bottom: var(--spacing-lg);">
+                    <div
+                        style="display: flex; justify-content: space-between; margin-bottom: var(--spacing-sm); font-family: var(--font-display); font-weight: 700;">
+                        <span style="font-size: var(--font-size-base);">Course Progress</span>
+                        <span id="detailProgressText">0%</span>
+                    </div>
+                    <div
+                        style="width: 100%; height: 8px; background: var(--color-border); border-radius: 4px; overflow: hidden; margin-bottom: var(--spacing-sm);">
+                        <div id="detailProgressBar"
+                            style="width: 0%; height: 100%; background: var(--color-primary); transition: width 0.4s ease;">
+                        </div>
+                    </div>
+                    <div
+                        style="display: flex; justify-content: space-between; font-size: var(--font-size-sm); color: var(--color-text-secondary); font-weight: 500;">
+                        <span id="detailCompletedStats">0 of 0 videos completed</span>
+                        <span id="detailTimeStats">0m completed</span>
+                    </div>
+                </div>
+
+                <div class="playlist-course-grid"
+                    style="display: grid; grid-template-columns: 1fr 320px; gap: var(--spacing-lg);">
+                    <!-- Video items list -->
+                    <div class="video-list-container">
+                        <h3
+                            style="font-family: var(--font-display); font-size: var(--font-size-lg); font-weight: 700; margin-bottom: var(--spacing-md);">
+                            Lesson Syllabus</h3>
+                        <div id="playlistDetailVideos"
+                            style="display: flex; flex-direction: column; gap: var(--spacing-sm);"></div>
+                    </div>
+
+                    <!-- Side control panel (groups) -->
+                    <div class="video-groups-container"
+                        style="background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-xl); padding: var(--spacing-xl); height: fit-content; position: sticky; top: var(--spacing-lg);">
+                        <h3
+                            style="font-family: var(--font-display); font-size: var(--font-size-md); font-weight: 700; margin-bottom: var(--spacing-sm);">
+                            Learning Blocks</h3>
+                        <p
+                            style="font-size: var(--font-size-sm); color: var(--color-text-secondary); margin-bottom: var(--spacing-md);">
+                            Group lessons into micro-goals and trace milestones. Complete a block to earn +200 XP bonus!
+                        </p>
+
+                        <div id="playlistDetailGroups"
+                            style="display: flex; flex-direction: column; gap: var(--spacing-sm); margin-bottom: var(--spacing-md);">
+                        </div>
+
+                        <button class="btn-primary" style="width: 100%;" id="addBlockBtn">Add Learning Block</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </template>
+
+
+
+    <!-- Admin Dashboard Page Template -->
+    <template id="adminPageTemplate">
+        <header class="app-header">
+            <div class="header-content">
+                <div class="brand-text">
+                    <h1 class="brand-title">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            style="vertical-align: -4px; margin-right: 8px;">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                        </svg>Admin Dashboard
+                    </h1>
+                    <p class="brand-subtitle">Manage platform metrics, users, gamification, and broadcaster system</p>
+                </div>
+                <div class="header-actions">
+                    <button class="btn-secondary" id="adminRefreshBtn" title="Refresh list and stats">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="23 4 23 10 17 10" />
+                            <polyline points="1 20 1 14 7 14" />
+                            <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
+                        </svg>
+                        <span>Refresh</span>
+                    </button>
+                    <button class="btn-secondary" id="adminBackBtn">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                            <path d="M15 10H5M5 10L9 6M5 10L9 14" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                        <span>Back</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <main class="app-main">
+            <!-- Sub Navigation Tabs for Admin -->
+            <div class="admin-tab-nav"
+                style="display: flex; gap: var(--spacing-sm); margin-bottom: var(--spacing-lg); border-bottom: 1px solid var(--color-border); padding-bottom: var(--spacing-sm);">
+                <button class="admin-tab-btn active" data-tab="analytics" onclick="app.switchAdminTab('analytics')">📊
+                    Analytics & Overview</button>
+                <button class="admin-tab-btn" data-tab="users" onclick="app.switchAdminTab('users')">👥 User
+                    Management</button>
+                <button class="admin-tab-btn" data-tab="gamification" onclick="app.switchAdminTab('gamification')">🎮
+                    Gamification Center</button>
+                <button class="admin-tab-btn" data-tab="finance" onclick="app.switchAdminTab('finance')">💰
+                    Finance Manager</button>
+                <button class="admin-tab-btn" data-tab="communications"
+                    onclick="app.switchAdminTab('communications')">📢 Global Broadcaster</button>
+            </div>
+
+            <!-- Tab Content Panel -->
+            <div class="admin-container">
+
+                <!-- Analytics & Overview Tab -->
+                <div id="adminTabAnalytics" class="admin-tab-content">
+                    <div class="admin-stats-row" id="adminStatsRow" style="margin-bottom: var(--spacing-lg);">
+                        <div class="admin-stat-card">
+                            <div class="admin-stat-value" id="adminTotalUsers">—</div>
+                            <div class="admin-stat-label">Total Registered Users</div>
+                        </div>
+                        <div class="admin-stat-card">
+                            <div class="admin-stat-value" id="adminActiveUsersToday">—</div>
+                            <div class="admin-stat-label">Active Users (Today)</div>
+                        </div>
+                        <div class="admin-stat-card">
+                            <div class="admin-stat-value" id="adminActiveUsersWeek">—</div>
+                            <div class="admin-stat-label">Active Users (This Week)</div>
+                        </div>
+                        <div class="admin-stat-card">
+                            <div class="admin-stat-value" id="adminAvgLevel">—</div>
+                            <div class="admin-stat-label">Average Platform Level</div>
+                        </div>
+                    </div>
+
+                    <div class="admin-grid-two-col"
+                        style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-lg);">
+                        <!-- Feature Usage Breakdown -->
+                        <div class="admin-card"
+                            style="background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-xl); padding: var(--spacing-xl);">
+                            <h3
+                                style="font-family: var(--font-display); font-size: var(--font-size-base); font-weight: 700; margin-bottom: var(--spacing-md); display: flex; align-items: center; gap: 8px;">
+                                📈 Feature Activity Breakdown
+                            </h3>
+                            <div style="display: flex; flex-direction: column; gap: var(--spacing-md);">
+                                <div
+                                    style="display: flex; justify-content: space-between; border-bottom: 1px dashed var(--color-border); padding-bottom: 6px;">
+                                    <span style="font-weight: 600; color: var(--color-text-secondary);">Total Habits
+                                        Tracked:</span>
+                                    <span id="adminTotalHabits"
+                                        style="font-weight: 700; color: var(--color-primary);">—</span>
+                                </div>
+                                <div
+                                    style="display: flex; justify-content: space-between; border-bottom: 1px dashed var(--color-border); padding-bottom: 6px;">
+                                    <span style="font-weight: 600; color: var(--color-text-secondary);">Total To-Do
+                                        Tasks:</span>
+                                    <span id="adminTotalTasks"
+                                        style="font-weight: 700; color: var(--color-primary);">—</span>
+                                </div>
+                                <div
+                                    style="display: flex; justify-content: space-between; border-bottom: 1px dashed var(--color-border); padding-bottom: 6px;">
+                                    <span style="font-weight: 600; color: var(--color-text-secondary);">Completed Focus
+                                        Sessions:</span>
+                                    <span id="adminTotalFocusSessions"
+                                        style="font-weight: 700; color: var(--color-primary);">—</span>
+                                </div>
+                                <div
+                                    style="display: flex; justify-content: space-between; border-bottom: 1px dashed var(--color-border); padding-bottom: 6px;">
+                                    <span style="font-weight: 600; color: var(--color-text-secondary);">Learning Courses
+                                        Configured:</span>
+                                    <span id="adminTotalPlaylists"
+                                        style="font-weight: 700; color: var(--color-primary);">—</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Platform System Info -->
+                        <div class="admin-card"
+                            style="background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-xl); padding: var(--spacing-xl);">
+                            <h3
+                                style="font-family: var(--font-display); font-size: var(--font-size-base); font-weight: 700; margin-bottom: var(--spacing-md); display: flex; align-items: center; gap: 8px;">
+                                🛡️ Administration System Info
+                            </h3>
+                            <div
+                                style="display: flex; flex-direction: column; gap: var(--spacing-sm); font-size: var(--font-size-sm); color: var(--color-text-secondary);">
+                                <p style="margin: 0;"><strong>Active Platform Instance:</strong> Production Hub</p>
+                                <p style="margin: 0;"><strong>Database System:</strong> Cloud Firestore (Online)</p>
+                                <p style="margin: 0;"><strong>Authentication:</strong> Firebase Auth client SDK</p>
+                                <p style="margin: 0;"><strong>Active Roles:</strong> Admin (System Superuser), User
+                                    (Normal User)</p>
+                                <p
+                                    style="margin: 0; color: var(--color-primary); font-weight: 600; margin-top: var(--spacing-sm);">
+                                    All modules are synced in real-time across users.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Advanced User Management Tab -->
+                <div id="adminTabUsers" class="admin-tab-content" style="display: none;">
+                    <div class="admin-filters-bar"
+                        style="display: flex; gap: var(--spacing-md); margin-bottom: var(--spacing-md);">
+                        <input type="text" id="adminUserSearch" class="admin-input-text"
+                            placeholder="🔍 Search name, email or uid..." oninput="app.filterUserTable()"
+                            style="flex: 1; padding: var(--spacing-sm) var(--spacing-md); border-radius: var(--radius-md); border: 1px solid var(--color-border); background: var(--color-surface);">
+                        <select id="adminUserStatusFilter" class="admin-select" onchange="app.filterUserTable()"
+                            style="padding: var(--spacing-sm) var(--spacing-md); border-radius: var(--radius-md); border: 1px solid var(--color-border); background: var(--color-surface); font-weight: 600;">
+                            <option value="all">All Account Statuses</option>
+                            <option value="active">Active Only</option>
+                            <option value="suspended">Suspended Only</option>
+                            <option value="banned">Banned Only</option>
+                        </select>
+                    </div>
+
+                    <div class="admin-table-wrapper">
+                        <div class="admin-table-header">
+                            <h3 class="admin-table-title">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                                    <circle cx="9" cy="7" r="4" />
+                                </svg>
+                                Registered Users Registry
+                            </h3>
+                        </div>
+                        <div class="admin-table-body" id="adminUserTableBody">
+                            <!-- Populated Dynamically -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Gamification Control Center Tab -->
+                <div id="adminTabGamification" class="admin-tab-content" style="display: none;">
+                    <div class="admin-grid-two-col"
+                        style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-lg);">
+                        <!-- Left: Settings & Builders -->
+                        <div style="display: flex; flex-direction: column; gap: var(--spacing-lg);">
+
+                            <!-- XP Scaling Settings -->
+                            <div class="admin-card"
+                                style="background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-xl); padding: var(--spacing-xl);">
+                                <h3
+                                    style="font-family: var(--font-display); font-size: var(--font-size-base); font-weight: 700; margin-bottom: var(--spacing-md); display: flex; align-items: center; gap: 8px;">
+                                    ⚙️ Dynamic XP Scaling Coefficients
+                                </h3>
+                                <form id="adminXpScalingForm" onsubmit="app.saveXPScalingSettings(event)">
+                                    <div
+                                        style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-sm); margin-bottom: var(--spacing-md);">
+                                        <div class="form-group" style="margin-bottom: 0;">
+                                            <label style="font-size: 11px;">XP Per Habit checked</label>
+                                            <input type="number" id="xpScaleHabit" class="admin-input" required min="1"
+                                                value="50">
+                                        </div>
+                                        <div class="form-group" style="margin-bottom: 0;">
+                                            <label style="font-size: 11px;">XP Per Task completed</label>
+                                            <input type="number" id="xpScaleTask" class="admin-input" required min="1"
+                                                value="30">
+                                        </div>
+                                        <div class="form-group" style="margin-bottom: 0;">
+                                            <label style="font-size: 11px;">XP Per Pomodoro session</label>
+                                            <input type="number" id="xpScalePomodoro" class="admin-input" required
+                                                min="1" value="150">
+                                        </div>
+                                        <div class="form-group" style="margin-bottom: 0;">
+                                            <label style="font-size: 11px;">XP Per Video completion</label>
+                                            <input type="number" id="xpScaleVideo" class="admin-input" required min="1"
+                                                value="40">
+                                        </div>
+                                        <div class="form-group" style="grid-column: 1 / -1; margin-bottom: 0;">
+                                            <label style="font-size: 11px;">Base XP required for L2 (linear
+                                                multiplier)</label>
+                                            <input type="number" id="xpScaleBase" class="admin-input" required min="100"
+                                                value="500">
+                                        </div>
+                                        <div class="form-group" style="grid-column: 1 / -1; margin-bottom: 0;">
+                                            <label style="font-size: 11px;">Daily Bounty Expiration (Hours)</label>
+                                            <input type="number" id="bountyExpireHours" class="admin-input" required min="1" max="168"
+                                                value="24">
+                                        </div>
+                                        <div class="form-group" style="grid-column: 1 / -1; margin-bottom: 0; display: flex; align-items: center; gap: 8px; margin-top: var(--spacing-xs);">
+                                            <input type="checkbox" id="xpScaleBountiesEnabled" checked style="width: 18px; height: 18px; cursor: pointer;">
+                                            <label for="xpScaleBountiesEnabled" style="font-size: 11px; font-weight: 700; cursor: pointer; margin-bottom: 0; user-select: none;">Enable Daily Bounties Section for All Users</label>
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="btn-primary" style="width: 100%;">Save Global
+                                        Constants</button>
+                                </form>
+                            </div>
+
+                            <!-- Global Challenges Builder -->
+                            <div class="admin-card"
+                                style="background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-xl); padding: var(--spacing-xl);">
+                                <h3
+                                    style="font-family: var(--font-display); font-size: var(--font-size-base); font-weight: 700; margin-bottom: var(--spacing-md); display: flex; align-items: center; gap: 8px;">
+                                    🏆 Global Platform Challenges Builder
+                                </h3>
+                                <form id="adminChallengeForm" onsubmit="app.createGlobalChallenge(event)">
+                                    <div class="form-group" style="margin-bottom: var(--spacing-sm);">
+                                        <label style="font-size: 11px;">Challenge Name</label>
+                                        <input type="text" id="challengeTitle" class="admin-input" required
+                                            placeholder="e.g., Early Bird Streak">
+                                    </div>
+                                    <div class="form-group" style="margin-bottom: var(--spacing-sm);">
+                                        <label style="font-size: 11px;">Description</label>
+                                        <input type="text" id="challengeDesc" class="admin-input" required
+                                            placeholder="e.g., Complete 5 focus sessions this week">
+                                    </div>
+                                    <div
+                                        style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-sm); margin-bottom: var(--spacing-md);">
+                                        <div class="form-group" style="margin-bottom: 0;">
+                                            <label style="font-size: 11px;">Target Action Count</label>
+                                            <input type="number" id="challengeTarget" class="admin-input" required
+                                                min="1" value="5">
+                                        </div>
+                                        <div class="form-group" style="margin-bottom: 0;">
+                                            <label style="font-size: 11px;">XP Prize Reward</label>
+                                            <input type="number" id="challengePrize" class="admin-input" required
+                                                min="10" value="500">
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="btn-primary" style="width: 100%;">Broadcast Active
+                                        Challenge</button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- Right: Badges & Challenge Status -->
+                        <div style="display: flex; flex-direction: column; gap: var(--spacing-lg);">
+
+                            <!-- Badge Assignment -->
+                            <div class="admin-card"
+                                style="background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-xl); padding: var(--spacing-xl);">
+                                <h3
+                                    style="font-family: var(--font-display); font-size: var(--font-size-base); font-weight: 700; margin-bottom: var(--spacing-md); display: flex; align-items: center; gap: 8px;">
+                                    🏅 Badge & Achievements Assignment
+                                </h3>
+                                <form id="adminBadgeForm" onsubmit="app.awardBadgeToUser(event)">
+                                    <div class="form-group" style="margin-bottom: var(--spacing-sm);">
+                                        <label style="font-size: 11px;">Select Target User</label>
+                                        <select id="badgeTargetUser" class="admin-role-select" required>
+                                            <option value="">-- Choose User --</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group" style="margin-bottom: var(--spacing-md);">
+                                        <label style="font-size: 11px;">Select Achievement Badge</label>
+                                        <select id="badgeName" class="admin-role-select" required>
+                                            <option value="🥇 Productivity Legend">🥇 Productivity Legend</option>
+                                            <option value="⚡ Habit Hero">⚡ Habit Hero</option>
+                                            <option value="🍅 Pomodoro Master">🍅 Pomodoro Master</option>
+                                            <option value="📚 Playlist Scholar">📚 Playlist Scholar</option>
+                                            <option value="🧘 Mind Artisan">🧘 Mind Artisan</option>
+                                            <option value="💎 Mornigami Veteran">💎 Mornigami Veteran</option>
+                                        </select>
+                                    </div>
+                                    <button type="submit" class="btn-primary" style="width: 100%;">Award Badge
+                                        Immediately</button>
+                                </form>
+                            </div>
+
+                            <!-- Daily Bounties Manager -->
+                            <div class="admin-card"
+                                style="background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-xl); padding: var(--spacing-xl); display: flex; flex-direction: column; gap: var(--spacing-md); margin-bottom: var(--spacing-lg);">
+                                <h3
+                                    style="font-family: var(--font-display); font-size: var(--font-size-base); font-weight: 700; margin-bottom: 0; display: flex; align-items: center; gap: 8px;">
+                                    🎯 Daily Bounties Manager
+                                </h3>
+                                
+                                <div id="adminBountiesContainer" style="display: flex; flex-direction: column; gap: var(--spacing-xs); margin-bottom: var(--spacing-sm);">
+                                    <!-- Dynamic Daily Bounties list for admin -->
+                                </div>
+                                
+                                <div style="border-top: 1.5px dashed var(--color-border); padding-top: var(--spacing-sm);">
+                                    <h4 style="font-size: 12px; font-weight: 700; margin-bottom: var(--spacing-xs);" id="adminBountyFormTitle">➕ Add New Daily Bounty</h4>
+                                    <form id="adminBountyForm" onsubmit="app.saveAdminBounty(event)" style="display: flex; flex-direction: column; gap: var(--spacing-xs);">
+                                        <input type="hidden" id="adminBountyIndex" value="-1">
+                                        <div class="form-group" style="margin-bottom: 0;">
+                                            <label style="font-size: 10px;">Bounty Text & Icon</label>
+                                            <input type="text" id="adminBountyText" class="admin-input" required placeholder="e.g. 🍅 Pomodoro Blitz: Complete a Focus Session">
+                                        </div>
+                                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-xs);">
+                                            <div class="form-group" style="margin-bottom: 0;">
+                                                <label style="font-size: 10px;">XP Reward</label>
+                                                <input type="number" id="adminBountyReward" class="admin-input" required min="10" value="100">
+                                            </div>
+                                            <div class="form-group" style="margin-bottom: 0;">
+                                                <label style="font-size: 10px;">Target Count</label>
+                                                <input type="number" id="adminBountyCount" class="admin-input" required min="1" value="1">
+                                            </div>
+                                        </div>
+                                        <div class="form-group" style="margin-bottom: 0;">
+                                            <label style="font-size: 10px;">Activity Type Trigger</label>
+                                            <select id="adminBountyType" class="admin-role-select" required style="height: 38px;">
+                                                <option value="pomodoro">Focus Session (pomodoro)</option>
+                                                <option value="habits">Habit checked (habits)</option>
+                                                <option value="tasks">Task completed (tasks)</option>
+                                            </select>
+                                        </div>
+                                        <div style="display: flex; gap: var(--spacing-xs); margin-top: var(--spacing-xs);">
+                                            <button type="submit" class="btn-primary" style="flex: 1; height: 38px; justify-content: center;" id="adminBountySubmitBtn">Add Bounty</button>
+                                            <button type="button" class="btn-secondary" style="height: 38px; display: none;" id="adminBountyCancelBtn" onclick="app.cancelAdminBountyEdit()">Cancel</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+
+                            <!-- List of Active Global Challenges -->
+                            <div class="admin-card"
+                                style="background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-xl); padding: var(--spacing-xl); flex: 1; display: flex; flex-direction: column;">
+                                <h3
+                                    style="font-family: var(--font-display); font-size: var(--font-size-base); font-weight: 700; margin-bottom: var(--spacing-md); display: flex; align-items: center; gap: 8px;">
+                                    📢 Active Platform-Wide Challenges
+                                </h3>
+                                <div id="adminActiveChallengesList"
+                                    style="display: flex; flex-direction: column; gap: var(--spacing-sm); overflow-y: auto; flex: 1;">
+                                    <!-- Dynamic Active Challenges -->
+                                    <div class="admin-loading" style="padding: var(--spacing-lg);">
+                                        <span>No challenges configured.</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Global Communications Tab -->
+                <div id="adminTabCommunications" class="admin-tab-content" style="display: none;">
+                    <div class="admin-card"
+                        style="background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-xl); padding: var(--spacing-xl); max-width: 600px; margin: 0 auto;">
+                        <h3
+                            style="font-family: var(--font-display); font-size: var(--font-size-base); font-weight: 700; margin-bottom: var(--spacing-md); display: flex; align-items: center; gap: 8px;">
+                            📢 System-Wide Announcements Broadcaster
+                        </h3>
+                        <form id="adminBroadcasterForm" onsubmit="app.publishAnnouncement(event)">
+                            <div class="form-group" style="margin-bottom: var(--spacing-sm);">
+                                <label style="font-size: 11px;">Announcement Banner Message</label>
+                                <textarea id="announcementInputText" required
+                                    placeholder="Type system-wide banner text here... (e.g., Server maintenance scheduled for 11PM today)"
+                                    style="width: 100%; height: 100px; padding: var(--spacing-sm); border-radius: var(--radius-md); border: 1px solid var(--color-border); background: var(--color-background); font-family: var(--font-body); font-size: var(--font-size-sm); resize: none;"></textarea>
+                            </div>
+                            <div
+                                style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-sm); margin-bottom: var(--spacing-md);">
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label style="font-size: 11px;">Banner Styling Level</label>
+                                    <select id="announcementStyleType" class="admin-role-select">
+                                        <option value="info">💡 Information (Info Primary)</option>
+                                        <option value="success">✅ Achievements Boost (Success Green)</option>
+                                        <option value="warning">⚠️ Warning Alert (Warning Yellow)</option>
+                                        <option value="danger">🚨 Severe Announcement (Danger Red)</option>
+                                    </select>
+                                </div>
+                                <div class="form-group"
+                                    style="margin-bottom: 0; display: flex; flex-direction: column; justify-content: center; align-items: flex-start; padding-left: var(--spacing-md);">
+                                    <label class="theme-switch-container"
+                                        style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: var(--font-size-xs); font-weight: 600;">
+                                        <input type="checkbox" id="announcementIsActive" checked style="display: none;">
+                                        <span class="theme-switch-control"
+                                            style="width: 44px; height: 24px; background: var(--color-border); border-radius: 12px; position: relative; display: inline-block; transition: background 0.3s;">
+                                            <span class="theme-switch-handle"
+                                                style="width: 18px; height: 18px; background: #fff; border-radius: 50%; position: absolute; top: 3px; left: 3px; transition: transform 0.3s; box-shadow: 0 1px 3px rgba(0,0,0,0.15);"></span>
+                                        </span>
+                                        <span>Active Broadcast</span>
+                                    </label>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn-primary" style="width: 100%;">Broadcast Announcement
+                                Banner</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Finance Manager Tab -->
+                <div id="adminTabFinance" class="admin-tab-content" style="display: none;">
+                    <div class="admin-grid-two-col"
+                        style="display: grid; grid-template-columns: 1.2fr 1fr; gap: var(--spacing-lg);">
+                        <!-- Left side: XP and defaults configuration -->
+                        <div style="display: flex; flex-direction: column; gap: var(--spacing-lg);">
+                            <!-- Finance Settings -->
+                            <div class="admin-card"
+                                style="background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-xl); padding: var(--spacing-xl);">
+                                <h3
+                                    style="font-family: var(--font-display); font-size: var(--font-size-base); font-weight: 700; margin-bottom: var(--spacing-md); display: flex; align-items: center; gap: 8px;">
+                                    ⚙️ Finance XP Scaling Settings
+                                </h3>
+                                <form id="adminFinanceSettingsForm" onsubmit="app.saveAdminFinanceSettings(event)">
+                                    <div class="form-group" style="margin-bottom: var(--spacing-md);">
+                                        <label style="font-size: 11px;">XP Award for Staying Under Daily Spending Limit</label>
+                                        <input type="number" id="adminFinanceXPReward" class="admin-input" required min="1"
+                                            value="50">
+                                    </div>
+                                    <button type="submit" class="btn-primary" style="width: 100%;">Save Finance Scaling Settings</button>
+                                </form>
+                            </div>
+
+                            <!-- Platform Default Categories -->
+                            <div class="admin-card"
+                                style="background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-xl); padding: var(--spacing-xl);">
+                                <h3
+                                    style="font-family: var(--font-display); font-size: var(--font-size-base); font-weight: 700; margin-bottom: var(--spacing-md); display: flex; align-items: center; gap: 8px;">
+                                    🏷️ Global Default Categories
+                                </h3>
+                                <p style="font-size: var(--font-size-xs); color: var(--color-text-secondary); margin-bottom: var(--spacing-md);">
+                                    These categories are automatically assigned to new users when they set up their budget.
+                                </p>
+                                <div id="adminDefaultCategoriesList" class="preset-tags-grid" style="margin-bottom: var(--spacing-md);">
+                                    <!-- Populated Dynamically -->
+                                </div>
+                                <form id="adminAddDefaultCategoryForm" onsubmit="app.handleAddDefaultCategory(event)" style="display: flex; gap: var(--spacing-xs);">
+                                    <input type="text" id="adminNewCategoryInput" class="admin-input" placeholder="e.g. Shopping 🛍️" required style="flex: 1; padding: 6px 12px; font-size: var(--font-size-xs); height: 36px; border-radius: var(--radius-md); border: 1px solid var(--color-border); background: var(--color-bg);">
+                                    <button type="submit" class="btn-primary" style="font-size: var(--font-size-xs); padding: 0 12px; height: 36px;">Add Category</button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- Right side: Financial Metrics Summary -->
+                        <div class="admin-card"
+                            style="background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-xl); padding: var(--spacing-xl);">
+                            <h3
+                                style="font-family: var(--font-display); font-size: var(--font-size-base); font-weight: 700; margin-bottom: var(--spacing-md); display: flex; align-items: center; gap: 8px;">
+                                📈 Platform Financial Metrics
+                            </h3>
+                            <div style="display: flex; flex-direction: column; gap: var(--spacing-md);">
+                                <div
+                                    style="display: flex; justify-content: space-between; border-bottom: 1px dashed var(--color-border); padding-bottom: 6px;">
+                                    <span style="font-weight: 600; color: var(--color-text-secondary);">Avg Monthly Budget:</span>
+                                    <span id="adminAvgBudget"
+                                        style="font-weight: 700; color: var(--color-success);">$0.00</span>
+                                </div>
+                                <div
+                                    style="display: flex; justify-content: space-between; border-bottom: 1px dashed var(--color-border); padding-bottom: 6px;">
+                                    <span style="font-weight: 600; color: var(--color-text-secondary);">Total Logged Expenses:</span>
+                                    <span id="adminTotalExpenses"
+                                        style="font-weight: 700; color: var(--color-danger);">$0.00</span>
+                                </div>
+                                <div
+                                    style="display: flex; justify-content: space-between; border-bottom: 1px dashed var(--color-border); padding-bottom: 6px;">
+                                    <span style="font-weight: 600; color: var(--color-text-secondary);">Finance Transactions Logged:</span>
+                                    <span id="adminTotalTransactionsCount"
+                                        style="font-weight: 700; color: var(--color-primary);">0</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- User Inspection & Override Section -->
+                    <div class="admin-card" style="background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-xl); padding: var(--spacing-xl); margin-top: var(--spacing-lg);">
+                        <h3 style="font-family: var(--font-display); font-size: var(--font-size-lg); font-weight: 700; margin-bottom: var(--spacing-md); display: flex; align-items: center; gap: 8px;">
+                            🔍 User Financial Overview & Override
+                        </h3>
+                        
+                        <div class="form-group" style="max-width: 400px; margin-bottom: var(--spacing-lg);">
+                            <label for="adminFinanceUserSelect" class="form-label" style="font-weight: 700;">Select User Registry File</label>
+                            <select id="adminFinanceUserSelect" class="admin-role-select" onchange="app.inspectUserFinance(this.value)" style="width: 100%; height: 42px; border-radius: var(--radius-md); border: 1px solid var(--color-border); padding: 0 var(--spacing-sm); font-weight: 600; background: var(--color-bg);">
+                                <option value="">-- Select Registered User --</option>
+                            </select>
+                        </div>
+
+                        <!-- Inspection details (Initially empty / instruction view) -->
+                        <div id="adminUserFinanceDetails" style="display: none; border-top: 1.5px solid var(--color-border); padding-top: var(--spacing-lg);">
+                            <!-- Rendered Dynamically -->
+                        </div>
+                        <div id="adminUserFinancePlaceholder" style="text-align: center; color: var(--color-text-tertiary); padding: var(--spacing-xl) 0;">
+                            <div style="font-size: 3rem; margin-bottom: var(--spacing-sm);">📂</div>
+                            <p style="font-size: var(--font-size-sm);">Select a user from the dropdown registry to inspect transactions, savings goals, and adjust account balance limits.</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </template>
+
+    <!-- Store Page Template -->
+    <template id="storePageTemplate">
+        <header class="app-header">
+            <div class="header-content">
+                <div class="brand-text">
+                    <h1 class="brand-title">Customization Store</h1>
+                    <p class="brand-subtitle">Spend your hard-earned XP on aesthetic camp customizations.</p>
+                </div>
+                <div class="store-balance-badge" title="Earn Spendable XP by completing habits, checking checklist tasks, finishing Focus sessions, and watching playlist course videos. Spend it in the Store to unlock customizations without losing your level." style="background: var(--color-surface); border: 1.5px solid var(--color-primary); padding: var(--spacing-sm) var(--spacing-lg); border-radius: var(--radius-full); font-weight: 700; color: var(--color-primary); font-size: var(--font-size-sm); display: flex; align-items: center; gap: var(--spacing-xs); border: 1.5px solid var(--color-primary); cursor: help;">
+                    🪙 Spendable Balance: <span id="storeBalanceText" style="margin-left: 2px;">0</span> XP
+                </div>
+            </div>
+        </header>
+
+        <main class="app-main">
+            <div class="store-tabs" style="display: flex; gap: var(--spacing-sm); margin-bottom: var(--spacing-lg); border-bottom: 1.5px solid var(--color-border); padding-bottom: var(--spacing-sm);">
+                <button class="store-tab-btn active" id="storeTabColorsBtn" onclick="app.switchStoreTab('colors')" style="padding: 8px 16px; border: none; background: transparent; font-family: inherit; font-size: var(--font-size-sm); font-weight: 700; cursor: pointer; border-bottom: 3px solid var(--color-primary); color: var(--color-primary);">🎨 Accent Colors</button>
+                <button class="store-tab-btn" id="storeTabAvatarsBtn" onclick="app.switchStoreTab('avatars')" style="padding: 8px 16px; border: none; background: transparent; font-family: inherit; font-size: var(--font-size-sm); font-weight: 700; cursor: pointer; border-bottom: 3px solid transparent; color: var(--color-text-secondary);">🦊 Profile Avatars</button>
+                <button class="store-tab-btn" id="storeTabBordersBtn" onclick="app.switchStoreTab('borders')" style="padding: 8px 16px; border: none; background: transparent; font-family: inherit; font-size: var(--font-size-sm); font-weight: 700; cursor: pointer; border-bottom: 3px solid transparent; color: var(--color-text-secondary);">✨ Badge Borders</button>
+            </div>
+
+            <div id="storeGrid" class="store-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: var(--spacing-lg);">
+                <!-- Dynamic Store Items -->
+            </div>
+        </main>
+    </template>
+
+    <!-- Community Page Template -->
+    <template id="communityPageTemplate">
+        <header class="app-header">
+            <div class="header-content">
+                <div class="brand-text">
+                    <h1 class="brand-title">Friends & Community</h1>
+                    <p class="brand-subtitle">Connect, compete, and share your morning folds with friends.</p>
+                </div>
+            </div>
+        </header>
+
+        <main class="app-main">
+            <div class="community-layout" style="display: grid; grid-template-columns: 1.2fr 1fr; gap: var(--spacing-xl);">
+                <!-- Leaderboard Section -->
+                <section class="leaderboard-section" style="background: var(--color-surface); border: 1.5px solid var(--color-border); border-radius: var(--radius-2xl); padding: var(--spacing-xl); box-shadow: var(--shadow-sm);">
+                    <h2 style="font-family: var(--font-display); font-size: var(--font-size-xl); font-weight: 700; margin-bottom: var(--spacing-xs); display: flex; align-items: center; gap: 8px;">
+                        🏆 Top Achievers Leaderboard
+                    </h2>
+                    <p style="font-size: var(--font-size-xs); color: var(--color-text-secondary); margin-bottom: var(--spacing-lg);">Global ranking of all users based on accumulated XP.</p>
+                    
+                    <div id="leaderboardList" style="display: flex; flex-direction: column; gap: var(--spacing-sm);">
+                        <!-- Rendered dynamically -->
+                    </div>
+                </section>
+
+                <!-- Friends Section -->
+                <section class="friends-section" style="display: flex; flex-direction: column; gap: var(--spacing-lg);">
+                    <!-- Add Friend Card -->
+                    <div style="background: var(--color-surface); border: 1.5px solid var(--color-border); border-radius: var(--radius-2xl); padding: var(--spacing-xl); box-shadow: var(--shadow-sm);">
+                        <h2 style="font-family: var(--font-display); font-size: var(--font-size-lg); font-weight: 700; margin-bottom: var(--spacing-xs); display: flex; align-items: center; gap: 6px; margin-top: 0;">
+                            👥 Add Friend
+                        </h2>
+                        <p style="font-size: var(--font-size-xs); color: var(--color-text-secondary); margin-bottom: var(--spacing-md);">Add users by username to track their progress.</p>
+                        
+                        <form id="addFriendForm" onsubmit="app.handleAddFriend(event)" style="display: flex; gap: 8px;">
+                            <input type="text" id="friendUsernameInput" placeholder="Enter username..." required style="flex: 1; padding: 10px 12px; border: 1.5px solid var(--color-border); border-radius: var(--radius-md); font-family: inherit; font-size: var(--font-size-sm); background: var(--color-bg); color: var(--color-text-primary);">
+                            <button type="submit" class="btn-primary" style="padding: 10px 16px; font-size: var(--font-size-sm); height: auto; border-radius: var(--radius-md); font-weight: 700; cursor: pointer;">Add Friend</button>
+                        </form>
+                        <div id="friendAddMsg" style="font-size: var(--font-size-xs); margin-top: 8px; font-weight: 600;"></div>
+                    </div>
+
+                    <!-- Friends List -->
+                    <div style="background: var(--color-surface); border: 1.5px solid var(--color-border); border-radius: var(--radius-2xl); padding: var(--spacing-xl); box-shadow: var(--shadow-sm); flex: 1; display: flex; flex-direction: column;">
+                        <h3 style="font-family: var(--font-display); font-size: var(--font-size-md); font-weight: 700; margin-bottom: var(--spacing-md); margin-top: 0;">Active Friends Camp</h3>
+                        <div id="friendsList" style="display: flex; flex-direction: column; gap: var(--spacing-sm); flex: 1;">
+                            <!-- Rendered dynamically -->
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </template>
+
+    <!-- Motivational Modal -->
+    <div id="motivationalPopup" class="modal">
+        <div class="modal-backdrop" onclick="app.closeMotivationalPopup()"></div>
+        <div class="modal-container">
+            <div class="modal-content motivational-content"
+                style="text-align: center; padding: var(--spacing-xl); max-width: 450px; margin: 0 auto; position: relative; z-index: 1001; animation: modalPop 0.4s var(--transition-spring);">
+                <div class="motivational-icon" style="font-size: 3.5rem; margin-bottom: var(--spacing-sm);">
+                    🎉
+                </div>
+                <h2 class="modal-title"
+                    style="margin-bottom: var(--spacing-sm); font-family: var(--font-display); color: var(--color-primary); font-size: var(--font-size-2xl);">
+                    Streak Completed!</h2>
+                <p id="motivationalMessage"
+                    style="font-size: var(--font-size-base); color: var(--color-text-primary); margin-bottom: var(--spacing-lg); line-height: 1.6; font-weight: 500;">
+                </p>
+                <button class="btn-primary" style="margin: 0 auto; display: block;"
+                    onclick="app.closeMotivationalPopup()">
+                    Keep Going!
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <style>
+        @keyframes modalPop {
+            from {
+                transform: scale(0.9);
+                opacity: 0;
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+    </style>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, updateProfile, updateEmail, updatePassword, reauthenticateWithCredential, EmailAuthProvider, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc, deleteDoc, collection, getDocs, runTransaction } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCs7MTj0iVx11l2YE0vP5YB9fUGhkeMOE4",
+            authDomain: "bishr-hub.firebaseapp.com",
+            projectId: "bishr-hub",
+            storageBucket: "bishr-hub.firebasestorage.app",
+            messagingSenderId: "1076184127468",
+            appId: "1:1076184127468:web:df8d06aeefdca3728452c9",
+            measurementId: "G-6EL974P299"
+        };
+
+        const app = initializeApp(firebaseConfig);
+
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        window.auth = auth;
+        window.db = db;
+        window.firestoreUtils = { doc, setDoc, getDoc, deleteDoc, collection, getDocs, runTransaction };
+
+        window.firebaseAuth = {
+            createUserWithEmailAndPassword,
+            signInWithEmailAndPassword,
+            signOut,
+            updateProfile,
+            updateEmail,
+            updatePassword,
+            reauthenticateWithCredential,
+            EmailAuthProvider,
+            sendPasswordResetEmail
+        };
+
+        onAuthStateChanged(auth, (user) => {
+            if (window.app && typeof window.app.onUserStatusChanged === 'function') {
+                window.app.onUserStatusChanged(user);
+            } else {
+                window.currentUser = user;
+            }
+        });
+
+        console.log("Firebase is ready to go, Abdelrahman!");
+    </script>
+    <script src="app.js"></script>
+</body>
+
+</html>

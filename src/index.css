@@ -1,0 +1,123 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Mornigami Light Theme Defaults */
+    --color-primary: #0F172A;
+    --color-primary-light: #334155;
+    --color-primary-dark: #000000;
+    --color-primary-contrast: #FFFFFF;
+
+    --color-secondary: #38BDF8;
+    --color-secondary-light: #7DD3FC;
+    --color-secondary-dark: #0284C7;
+
+    --color-success: #22C55E;
+    --color-success-light: #4ADE80;
+    --color-success-bg: #F0FDF4;
+
+    --color-warning: #F59E0B;
+    --color-warning-light: #FBBF24;
+    --color-warning-bg: #FFFBEB;
+
+    --color-danger: #EF4444;
+    --color-danger-light: #F87171;
+    --color-danger-bg: #FEF2F2;
+
+    --color-bg: #F1F5F9;
+    --color-surface: #FFFFFF;
+    --color-border: #CBD5E1;
+    --color-border-light: #F0F9FF;
+
+    --color-text-primary: #0F172A;
+    --color-text-secondary: #64748B;
+    --color-text-tertiary: #94A3B8;
+
+    --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.06), 0 2px 4px rgba(0, 0, 0, 0.04);
+    --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.04);
+    --shadow-xl: 0 24px 48px rgba(0, 0, 0, 0.12), 0 8px 16px rgba(0, 0, 0, 0.06);
+
+    --sidebar-width: 250px;
+    --sidebar-width-minimized: 78px;
+  }
+
+  .dark {
+    --color-primary: #FFFFFF;
+    --color-primary-light: #F1F5F9;
+    --color-primary-dark: #CBD5E1;
+    --color-primary-contrast: #0F172A;
+
+    --color-bg: #121212;
+    --color-surface: #1E1E1E;
+    --color-border: #333333;
+    --color-border-light: #2D3748;
+
+    --color-text-primary: #E2E8F0;
+    --color-text-secondary: #CBD5E1;
+    --color-text-tertiary: #94A3B8;
+
+    --color-success-bg: #052E16;
+    --color-warning-bg: #451A03;
+    --color-danger-bg: #450A0A;
+
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4), 0 2px 4px rgba(0, 0, 0, 0.3);
+    --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.5), 0 4px 12px rgba(0, 0, 0, 0.4);
+    --shadow-xl: 0 24px 48px rgba(0, 0, 0, 0.6), 0 8px 16px rgba(0, 0, 0, 0.5);
+  }
+
+  * {
+    border-color: var(--color-border);
+  }
+
+  body {
+    background-color: var(--color-bg);
+    color: var(--color-text-primary);
+    font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+
+  h1, h2, h3, .font-display {
+    font-family: 'Fraunces', serif;
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-tertiary);
+}
+
+/* Custom Animated Badge Borders */
+.spark-border {
+  border-color: #F59E0B !important;
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.6) !important;
+  animation: pulseBorder 1.5s infinite alternate;
+}
+
+.fire-border {
+  border-color: #EF4444 !important;
+  box-shadow: 0 0 12px rgba(239, 68, 68, 0.6) !important;
+  animation: flameBorder 1s infinite alternate;
+}
+
+.rainbow-border {
+  border-color: transparent !important;
+  background-image: linear-gradient(var(--color-surface), var(--color-surface)), linear-gradient(135deg, #EF4444, #F59E0B, #10B981, #38BDF8, #8A2BE2);
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.5) !important;
+  animation: rainbowBorder 3s linear infinite;
+}
