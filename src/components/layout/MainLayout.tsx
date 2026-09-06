@@ -9,10 +9,11 @@ import { Toaster } from 'sonner';
 import { db, doc, getDoc } from '@/lib/firebase';
 import { Megaphone, X } from 'lucide-react';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { cn } from '@/lib/utils';
 
 export const MainLayout: React.FC = () => {
   const [authModalOpen, setAuthModalOpen] = useState(false);
-  const [announcement, setAnnouncement] = useState<string | null>(null);
+  const [announcement, setAnnouncement] = useState<{ text: string; type: string } | null>(null);
   const [dismissed, setDismissed] = useState(false);
 
   useEffect(() => {
@@ -23,7 +24,10 @@ export const MainLayout: React.FC = () => {
         if (snap.exists()) {
           const data = snap.data();
           if (data.active && data.text) {
-            setAnnouncement(data.text);
+            setAnnouncement({
+              text: data.text,
+              type: data.type || 'info',
+            });
           }
         }
       } catch (err) {
@@ -45,14 +49,25 @@ export const MainLayout: React.FC = () => {
 
         {/* Global Announcement Banner */}
         {announcement && !dismissed && (
-          <div className="bg-primary/10 border-b border-primary/20 px-6 py-2.5 flex items-center justify-between text-xs font-bold text-text-primary animate-in fade-in-50 duration-300">
+          <div
+            className={cn(
+              'border-b px-6 py-2.5 flex items-center justify-between text-xs font-bold animate-in fade-in-50 duration-300',
+              announcement.type === 'success'
+                ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-900 dark:text-emerald-300'
+                : announcement.type === 'warning'
+                ? 'bg-amber-500/10 border-amber-500/30 text-amber-900 dark:text-amber-300'
+                : announcement.type === 'danger'
+                ? 'bg-rose-500/10 border-rose-500/30 text-rose-900 dark:text-rose-300'
+                : 'bg-primary/10 border-primary/20 text-text-primary'
+            )}
+          >
             <div className="flex items-center gap-2.5">
-              <Megaphone className="w-4 h-4 text-primary shrink-0" />
-              <span>{announcement}</span>
+              <Megaphone className="w-4 h-4 shrink-0" />
+              <span>{announcement.text}</span>
             </div>
             <button
               onClick={() => setDismissed(true)}
-              className="text-text-tertiary hover:text-text-primary p-1"
+              className="opacity-70 hover:opacity-100 p-1 transition-opacity"
               title="Dismiss banner"
             >
               <X className="w-4 h-4" />

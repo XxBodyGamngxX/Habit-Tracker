@@ -25,6 +25,8 @@ export interface UserDoc {
   pomodoroStats?: PomodoroStats;
   motivationalSettings?: MotivationalSettings;
   financeData?: FinanceData;
+  badges?: string[];
+  completedChallenges?: string[];
 }
 
 export interface Habit {
@@ -181,5 +183,41 @@ export interface MotivationalSettings {
   enabled: boolean;
   targetCount: number;
   streakCount: number;
+}
+
+export interface GlobalChallenge {
+  id: string;
+  title: string;
+  description: string;
+  target: number;
+  prize: number;
+  created?: string;
+}
+
+export interface GlobalBountyTemplate {
+  id: string;
+  text: string;
+  reward: number;
+  countNeeded: number;
+  type: 'pomodoro' | 'habits' | 'tasks';
+}
+
+export interface XPScalingConfig {
+  habit: number;
+  task: number;
+  pomodoro: number;
+  video: number;
+  groupBonus: number;
+  levelBase: number;
+  bountyExpireHours: number;
+  financeBonus: number;
+  bountiesEnabled: boolean;
+}
+
+export interface GlobalAnnouncement {
+  text: string;
+  type: 'info' | 'success' | 'warning' | 'danger';
+  active: boolean;
+  publishedAt?: string;
 }
 
