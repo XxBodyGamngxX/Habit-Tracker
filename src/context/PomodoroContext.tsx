@@ -125,7 +125,12 @@ export const PomodoroProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   // Sync stats from cloud if present
   useEffect(() => {
     if (userDoc?.pomodoroStats) {
-      setStats(userDoc.pomodoroStats);
+      setStats({
+        sessionsToday: Number(userDoc.pomodoroStats.sessionsToday) || 0,
+        totalFocusTime: Number(userDoc.pomodoroStats.totalFocusTime) || 0,
+        currentStreak: Number(userDoc.pomodoroStats.currentStreak) || 0,
+        lastSessionDate: userDoc.pomodoroStats.lastSessionDate || null,
+      });
     }
   }, [userDoc]);
 

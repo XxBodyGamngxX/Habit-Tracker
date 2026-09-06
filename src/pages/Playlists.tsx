@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { loadLocalData, saveLocalData } from '@/lib/storage';
 import { Button } from '@/components/ui/Button';
@@ -16,17 +16,25 @@ import type { Playlist } from '@/types';
 import { toast } from 'sonner';
 
 export const Playlists: React.FC = () => {
-  const { user } = useAuth();
+  const { user, userDoc } = useAuth();
 
   const [playlists, setPlaylists] = useState<Playlist[]>(() => {
-    return loadLocalData<Playlist[]>('playlists', [
+    const loaded = loadLocalData<Playlist[]>('playlists', [
       {
         id: 'default1',
         title: 'Lofi Hip Hop Radio - Beats to Relax/Study to',
         youtubeId: 'jfKfPfyJRdk',
       },
     ]);
+    return Array.isArray(loaded) ? loaded : [];
   });
+
+  useEffect(() => {
+    if (userDoc?.playlists && Array.isArray(userDoc.playlists)) {
+      setPlaylists(userDoc.playlists);
+      localStorage.setItem('playlists', JSON.stringify(userDoc.playlists));
+    }
+  }, [userDoc]);
 
   const [activeVideoId, setActiveVideoId] = useState<string>(playlists[0]?.youtubeId || 'jfKfPfyJRdk');
   const [modalOpen, setModalOpen] = useState(false);

@@ -32,52 +32,101 @@ interface FinanceContextType {
 
 const FinanceContext = createContext<FinanceContextType | undefined>(undefined);
 
+export const DEFAULT_FINANCE_DATA: FinanceData = {
+  monthYear: '',
+  startingDate: '',
+  monthlyIncome: 0,
+  dailyBudget: 0,
+  expenses: [],
+  xpBonusClaimedDates: {},
+  categories: ['Coffee ☕', 'Diet & Groceries 🍏', 'Gaming 🎮', 'PC Accessories 💻', 'Transportation 🚗'],
+  currency: 'EGP',
+  savingsBalance: 0,
+  savingsGoals: [],
+  activeGoal: null,
+  essentialCategories: {
+    'Diet & Groceries 🍏': true,
+    'Transportation 🚗': true,
+  },
+  itemPreferences: {},
+  lastClaimedBonusDate: '',
+  visaBalance: 0,
+  walletBalance: 0,
+  visaIncluded: true,
+  visaAllocation: 0,
+  walletAllocation: 0,
+};
+
+export const normalizeFinanceData = (raw?: Partial<FinanceData> | null): FinanceData => {
+  if (!raw) return { ...DEFAULT_FINANCE_DATA };
+  const categories = Array.isArray(raw.categories) && raw.categories.length > 0
+    ? raw.categories
+    : DEFAULT_FINANCE_DATA.categories;
+  const expenses = Array.isArray(raw.expenses) ? raw.expenses : [];
+  const savingsGoals = Array.isArray(raw.savingsGoals) ? raw.savingsGoals : [];
+  const essentialCategories = raw.essentialCategories && typeof raw.essentialCategories === 'object'
+    ? raw.essentialCategories
+    : DEFAULT_FINANCE_DATA.essentialCategories;
+
+  let visaBalance = raw.visaBalance !== undefined && raw.visaBalance !== null ? Number(raw.visaBalance) : null;
+  let walletBalance = raw.walletBalance !== undefined && raw.walletBalance !== null ? Number(raw.walletBalance) : null;
+  if (visaBalance === null && walletBalance === null) {
+    const totalSpent = expenses.filter(e => e.type !== 'income').reduce((sum, e) => sum + (e.amount || 0), 0);
+    visaBalance = Math.max(0, (Number(raw.monthlyIncome) || 0) - totalSpent);
+    walletBalance = 0;
+  } else {
+    visaBalance = visaBalance || 0;
+    walletBalance = walletBalance || 0;
+  }
+
+  return {
+    monthYear: raw.monthYear || '',
+    startingDate: raw.startingDate || '',
+    monthlyIncome: Number(raw.monthlyIncome) || 0,
+    dailyBudget: Number(raw.dailyBudget) || 0,
+    expenses,
+    xpBonusClaimedDates: raw.xpBonusClaimedDates || {},
+    categories,
+    currency: raw.currency || 'EGP',
+    savingsBalance: Number(raw.savingsBalance) || 0,
+    savingsGoals,
+    activeGoal: raw.activeGoal || null,
+    essentialCategories,
+    itemPreferences: raw.itemPreferences || {},
+    lastClaimedBonusDate: raw.lastClaimedBonusDate || '',
+    visaBalance,
+    walletBalance,
+    visaIncluded: raw.visaIncluded !== undefined ? Boolean(raw.visaIncluded) : true,
+    visaAllocation: Number(raw.visaAllocation ?? visaBalance),
+    walletAllocation: Number(raw.walletAllocation ?? walletBalance),
+  };
+};
+
 export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, userDoc } = useAuth();
   const { gainXP } = useGamification();
 
   const [financeData, setFinanceData] = useState<FinanceData>(() => {
-    return loadLocalData<FinanceData>('financeData', {
-      monthYear: '',
-      startingDate: '',
-      monthlyIncome: 0,
-      dailyBudget: 0,
-      expenses: [],
-      xpBonusClaimedDates: {},
-      categories: ['Coffee ☕', 'Diet & Groceries 🍏', 'Gaming 🎮', 'PC Accessories 💻', 'Transportation 🚗'],
-      currency: 'EGP',
-      savingsBalance: 0,
-      savingsGoals: [],
-      activeGoal: null,
-      essentialCategories: {
-        'Diet & Groceries 🍏': true,
-        'Transportation 🚗': true,
-      },
-      itemPreferences: {},
-      lastClaimedBonusDate: '',
-      visaBalance: 0,
-      walletBalance: 0,
-      visaIncluded: true,
-      visaAllocation: 0,
-      walletAllocation: 0,
-    });
+    return normalizeFinanceData(loadLocalData<Partial<FinanceData>>('financeData', {}));
   });
 
   useEffect(() => {
     if (userDoc?.financeData) {
-      setFinanceData(userDoc.financeData);
-      localStorage.setItem('financeData', JSON.stringify(userDoc.financeData));
+      const normalized = normalizeFinanceData(userDoc.financeData);
+      setFinanceData(normalized);
+      localStorage.setItem('financeData', JSON.stringify(normalized));
     }
   }, [userDoc]);
 
   const saveFinance = (data: FinanceData) => {
-    setFinanceData(data);
-    saveLocalData('financeData', data, user?.uid);
+    const normalized = normalizeFinanceData(data);
+    setFinanceData(normalized);
+    saveLocalData('financeData', normalized, user?.uid);
   };
 
   const getCycleDetails = (data: FinanceData = financeData): CycleDetails => {
-    if (!data.startingDate) {
-      const now = new Date();
+    const now = new Date();
+    if (!data?.startingDate) {
       const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
       return {
         cycleEndDate: lastDay,
@@ -87,15 +136,23 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }
 
     const startDate = new Date(data.startingDate);
+    if (isNaN(startDate.getTime())) {
+      const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+      return {
+        cycleEndDate: lastDay,
+        remainingDays: Math.max(1, lastDay.getDate() - now.getDate() + 1),
+        formattedRange: now.toLocaleString('default', { month: 'long' }),
+      };
+    }
     startDate.setHours(0, 0, 0, 0);
 
     const cycleEndDate = new Date(startDate);
     cycleEndDate.setMonth(cycleEndDate.getMonth() + 1);
 
-    const now = new Date();
-    now.setHours(0, 0, 0, 0);
+    const currentDate = new Date();
+    currentDate.setHours(0, 0, 0, 0);
 
-    const diffTime = cycleEndDate.getTime() - now.getTime();
+    const diffTime = cycleEndDate.getTime() - currentDate.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     const remainingDays = diffDays > 0 ? diffDays : 1;
 
@@ -109,9 +166,9 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   const totalSpentThisCycle = (financeData.expenses || [])
     .filter((e) => e.type !== 'income')
-    .reduce((sum, e) => sum + e.amount, 0);
+    .reduce((sum, e) => sum + (e.amount || 0), 0);
 
-  const remainingBalance = Math.max(0, financeData.monthlyIncome - totalSpentThisCycle);
+  const remainingBalance = Math.max(0, (financeData.monthlyIncome || 0) - totalSpentThisCycle);
 
   const setupFinance = (
     income: number,
@@ -276,18 +333,21 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
   };
 
   const addCustomCategory = (cat: string) => {
-    if (!cat.trim() || financeData.categories.includes(cat.trim())) return;
+    const trimmed = cat.trim();
+    const categories = Array.isArray(financeData.categories) ? financeData.categories : [];
+    if (!trimmed || categories.includes(trimmed)) return;
     const updated: FinanceData = {
       ...financeData,
-      categories: [...financeData.categories, cat.trim()],
+      categories: [...categories, trimmed],
     };
     saveFinance(updated);
   };
 
   const removeCategory = (cat: string) => {
+    const categories = Array.isArray(financeData.categories) ? financeData.categories : [];
     const updated: FinanceData = {
       ...financeData,
-      categories: financeData.categories.filter((c) => c !== cat),
+      categories: categories.filter((c) => c !== cat),
     };
     saveFinance(updated);
   };

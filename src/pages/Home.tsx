@@ -111,14 +111,15 @@ export const Home: React.FC = () => {
 
           {/* Bounties List */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {bounties.map((bounty) => {
+            {(bounties || []).map((bounty) => {
               let currentCount = 0;
-              if (bounty.type === 'pomodoro') currentCount = bountyStats.pomodorosCompletedToday;
-              if (bounty.type === 'habit') currentCount = bountyStats.habitsCompletedToday;
-              if (bounty.type === 'task') currentCount = bountyStats.tasksCompletedToday;
+              if (bounty.type === 'pomodoro') currentCount = bountyStats?.pomodorosCompletedToday || 0;
+              if (bounty.type === 'habit') currentCount = bountyStats?.habitsCompletedToday || 0;
+              if (bounty.type === 'task') currentCount = bountyStats?.tasksCompletedToday || 0;
 
-              const progress = Math.min(100, Math.round((currentCount / bounty.targetCount) * 100));
-              const canClaim = !bounty.completed && currentCount >= bounty.targetCount;
+              const target = bounty.targetCount || 1;
+              const progress = Math.min(100, Math.round((currentCount / target) * 100));
+              const canClaim = !bounty.completed && currentCount >= target;
 
               return (
                 <Card
@@ -134,7 +135,7 @@ export const Home: React.FC = () => {
                         </span>
                       ) : (
                         <span className="text-[11px] font-bold text-text-tertiary">
-                          {currentCount} / {bounty.targetCount}
+                          {currentCount} / {target}
                         </span>
                       )}
                     </div>

@@ -4,6 +4,7 @@ import { Sun, Moon, ArrowLeft } from 'lucide-react';
 import { useTheme } from '@/context/ThemeContext';
 import { Button } from '@/components/ui/Button';
 import { Toaster } from 'sonner';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 
 export const StandaloneLayout: React.FC = () => {
   const { theme, toggleTheme } = useTheme();
@@ -37,7 +38,9 @@ export const StandaloneLayout: React.FC = () => {
       </header>
 
       <main className="flex-1 flex flex-col items-center justify-center p-4 sm:p-8">
-        <Outlet />
+        <ErrorBoundary>
+          <Outlet />
+        </ErrorBoundary>
       </main>
 
       <Toaster position="top-right" richColors />

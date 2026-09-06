@@ -63,7 +63,12 @@ export const GamificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     return parseInt(localStorage.getItem('spentXP') || '0', 10);
   });
   const [unlockedItems, setUnlockedItems] = useState<UnlockedItems>(() => {
-    return loadLocalData('unlockedItems', { colors: [], avatars: [], borders: [] });
+    const loaded = loadLocalData<UnlockedItems>('unlockedItems', { colors: [], avatars: [], borders: [] });
+    return {
+      colors: Array.isArray(loaded?.colors) ? loaded.colors : [],
+      avatars: Array.isArray(loaded?.avatars) ? loaded.avatars : [],
+      borders: Array.isArray(loaded?.borders) ? loaded.borders : [],
+    };
   });
   const [activeAvatar, setActiveAvatar] = useState<string>(() => {
     return localStorage.getItem('activeAvatar') || '🌱';
@@ -78,29 +83,41 @@ export const GamificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
   // Sync with Firestore userDoc when it arrives
   useEffect(() => {
     if (userDoc) {
-      if (userDoc.userLevel !== undefined) {
-        setUserLevel(userDoc.userLevel);
-        localStorage.setItem('userLevel', userDoc.userLevel.toString());
+      if (userDoc.userLevel !== undefined && userDoc.userLevel !== null) {
+        const lvl = Number(userDoc.userLevel) || 1;
+        setUserLevel(lvl);
+        localStorage.setItem('userLevel', lvl.toString());
       }
-      if (userDoc.userXP !== undefined) {
-        setUserXP(userDoc.userXP);
-        localStorage.setItem('userXP', userDoc.userXP.toString());
+      if (userDoc.userXP !== undefined && userDoc.userXP !== null) {
+        const xp = Number(userDoc.userXP) || 0;
+        setUserXP(xp);
+        localStorage.setItem('userXP', xp.toString());
       }
-      if (userDoc.spentXP !== undefined) {
-        setSpentXP(userDoc.spentXP);
-        localStorage.setItem('spentXP', userDoc.spentXP.toString());
+      if (userDoc.spentXP !== undefined && userDoc.spentXP !== null) {
+        const spent = Number(userDoc.spentXP) || 0;
+        setSpentXP(spent);
+        localStorage.setItem('spentXP', spent.toString());
       }
       if (userDoc.unlockedItems) {
-        setUnlockedItems(userDoc.unlockedItems);
-        localStorage.setItem('unlockedItems', JSON.stringify(userDoc.unlockedItems));
+        const safeUnlocked: UnlockedItems = {
+          colors: Array.isArray(userDoc.unlockedItems.colors) ? userDoc.unlockedItems.colors : [],
+          avatars: Array.isArray(userDoc.unlockedItems.avatars) ? userDoc.unlockedItems.avatars : [],
+          borders: Array.isArray(userDoc.unlockedItems.borders) ? userDoc.unlockedItems.borders : [],
+        };
+        setUnlockedItems(safeUnlocked);
+        localStorage.setItem('unlockedItems', JSON.stringify(safeUnlocked));
       }
       if (userDoc.activeAvatar) {
         setActiveAvatar(userDoc.activeAvatar);
         localStorage.setItem('activeAvatar', userDoc.activeAvatar);
       }
       if (userDoc.activeBorder !== undefined) {
-        setActiveBorder(userDoc.activeBorder);
-        localStorage.setItem('activeBorder', userDoc.activeBorder);
+        setActiveBorder(userDoc.activeBorder || '');
+        localStorage.setItem('activeBorder', userDoc.activeBorder || '');
+      }
+      if (userDoc.activeColor) {
+        setAccentColor(userDoc.activeColor);
+        localStorage.setItem('accentColor', userDoc.activeColor);
       }
     }
   }, [userDoc]);
@@ -159,9 +176,12 @@ export const GamificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     localStorage.setItem('userXP', nextXP.toString());
     localStorage.setItem('spentXP', nextSpent.toString());
 
+    const currentCategoryItems = Array.isArray(unlockedItems?.[category]) ? unlockedItems[category] : [];
     const updatedUnlocked: UnlockedItems = {
-      ...unlockedItems,
-      [category]: [...(unlockedItems[category] || []), item.value],
+      colors: Array.isArray(unlockedItems?.colors) ? [...unlockedItems.colors] : [],
+      avatars: Array.isArray(unlockedItems?.avatars) ? [...unlockedItems.avatars] : [],
+      borders: Array.isArray(unlockedItems?.borders) ? [...unlockedItems.borders] : [],
+      [category]: [...currentCategoryItems, item.value],
     };
     setUnlockedItems(updatedUnlocked);
     saveLocalData('unlockedItems', updatedUnlocked, user?.uid);

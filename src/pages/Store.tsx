@@ -25,7 +25,7 @@ export const Store: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'colors' | 'avatars' | 'borders'>('colors');
 
   const handleAction = (category: 'colors' | 'avatars' | 'borders', item: StoreItem) => {
-    const isUnlocked = unlockedItems[category]?.includes(item.value);
+    const isUnlocked = unlockedItems?.[category]?.includes(item.value);
 
     if (isUnlocked) {
       if (category === 'colors') {
@@ -51,7 +51,7 @@ export const Store: React.FC = () => {
   };
 
   const renderItemCard = (category: 'colors' | 'avatars' | 'borders', item: StoreItem) => {
-    const isUnlocked = unlockedItems[category]?.includes(item.value);
+    const isUnlocked = unlockedItems?.[category]?.includes(item.value);
     let isEquipped = false;
     if (category === 'colors') isEquipped = accentColor === item.value;
     if (category === 'avatars') isEquipped = activeAvatar === item.value;

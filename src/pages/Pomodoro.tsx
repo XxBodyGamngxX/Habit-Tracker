@@ -35,9 +35,9 @@ export const Pomodoro: React.FC = () => {
 
   const [zenMode, setZenMode] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
-  const [workMins, setWorkMins] = useState(settings.workDuration);
-  const [shortMins, setShortMins] = useState(settings.shortBreakDuration);
-  const [longMins, setLongMins] = useState(settings.longBreakDuration);
+  const [workMins, setWorkMins] = useState(settings?.workDuration || 25);
+  const [shortMins, setShortMins] = useState(settings?.shortBreakDuration || 5);
+  const [longMins, setLongMins] = useState(settings?.longBreakDuration || 15);
 
   const formatTime = (seconds: number): string => {
     const mins = Math.floor(seconds / 60);

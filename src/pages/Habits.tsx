@@ -181,7 +181,7 @@ export const Habits: React.FC = () => {
                   {/* Days of week active indicators */}
                   <div className="flex items-center justify-between gap-1 pt-2 border-t border-border/50">
                     {dayLabels.map((day, idx) => {
-                      const isActiveDay = habit.targetDays.includes(idx);
+                      const isActiveDay = Array.isArray(habit.targetDays) && habit.targetDays.includes(idx);
                       return (
                         <div
                           key={idx}
@@ -294,7 +294,7 @@ export const Habits: React.FC = () => {
               <label className="text-xs font-bold text-text-secondary">Active Days of Week</label>
               <div className="grid grid-cols-7 gap-1">
                 {dayLabels.map((day, idx) => {
-                  const selected = targetDays.includes(idx);
+                  const selected = Array.isArray(targetDays) && targetDays.includes(idx);
                   return (
                     <button
                       type="button"

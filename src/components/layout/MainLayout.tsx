@@ -8,6 +8,7 @@ import { LevelUpModal } from '@/components/gamification/LevelUpModal';
 import { Toaster } from 'sonner';
 import { db, doc, getDoc } from '@/lib/firebase';
 import { Megaphone, X } from 'lucide-react';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 
 export const MainLayout: React.FC = () => {
   const [authModalOpen, setAuthModalOpen] = useState(false);
@@ -61,7 +62,9 @@ export const MainLayout: React.FC = () => {
 
         {/* Dynamic Routed Content */}
         <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto overflow-y-auto">
-          <Outlet />
+          <ErrorBoundary>
+            <Outlet />
+          </ErrorBoundary>
         </main>
       </div>
 

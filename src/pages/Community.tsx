@@ -19,16 +19,28 @@ interface LeaderboardUser {
 }
 
 export const Community: React.FC = () => {
-  const { user, userNumber } = useAuth();
+  const { user, userDoc, userNumber } = useAuth();
   const { userLevel, userXP, activeAvatar } = useGamification();
 
   const [leaderboard, setLeaderboard] = useState<LeaderboardUser[]>([]);
   const [friendsList, setFriendsList] = useState<string[]>(() => {
-    const cached = localStorage.getItem('friendsList');
-    return cached ? JSON.parse(cached) : [];
+    try {
+      const cached = localStorage.getItem('friendsList');
+      const parsed = cached ? JSON.parse(cached) : [];
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
   });
   const [friendInput, setFriendInput] = useState('');
   const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (userDoc?.friends && Array.isArray(userDoc.friends)) {
+      setFriendsList(userDoc.friends);
+      localStorage.setItem('friendsList', JSON.stringify(userDoc.friends));
+    }
+  }, [userDoc]);
 
   useEffect(() => {
     const fetchLeaderboard = async () => {

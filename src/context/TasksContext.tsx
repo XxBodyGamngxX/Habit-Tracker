@@ -21,12 +21,13 @@ export const TasksProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const { gainXP } = useGamification();
 
   const [tasks, setTasks] = useState<Task[]>(() => {
-    return loadLocalData<Task[]>('tasks', []);
+    const raw = loadLocalData<Task[]>('tasks', []);
+    return Array.isArray(raw) ? raw : [];
   });
   const [filter, setFilter] = useState<'all' | 'pending' | 'completed'>('pending');
 
   useEffect(() => {
-    if (userDoc?.tasks) {
+    if (userDoc?.tasks && Array.isArray(userDoc.tasks)) {
       setTasks(userDoc.tasks);
       localStorage.setItem('tasks', JSON.stringify(userDoc.tasks));
     }

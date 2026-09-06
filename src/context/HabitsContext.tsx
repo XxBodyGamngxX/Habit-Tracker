@@ -21,13 +21,28 @@ export const HabitsProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const { gainXP } = useGamification();
 
   const [habits, setHabits] = useState<Habit[]>(() => {
-    return loadLocalData<Habit[]>('habits', []);
+    const raw = loadLocalData<Habit[]>('habits', []);
+    if (!Array.isArray(raw)) return [];
+    return raw.map((h) => ({
+      ...h,
+      completedDates: Array.isArray(h?.completedDates) ? h.completedDates : [],
+      targetDays: Array.isArray(h?.targetDays) ? h.targetDays : [0, 1, 2, 3, 4, 5, 6],
+      currentStreak: h?.currentStreak || 0,
+      timeSpentToday: h?.timeSpentToday || 0,
+    }));
   });
 
   useEffect(() => {
-    if (userDoc?.habits) {
-      setHabits(userDoc.habits);
-      localStorage.setItem('habits', JSON.stringify(userDoc.habits));
+    if (userDoc?.habits && Array.isArray(userDoc.habits)) {
+      const safeHabits = userDoc.habits.map((h) => ({
+        ...h,
+        completedDates: Array.isArray(h?.completedDates) ? h.completedDates : [],
+        targetDays: Array.isArray(h?.targetDays) ? h.targetDays : [0, 1, 2, 3, 4, 5, 6],
+        currentStreak: h?.currentStreak || 0,
+        timeSpentToday: h?.timeSpentToday || 0,
+      }));
+      setHabits(safeHabits);
+      localStorage.setItem('habits', JSON.stringify(safeHabits));
     }
   }, [userDoc]);
 
@@ -67,6 +82,7 @@ export const HabitsProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   };
 
   const isHabitCompletedToday = (habit: Habit): boolean => {
+    if (!habit || !Array.isArray(habit.completedDates)) return false;
     const today = getTodayDateStr();
     return habit.completedDates.includes(today);
   };
@@ -78,8 +94,9 @@ export const HabitsProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     const updated = habits.map((habit) => {
       if (habit.id !== id) return habit;
 
-      const isCompleted = habit.completedDates.includes(today);
-      let newCompletedDates = [...habit.completedDates];
+      const completedDates = Array.isArray(habit.completedDates) ? habit.completedDates : [];
+      const isCompleted = completedDates.includes(today);
+      let newCompletedDates = [...completedDates];
       let streak = habit.currentStreak || 0;
 
       if (isCompleted) {

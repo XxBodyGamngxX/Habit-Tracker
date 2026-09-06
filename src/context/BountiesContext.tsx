@@ -107,13 +107,21 @@ export const BountiesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   // Sync real-time progress from Pomodoro, Habits, and Tasks
   useEffect(() => {
     const today = getTodayStr();
-    const completedHabitsToday = habits.filter((h) => h.completedDates.includes(today)).length;
-    const completedTasksToday = tasks.filter((t) => t.completed).length;
-    const pomodoros = pomodoroStats.sessionsToday;
+    const completedHabitsToday = (habits || []).filter(
+      (h) => Array.isArray(h?.completedDates) && h.completedDates.includes(today)
+    ).length;
+    const completedTasksToday = (tasks || []).filter((t) => t?.completed).length;
+    const pomodoros = pomodoroStats?.sessionsToday || 0;
 
     setBountyStats((prev) => {
-      const updated = {
-        ...prev,
+      const current = prev || {
+        pomodorosCompletedToday: 0,
+        habitsCompletedToday: 0,
+        tasksCompletedToday: 0,
+        dateStr: today,
+      };
+      const updated: BountyStats = {
+        ...current,
         pomodorosCompletedToday: pomodoros,
         habitsCompletedToday: completedHabitsToday,
         tasksCompletedToday: completedTasksToday,
@@ -122,24 +130,32 @@ export const BountiesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       saveLocalData('bountyStats', updated);
       return updated;
     });
-  }, [pomodoroStats.sessionsToday, habits, tasks]);
+  }, [pomodoroStats?.sessionsToday, habits, tasks]);
 
   const claimBounty = (bountyId: string) => {
-    const target = bounties.find((b) => b.id === bountyId);
+    const safeBounties = Array.isArray(bounties) ? bounties : [];
+    const target = safeBounties.find((b) => b.id === bountyId);
     if (!target || target.completed) return;
 
+    const safeStats = bountyStats || {
+      pomodorosCompletedToday: 0,
+      habitsCompletedToday: 0,
+      tasksCompletedToday: 0,
+      dateStr: '',
+    };
+
     let canClaim = false;
-    if (target.type === 'pomodoro' && bountyStats.pomodorosCompletedToday >= target.targetCount) {
+    if (target.type === 'pomodoro' && safeStats.pomodorosCompletedToday >= target.targetCount) {
       canClaim = true;
-    } else if (target.type === 'habit' && bountyStats.habitsCompletedToday >= target.targetCount) {
+    } else if (target.type === 'habit' && safeStats.habitsCompletedToday >= target.targetCount) {
       canClaim = true;
-    } else if (target.type === 'task' && bountyStats.tasksCompletedToday >= target.targetCount) {
+    } else if (target.type === 'task' && safeStats.tasksCompletedToday >= target.targetCount) {
       canClaim = true;
     }
 
     if (!canClaim) return;
 
-    const updated = bounties.map((b) => (b.id === bountyId ? { ...b, completed: true } : b));
+    const updated = safeBounties.map((b) => (b.id === bountyId ? { ...b, completed: true } : b));
     setBounties(updated);
     saveLocalData('dailyBounties', updated);
     gainXP(target.xp, `Bounty: ${target.title}`);

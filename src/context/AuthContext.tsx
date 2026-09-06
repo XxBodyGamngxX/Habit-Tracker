@@ -139,16 +139,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-      setUser(currentUser);
-      if (currentUser) {
-        await fetchUserData(currentUser);
-      } else {
-        setUserDoc(null);
-        setUserRole('user');
-        setUserNumber(null);
-        localStorage.removeItem('userNumber');
+      try {
+        setUser(currentUser);
+        if (currentUser) {
+          await fetchUserData(currentUser);
+        } else {
+          setUserDoc(null);
+          setUserRole('user');
+          setUserNumber(null);
+          localStorage.removeItem('userNumber');
+        }
+      } catch (err) {
+        console.error('Error handling auth state change:', err);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     });
     return () => unsubscribe();
   }, []);

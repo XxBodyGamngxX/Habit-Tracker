@@ -26,9 +26,15 @@ export const TopBar: React.FC<TopBarProps> = ({ onOpenAuth }) => {
   const { theme, toggleTheme, accentColor, setAccentColor } = useTheme();
   const navigate = useNavigate();
 
+  const unlockedColors = Array.isArray(unlockedItems?.colors) ? unlockedItems.colors : [];
   const unlockedColorItems = STORE_ITEMS.colors.filter((c) =>
-    unlockedItems.colors.includes(c.value)
+    unlockedColors.includes(c.value)
   );
+
+  const safeLevel = userLevel || 1;
+  const safeXP = userXP || 0;
+  const safeXPNeeded = xpNeeded || 500;
+  const safeProgress = Math.max(0, Math.min(100, progressPercent || 0));
 
   return (
     <header className="h-16 px-6 border-b border-border bg-surface flex items-center justify-between sticky top-0 z-20 shadow-sm">
@@ -36,16 +42,16 @@ export const TopBar: React.FC<TopBarProps> = ({ onOpenAuth }) => {
       <div className="flex items-center gap-3.5 bg-background px-3.5 py-1.5 rounded-2xl border border-border max-w-sm sm:max-w-md w-full shadow-xs">
         {/* Level Badge */}
         <div className="bg-primary text-primary-foreground text-xs font-black px-2 py-0.5 rounded-lg shadow-xs shrink-0">
-          L{userLevel}
+          L{safeLevel}
         </div>
 
         {/* Avatar with Animated Border */}
         <div
           className={cn(
             'w-8 h-8 rounded-full flex items-center justify-center text-lg bg-surface border-2 border-border shrink-0 transition-all',
-            activeBorder
+            activeBorder || ''
           )}
-          title={`Level ${userLevel} Achiever`}
+          title={`Level ${safeLevel} Achiever`}
         >
           {activeAvatar || '🌱'}
         </div>
@@ -55,10 +61,10 @@ export const TopBar: React.FC<TopBarProps> = ({ onOpenAuth }) => {
           <div className="flex justify-between text-[11px] font-bold text-text-secondary leading-none">
             <span>XP Progress</span>
             <span>
-              {userXP} / {xpNeeded} XP
+              {safeXP} / {safeXPNeeded} XP
             </span>
           </div>
-          <Progress value={progressPercent} className="h-2" />
+          <Progress value={safeProgress} className="h-2" />
         </div>
       </div>
 
