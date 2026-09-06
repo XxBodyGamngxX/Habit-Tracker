@@ -21,10 +21,11 @@ interface TopBarProps {
 }
 
 export const TopBar: React.FC<TopBarProps> = ({ onOpenAuth }) => {
-  const { user, userRole, userNumber, signOut } = useAuth();
+  const { user, userDoc, userRole, userNumber, signOut } = useAuth();
   const { userLevel, userXP, xpNeeded, progressPercent, activeAvatar, activeBorder, unlockedItems } = useGamification();
   const { theme, toggleTheme, accentColor, setAccentColor } = useTheme();
   const navigate = useNavigate();
+  const userAvatarUrl = userDoc?.profilePicUrl || userDoc?.photoURL || user?.photoURL;
 
   const handleSignOut = async () => {
     await signOut();
@@ -42,40 +43,9 @@ export const TopBar: React.FC<TopBarProps> = ({ onOpenAuth }) => {
   const safeProgress = Math.max(0, Math.min(100, progressPercent || 0));
 
   return (
-    <header className="h-16 px-6 border-b border-border bg-surface flex items-center justify-between sticky top-0 z-20 shadow-sm">
-      {/* Left: XP Progression Bar Widget */}
-      <div className="flex items-center gap-3.5 bg-background px-3.5 py-1.5 rounded-2xl border border-border max-w-sm sm:max-w-md w-full shadow-xs">
-        {/* Level Badge */}
-        <div className="bg-primary text-primary-foreground text-xs font-black px-2 py-0.5 rounded-lg shadow-xs shrink-0">
-          L{safeLevel}
-        </div>
-
-        {/* Avatar with Animated Border */}
-        <div
-          className={cn(
-            'w-8 h-8 rounded-full flex items-center justify-center text-lg bg-surface border-2 border-border shrink-0 transition-all',
-            activeBorder || ''
-          )}
-          title={`Level ${safeLevel} Achiever`}
-        >
-          {activeAvatar || '🌱'}
-        </div>
-
-        {/* Progress Bar & Details */}
-        <div className="flex flex-col flex-1 gap-1">
-          <div className="flex justify-between text-[11px] font-bold text-text-secondary leading-none">
-            <span>XP Progress</span>
-            <span>
-              {safeXP} / {safeXPNeeded} XP
-            </span>
-          </div>
-          <Progress value={safeProgress} className="h-2" />
-        </div>
-      </div>
-
-      {/* Right: Actions (Accent picker, Theme toggle, Auth / Profile) */}
-      <div className="flex items-center gap-2.5">
-        {/* Accent Color Picker Dropdown */}
+    <header className="h-16 px-6 border-b border-border bg-surface flex items-center justify-end sticky top-0 z-20 shadow-sm">
+      <div className="flex items-center gap-3 flex-wrap justify-end">
+        {/* 1. Accent Color Picker Dropdown */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
@@ -120,7 +90,7 @@ export const TopBar: React.FC<TopBarProps> = ({ onOpenAuth }) => {
           </DropdownMenuContent>
         </DropdownMenu>
 
-        {/* Theme Toggle Button */}
+        {/* 2. Dark/Light Mode Toggle Button */}
         <Button
           variant="outline"
           size="icon"
@@ -135,7 +105,37 @@ export const TopBar: React.FC<TopBarProps> = ({ onOpenAuth }) => {
           )}
         </Button>
 
-        {/* User Profile / Login */}
+        {/* 3. XP Progression Bar Widget */}
+        <div className="flex items-center gap-3 bg-background px-3.5 py-1.5 rounded-2xl border border-border w-56 sm:w-64 md:w-72 shadow-xs shrink-0">
+          {/* Level Badge */}
+          <div className="bg-primary text-primary-foreground text-xs font-black px-2 py-0.5 rounded-lg shadow-xs shrink-0">
+            L{safeLevel}
+          </div>
+
+          {/* Avatar with Animated Border */}
+          <div
+            className={cn(
+              'w-7 h-7 rounded-full flex items-center justify-center text-base bg-surface border-2 border-border shrink-0 transition-all',
+              activeBorder || ''
+            )}
+            title={`Level ${safeLevel} Achiever`}
+          >
+            {activeAvatar || '🌱'}
+          </div>
+
+          {/* Progress Bar & Details */}
+          <div className="flex flex-col flex-1 min-w-0 gap-1">
+            <div className="flex justify-between text-[10px] font-bold text-text-secondary leading-none">
+              <span>XP Progress</span>
+              <span>
+                {safeXP} / {safeXPNeeded} XP
+              </span>
+            </div>
+            <Progress value={safeProgress} className="h-1.5" />
+          </div>
+        </div>
+
+        {/* 4. User Profile / Login */}
         {user ? (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -143,9 +143,17 @@ export const TopBar: React.FC<TopBarProps> = ({ onOpenAuth }) => {
                 className="flex items-center gap-2 p-1 pl-2 pr-3 rounded-xl border border-border bg-background hover:bg-surface transition-all"
                 title="Account Menu"
               >
-                <div className="w-7 h-7 rounded-lg bg-primary text-primary-foreground font-bold flex items-center justify-center text-xs">
-                  {user.displayName ? user.displayName.charAt(0).toUpperCase() : 'U'}
-                </div>
+                {userAvatarUrl ? (
+                  <img
+                    src={userAvatarUrl}
+                    alt={user.displayName || 'User'}
+                    className="w-7 h-7 rounded-lg object-cover shrink-0 border border-border"
+                  />
+                ) : (
+                  <div className="w-7 h-7 rounded-lg bg-primary text-primary-foreground font-bold flex items-center justify-center text-xs shrink-0">
+                    {user.displayName ? user.displayName.charAt(0).toUpperCase() : 'U'}
+                  </div>
+                )}
                 <div className="hidden sm:flex flex-col items-start leading-tight">
                   <span className="text-xs font-bold text-text-primary truncate max-w-[90px]">
                     {user.displayName || user.email?.split('@')[0]}
@@ -158,19 +166,32 @@ export const TopBar: React.FC<TopBarProps> = ({ onOpenAuth }) => {
                 </div>
               </button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56">
-              <DropdownMenuLabel className="flex flex-col">
-                <span className="font-bold text-text-primary">
-                  {user.displayName || 'User'}
-                </span>
-                <span className="text-[11px] text-text-secondary truncate font-normal">
-                  {user.email}
-                </span>
-                {userNumber && (
-                  <span className="text-[10px] text-primary font-bold mt-0.5">
-                    User ID: #{userNumber}
-                  </span>
+            <DropdownMenuContent align="end" className="w-60">
+              <DropdownMenuLabel className="flex items-center gap-2.5 py-2.5">
+                {userAvatarUrl ? (
+                  <img
+                    src={userAvatarUrl}
+                    alt=""
+                    className="w-10 h-10 rounded-xl object-cover shrink-0 border border-border"
+                  />
+                ) : (
+                  <div className="w-10 h-10 rounded-xl bg-primary text-primary-foreground font-bold flex items-center justify-center text-sm shrink-0">
+                    {user.displayName ? user.displayName.charAt(0).toUpperCase() : 'U'}
+                  </div>
                 )}
+                <div className="flex flex-col min-w-0">
+                  <span className="font-bold text-text-primary text-xs truncate">
+                    {user.displayName || 'User'}
+                  </span>
+                  <span className="text-[11px] text-text-secondary truncate font-normal">
+                    {user.email}
+                  </span>
+                  {userNumber && (
+                    <span className="text-[10px] text-primary font-bold">
+                      User ID: #{userNumber}
+                    </span>
+                  )}
+                </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={() => navigate('/settings')}>
