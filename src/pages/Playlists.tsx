@@ -86,7 +86,7 @@ const MOTIVATIONAL_MESSAGES = [
 ];
 
 // Helpers
-export const parseISO8601Duration = (iso?: string): number => {
+const parseISO8601Duration = (iso?: string): number => {
   if (!iso) return 0;
   const match = iso.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
   if (!match) return 0;
@@ -96,7 +96,7 @@ export const parseISO8601Duration = (iso?: string): number => {
   return hours * 3600 + minutes * 60 + seconds;
 };
 
-export const formatDuration = (totalSeconds: number): string => {
+const formatDuration = (totalSeconds: number): string => {
   if (!totalSeconds || totalSeconds <= 0) return '0m';
   const hours = Math.floor(totalSeconds / 3600);
   const minutes = Math.floor((totalSeconds % 3600) / 60);
@@ -106,7 +106,7 @@ export const formatDuration = (totalSeconds: number): string => {
   return `${seconds}s`;
 };
 
-export const extractPlaylistId = (url: string): string | null => {
+const extractPlaylistId = (url: string): string | null => {
   const trimmed = url.trim();
   const reg = /[?&]list=([^#&?]+)/;
   const match = trimmed.match(reg);
@@ -115,7 +115,7 @@ export const extractPlaylistId = (url: string): string | null => {
   return null;
 };
 
-export const parseRangeSpecification = (inputString: string): { start: number; end: number }[] => {
+const parseRangeSpecification = (inputString: string): { start: number; end: number }[] => {
   const regex = /(\d+)[\s:-]+(\d+)/g;
   const ranges: { start: number; end: number }[] = [];
   let match: RegExpExecArray | null;
