@@ -11,7 +11,8 @@ import {
 } from '@/components/ui/Dialog';
 import { Input } from '@/components/ui/Input';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/Tabs';
-import { Plus, Check, Trash2, Calendar } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Plus, Check, Trash2, Calendar, ExternalLink } from 'lucide-react';
 import type { TaskPriority } from '@/types';
 import { cn } from '@/lib/utils';
 
@@ -61,10 +62,20 @@ export const Todo: React.FC = () => {
           </p>
         </div>
 
-        <Button onClick={() => setModalOpen(true)} className="h-10 px-4 font-bold gap-2 self-start sm:self-auto">
-          <Plus className="w-4 h-4" />
-          <span>New Task Crease</span>
-        </Button>
+        <div className="flex items-center gap-2">
+          <Link
+            to="/standalone/todo"
+            className="inline-flex items-center justify-center h-10 w-10 rounded-xl border border-border bg-surface hover:bg-background text-text-secondary hover:text-text-primary transition-colors"
+            title="Open Standalone Window"
+          >
+            <ExternalLink className="w-4 h-4" />
+          </Link>
+
+          <Button onClick={() => setModalOpen(true)} className="h-10 px-4 font-bold gap-2 self-start sm:self-auto">
+            <Plus className="w-4 h-4" />
+            <span>New Task Crease</span>
+          </Button>
+        </div>
       </div>
 
       {/* Filter Tabs */}

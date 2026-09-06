@@ -10,7 +10,8 @@ import {
   DialogDescription,
 } from '@/components/ui/Dialog';
 import { Input } from '@/components/ui/Input';
-import { Play, Pause, RotateCcw, Settings as SettingsIcon, Flame, Clock, Trophy, Maximize2, Minimize2 } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Play, Pause, RotateCcw, Settings as SettingsIcon, Flame, Clock, Trophy, Maximize2, Minimize2, ExternalLink } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export const Pomodoro: React.FC = () => {
@@ -152,6 +153,14 @@ export const Pomodoro: React.FC = () => {
         </div>
 
         <div className="flex items-center gap-2">
+          <Link
+            to="/standalone/pomodoro"
+            className="inline-flex items-center justify-center h-10 w-10 rounded-xl border border-border bg-surface hover:bg-background text-text-secondary hover:text-text-primary transition-colors"
+            title="Open Standalone Window"
+          >
+            <ExternalLink className="w-4 h-4" />
+          </Link>
+
           <Button
             variant="outline"
             size="icon"
