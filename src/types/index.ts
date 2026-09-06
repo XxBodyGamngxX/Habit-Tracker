@@ -147,9 +147,39 @@ export interface UnlockedItems {
   borders: string[];
 }
 
+export interface PlaylistVideo {
+  id: string;
+  title: string;
+  thumbnail: string;
+  channelTitle?: string;
+  completed: boolean;
+  durationSeconds?: number;
+}
+
+export type PlaylistGroupColor = 'default' | 'rose' | 'amber' | 'emerald' | 'sky' | 'violet' | 'slate';
+
+export interface PlaylistGroup {
+  id: string;
+  name: string;
+  start: number; // 1-indexed
+  end: number;   // 1-indexed
+  color?: PlaylistGroupColor;
+}
+
 export interface Playlist {
   id: string;
   title: string;
-  youtubeId: string;
-  thumbnailUrl?: string;
+  thumbnail: string;
+  channel?: string;
+  videos: PlaylistVideo[];
+  groups?: PlaylistGroup[];
+  speed?: number;
+  expanded?: boolean;
 }
+
+export interface MotivationalSettings {
+  enabled: boolean;
+  targetCount: number;
+  streakCount: number;
+}
+
