@@ -16,6 +16,7 @@ interface LeaderboardUser {
   userXP: number;
   avatar: string;
   userNumber?: number;
+  profilePicUrl?: string | null;
 }
 
 export const Community: React.FC = () => {
@@ -34,6 +35,17 @@ export const Community: React.FC = () => {
   });
   const [friendInput, setFriendInput] = useState('');
   const [loading, setLoading] = useState(true);
+
+  // Synchronized 30-second toggle between Avatar and Profile Picture for all leaderboard users
+  const [showProfilePic, setShowProfilePic] = useState(false);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setShowProfilePic((prev) => !prev);
+    }, 30000);
+
+    return () => clearInterval(timer);
+  }, []);
 
   useEffect(() => {
     if (userDoc?.friends && Array.isArray(userDoc.friends)) {
@@ -59,6 +71,7 @@ export const Community: React.FC = () => {
                 userXP: data.userXP || 0,
                 avatar: data.activeAvatar || '🌱',
                 userNumber: data.userNumber,
+                profilePicUrl: data.profilePicUrl || data.photoURL || null,
               });
             }
           });
@@ -67,9 +80,9 @@ export const Community: React.FC = () => {
         // Fallback or seed if empty
         if (usersList.length === 0) {
           usersList.push(
-            { uid: 'mock1', displayName: 'Fold Master 🏆', userLevel: 12, userXP: 340, avatar: '🕊️', userNumber: 1 },
-            { uid: 'mock2', displayName: 'Morning Light 🌅', userLevel: 8, userXP: 210, avatar: '🦊', userNumber: 2 },
-            { uid: 'mock3', displayName: 'Pomodoro King 🍅', userLevel: 7, userXP: 150, avatar: '🐸', userNumber: 3 },
+            { uid: 'mock1', displayName: 'Fold Master 🏆', userLevel: 12, userXP: 340, avatar: '🕊️', userNumber: 1, profilePicUrl: null },
+            { uid: 'mock2', displayName: 'Morning Light 🌅', userLevel: 8, userXP: 210, avatar: '🦊', userNumber: 2, profilePicUrl: null },
+            { uid: 'mock3', displayName: 'Pomodoro King 🍅', userLevel: 7, userXP: 150, avatar: '🐸', userNumber: 3, profilePicUrl: null },
             {
               uid: user?.uid || 'curr',
               displayName: user?.displayName || 'You',
@@ -77,6 +90,7 @@ export const Community: React.FC = () => {
               userXP,
               avatar: activeAvatar || '🌱',
               userNumber: userNumber || 4,
+              profilePicUrl: userDoc?.profilePicUrl || userDoc?.photoURL || user?.photoURL || null,
             }
           );
         }
@@ -96,7 +110,7 @@ export const Community: React.FC = () => {
     };
 
     fetchLeaderboard();
-  }, [user, userLevel, userXP, activeAvatar, userNumber]);
+  }, [user, userDoc, userLevel, userXP, activeAvatar, userNumber]);
 
   const handleAddFriend = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -167,6 +181,10 @@ export const Community: React.FC = () => {
               leaderboard.map((item, idx) => {
                 const rank = idx + 1;
                 const isCurrent = item.uid === user?.uid;
+                const userAvatar = isCurrent ? (activeAvatar || item.avatar) : item.avatar;
+                const currentUserPhoto = userDoc?.profilePicUrl || userDoc?.photoURL || user?.photoURL || null;
+                const userPhoto = isCurrent ? (currentUserPhoto || item.profilePicUrl) : item.profilePicUrl;
+                const hasPhoto = Boolean(userPhoto);
 
                 let rankBadge: React.ReactNode = <span className="text-xs font-black text-text-tertiary">#{rank}</span>;
                 if (rank === 1) rankBadge = <span className="text-lg">🥇</span>;
@@ -188,8 +206,41 @@ export const Community: React.FC = () => {
                         {rankBadge}
                       </div>
 
-                      <div className="w-9 h-9 rounded-full bg-background border border-border flex items-center justify-center text-lg shrink-0">
-                        {item.avatar}
+                      {/* Synchronized Avatar & Profile Picture */}
+                      <div className="w-9 h-9 rounded-full bg-background border border-border flex items-center justify-center shrink-0 overflow-hidden relative shadow-xs">
+                        {hasPhoto ? (
+                          <>
+                            {/* Avatar face */}
+                            <div
+                              className={cn(
+                                'absolute inset-0 flex items-center justify-center text-lg transition-all duration-500 transform ease-in-out',
+                                showProfilePic
+                                  ? 'opacity-0 scale-75 rotate-12 pointer-events-none'
+                                  : 'opacity-100 scale-100 rotate-0'
+                              )}
+                            >
+                              <span className="leading-none select-none">{userAvatar}</span>
+                            </div>
+
+                            {/* Profile Picture face */}
+                            <div
+                              className={cn(
+                                'absolute inset-0 flex items-center justify-center transition-all duration-500 transform ease-in-out',
+                                showProfilePic
+                                  ? 'opacity-100 scale-100 rotate-0'
+                                  : 'opacity-0 scale-75 -rotate-12 pointer-events-none'
+                              )}
+                            >
+                              <img
+                                src={userPhoto!}
+                                alt={item.displayName}
+                                className="w-full h-full object-cover rounded-full"
+                              />
+                            </div>
+                          </>
+                        ) : (
+                          <span className="text-lg leading-none select-none">{userAvatar}</span>
+                        )}
                       </div>
 
                       <div className="flex flex-col">
