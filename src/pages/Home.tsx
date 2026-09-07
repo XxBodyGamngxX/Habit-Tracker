@@ -34,7 +34,7 @@ export const Home: React.FC = () => {
     {
       to: '/finance',
       title: 'Finance Hub',
-      desc: 'Track income, set a daily budget, manage your savings vault, and get Gemini AI spending advice.',
+      desc: 'Track income, set a daily budget, manage your savings vault, and maintain disciplined spending.',
       icon: '💰',
       badge: 'Manage Budget',
     },

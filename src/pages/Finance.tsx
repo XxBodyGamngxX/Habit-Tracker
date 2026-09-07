@@ -14,7 +14,6 @@ import { Progress } from '@/components/ui/Progress';
 import {
   Plus,
   Trash2,
-  Sparkles,
   CreditCard,
   Wallet,
   PiggyBank,
@@ -44,7 +43,6 @@ export const Finance: React.FC = () => {
     removeCategory,
     claimDailyBonusXP,
     isTodayBonusClaimed,
-    getAIReport,
     totalSpentThisCycle,
     remainingBalance,
   } = useFinance();
@@ -92,10 +90,6 @@ export const Finance: React.FC = () => {
 
   // Category Form
   const [newCatName, setNewCatName] = useState('');
-
-  // AI Advisor
-  const [aiReport, setAiReport] = useState<string | null>(null);
-  const [aiLoading, setAiLoading] = useState(false);
 
   const currency = financeData.currency || 'EGP';
 
@@ -184,19 +178,6 @@ export const Finance: React.FC = () => {
     }
   };
 
-  const handleFetchAIReport = async () => {
-    setAiLoading(true);
-    setAiReport(null);
-    try {
-      const text = await getAIReport();
-      setAiReport(text);
-    } catch {
-      setAiReport('Failed to generate AI report.');
-    } finally {
-      setAiLoading(false);
-    }
-  };
-
   // Savings Goal calculations
   const goal = financeData.activeGoal;
   const goalProgress = goal && goal.target > 0
@@ -215,7 +196,7 @@ export const Finance: React.FC = () => {
             Financial Intelligence
           </h1>
           <p className="text-sm font-medium text-text-secondary mt-1">
-            Dynamic salary cycle tracking, savings vault calculator, and Gemini AI spending advisory.
+            Dynamic salary cycle tracking, savings vault calculator, and disciplined spending management.
           </p>
         </div>
 
@@ -451,41 +432,6 @@ export const Finance: React.FC = () => {
                 <div className="text-sm font-extrabold text-text-primary mt-0.5">{currency} {goalMonthlyReq}</div>
               </div>
             </div>
-          </div>
-        )}
-      </Card>
-
-      {/* Google Gemini AI Spending Advisor Card */}
-      <Card className="p-6 bg-gradient-to-r from-primary/5 via-secondary/10 to-primary/5 border-border">
-        <div className="flex items-start justify-between gap-4 flex-wrap">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-primary text-primary-foreground flex items-center justify-center shadow-xs">
-              <Sparkles className="w-5 h-5" />
-            </div>
-            <div>
-              <h3 className="font-display text-base font-bold text-text-primary">
-                Gemini 1.5 Flash AI Financial Advisor
-              </h3>
-              <p className="text-xs text-text-secondary">
-                Generate an intelligent Arabic spending analysis based on your recent purchase ledger.
-              </p>
-            </div>
-          </div>
-
-          <Button
-            size="sm"
-            onClick={handleFetchAIReport}
-            disabled={aiLoading}
-            className="h-9 text-xs font-bold gap-1.5 shadow-xs"
-          >
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>{aiLoading ? 'Analyzing Ledger...' : 'Generate Financial Report'}</span>
-          </Button>
-        </div>
-
-        {aiReport && (
-          <div className="mt-4 p-4 rounded-2xl bg-surface border border-border text-xs leading-relaxed text-text-primary whitespace-pre-line font-medium dir-rtl text-right">
-            {aiReport}
           </div>
         )}
       </Card>

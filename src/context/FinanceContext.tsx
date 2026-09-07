@@ -25,7 +25,6 @@ interface FinanceContextType {
   removeCategory: (cat: string) => void;
   claimDailyBonusXP: () => boolean;
   isTodayBonusClaimed: boolean;
-  getAIReport: () => Promise<string>;
   totalSpentThisCycle: number;
   remainingBalance: number;
 }
@@ -384,29 +383,6 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
     return true;
   };
 
-  const getAIReport = async (): Promise<string> => {
-    const apiKey = 'AQ.Ab8RN6LeB6-5yv8xPq3BB49fDyqRQjqhEnP5gYOrqe-QBIbQLg';
-    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
-
-    const recentExpenses = (financeData.expenses || []).slice(0, 20);
-    const expensesText = JSON.stringify(recentExpenses);
-    const prompt = `أنا بستخدم تطبيق Mornigami لتتبع مصاريفي. دي قائمة مشترياتي الأخيرة: ${expensesText}. 
-بصفتك مستشار مالي محترف، حلل الأرقام والتصنيفات دي، واكتب تقرير ملخص من 3 سطور، واديني نصيحة عملية لتحسين ميزانيتي وتقليل النفقات باللغة العربية.`;
-
-    try {
-      const response = await fetch(apiUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }),
-      });
-      const data = await response.json();
-      return data.candidates?.[0]?.content?.parts?.[0]?.text || 'لا توجد نصيحة حالياً.';
-    } catch (error) {
-      console.error('AI Error:', error);
-      return 'خطأ في الاتصال بالذكاء الاصطناعي.';
-    }
-  };
-
   return (
     <FinanceContext.Provider
       value={{
@@ -424,7 +400,6 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
         removeCategory,
         claimDailyBonusXP,
         isTodayBonusClaimed,
-        getAIReport,
         totalSpentThisCycle,
         remainingBalance,
       }}
