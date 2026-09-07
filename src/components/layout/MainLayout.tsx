@@ -14,12 +14,12 @@ export const MainLayout: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <div className="min-h-screen flex bg-background text-foreground selection:bg-primary selection:text-primary-foreground">
+    <div className="min-h-screen flex bg-background text-foreground selection:bg-primary selection:text-primary-foreground w-full max-w-full overflow-x-hidden">
       {/* Navigation Sidebar (Desktop) */}
       <Sidebar />
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-w-0">
+      <div className="flex-1 flex flex-col min-w-0 w-full max-w-full overflow-x-hidden">
         {/* Top Header Bar */}
         <TopBar
           onOpenAuth={() => setAuthModalOpen(true)}
@@ -27,7 +27,7 @@ export const MainLayout: React.FC = () => {
         />
 
         {/* Dynamic Routed Content */}
-        <main className="flex-1 p-3 sm:p-6 lg:p-8 w-full overflow-y-auto pb-24 md:pb-8">
+        <main className="flex-1 p-3 sm:p-6 lg:p-8 w-full max-w-full overflow-y-auto overflow-x-hidden pb-24 md:pb-8">
           <ErrorBoundary>
             <Outlet />
           </ErrorBoundary>

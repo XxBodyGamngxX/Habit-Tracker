@@ -45,78 +45,80 @@ export const TopBar: React.FC<TopBarProps> = ({ onOpenAuth, onOpenMobileMenu }) 
   const safeProgress = Math.max(0, Math.min(100, progressPercent || 0));
 
   return (
-    <header className="h-16 px-3 sm:px-6 border-b border-border bg-surface flex items-center justify-between md:justify-end sticky top-0 z-20 shadow-xs">
+    <header className="h-14 sm:h-16 px-3 sm:px-6 border-b border-border bg-surface flex items-center justify-between md:justify-end sticky top-0 z-20 shadow-xs w-full max-w-full overflow-hidden">
       {/* Mobile Menu Trigger & Brand Logo */}
-      <div className="flex items-center gap-1.5 md:hidden">
+      <div className="flex items-center gap-1.5 md:hidden min-w-0">
         <Button
           variant="ghost"
           size="icon"
           onClick={onOpenMobileMenu}
-          className="w-9 h-9 rounded-xl text-text-secondary hover:text-text-primary active:scale-95"
+          className="w-8 h-8 rounded-xl text-text-secondary hover:text-text-primary active:scale-95 shrink-0"
           aria-label="Open navigation menu"
         >
-          <Menu className="w-5 h-5" />
+          <Menu className="w-4 h-4" />
         </Button>
         <button
           onClick={() => navigate('/')}
-          className="flex items-center gap-2 hover:opacity-90 transition-opacity"
+          className="flex items-center gap-2 hover:opacity-90 transition-opacity truncate min-w-0"
         >
           <img
             src={iconLogo}
             alt="Mornigami"
-            className="w-7 h-7 object-contain rounded-lg shrink-0"
+            className="w-6 h-6 object-contain rounded-lg shrink-0"
           />
-          <span className="font-display font-black text-lg text-primary tracking-tight">
+          <span className="font-display font-black text-base sm:text-lg text-primary tracking-tight truncate">
             Mornigami
           </span>
         </button>
       </div>
 
-      <div className="flex items-center gap-2 sm:gap-3 justify-end ml-auto">
-        {/* 1. Accent Color Picker Dropdown */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="outline"
-              size="icon"
-              className="rounded-xl w-8 h-8 sm:w-9 sm:h-9 shrink-0"
-              title="Change Accent Color"
-            >
-              <Palette className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-text-secondary" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-48">
-            <DropdownMenuLabel>Accent Colors</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => setAccentColor('')} className="flex items-center gap-2">
-              <span className="w-4 h-4 rounded-full border border-border bg-slate-900 dark:bg-white" />
-              <span>Theme Default</span>
-            </DropdownMenuItem>
-            {unlockedColorItems.length > 0 ? (
-              unlockedColorItems.map((color) => (
-                <DropdownMenuItem
-                  key={color.id}
-                  onClick={() => setAccentColor(color.value)}
-                  className="flex items-center gap-2"
-                >
-                  <span
-                    className="w-4 h-4 rounded-full border border-border"
-                    style={{ backgroundColor: color.value }}
-                  />
-                  <span>{color.name}</span>
-                  {accentColor === color.value && <span className="ml-auto text-xs text-primary font-bold">✓</span>}
-                </DropdownMenuItem>
-              ))
-            ) : (
-              <DropdownMenuItem
-                onClick={() => navigate('/store')}
-                className="text-xs text-text-tertiary"
+      <div className="flex items-center gap-1.5 sm:gap-3 justify-end shrink-0">
+        {/* 1. Accent Color Picker Dropdown (Desktop Only) */}
+        <div className="hidden md:flex">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="outline"
+                size="icon"
+                className="rounded-xl w-9 h-9 shrink-0"
+                title="Change Accent Color"
               >
-                Unlock more in Store 🛍️
+                <Palette className="w-4 h-4 text-text-secondary" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuLabel>Accent Colors</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => setAccentColor('')} className="flex items-center gap-2">
+                <span className="w-4 h-4 rounded-full border border-border bg-slate-900 dark:bg-white" />
+                <span>Theme Default</span>
               </DropdownMenuItem>
-            )}
-          </DropdownMenuContent>
-        </DropdownMenu>
+              {unlockedColorItems.length > 0 ? (
+                unlockedColorItems.map((color) => (
+                  <DropdownMenuItem
+                    key={color.id}
+                    onClick={() => setAccentColor(color.value)}
+                    className="flex items-center gap-2"
+                  >
+                    <span
+                      className="w-4 h-4 rounded-full border border-border"
+                      style={{ backgroundColor: color.value }}
+                    />
+                    <span>{color.name}</span>
+                    {accentColor === color.value && <span className="ml-auto text-xs text-primary font-bold">✓</span>}
+                  </DropdownMenuItem>
+                ))
+              ) : (
+                <DropdownMenuItem
+                  onClick={() => navigate('/store')}
+                  className="text-xs text-text-tertiary"
+                >
+                  Unlock more in Store 🛍️
+                </DropdownMenuItem>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
 
         {/* 2. Dark/Light Mode Toggle Button */}
         <Button
@@ -167,14 +169,13 @@ export const TopBar: React.FC<TopBarProps> = ({ onOpenAuth, onOpenMobileMenu }) 
         {/* Mobile Compact Pill (sm:hidden) */}
         <div
           onClick={() => navigate('/store')}
-          className="flex sm:hidden items-center gap-1.5 bg-background px-2 py-1 rounded-xl border border-border shadow-xs shrink-0 cursor-pointer active:scale-95 transition-all"
-          title={`Level ${safeLevel} • ${safeXP} / ${safeXPNeeded} XP (${safeProgress}%)`}
+          className="flex sm:hidden items-center gap-1 bg-background px-2 py-1 rounded-xl border border-border shadow-xs shrink-0 cursor-pointer active:scale-95 transition-all"
+          title={`Level ${safeLevel} • ${safeXP} / ${safeXPNeeded} XP (${safeProgress}%) - Tap to visit Store`}
         >
-          <div className="bg-primary text-primary-foreground text-[10px] font-black px-1.5 py-0.5 rounded-md">
+          <span className="bg-primary text-primary-foreground text-[10px] font-black px-1.5 py-0.5 rounded-md leading-none">
             L{safeLevel}
-          </div>
+          </span>
           <span className="text-xs leading-none">{activeAvatar || '🌱'}</span>
-          <span className="text-[10px] font-bold text-primary">{safeProgress}%</span>
         </div>
 
         {/* 4. User Profile / Login */}
@@ -182,17 +183,17 @@ export const TopBar: React.FC<TopBarProps> = ({ onOpenAuth, onOpenMobileMenu }) 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button
-                className="flex items-center gap-2 p-1 pl-2 pr-3 rounded-xl border border-border bg-background hover:bg-surface transition-all"
+                className="flex items-center gap-2 p-1 sm:pl-2 sm:pr-3 rounded-xl border border-border bg-background hover:bg-surface transition-all shrink-0"
                 title="Account Menu"
               >
                 {userAvatarUrl ? (
                   <img
                     src={userAvatarUrl}
                     alt={user.displayName || 'User'}
-                    className="w-7 h-7 rounded-lg object-cover shrink-0 border border-border"
+                    className="w-6 h-6 sm:w-7 sm:h-7 rounded-lg object-cover shrink-0 border border-border"
                   />
                 ) : (
-                  <div className="w-7 h-7 rounded-lg bg-primary text-primary-foreground font-bold flex items-center justify-center text-xs shrink-0">
+                  <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-primary text-primary-foreground font-bold flex items-center justify-center text-xs shrink-0">
                     {user.displayName ? user.displayName.charAt(0).toUpperCase() : 'U'}
                   </div>
                 )}
