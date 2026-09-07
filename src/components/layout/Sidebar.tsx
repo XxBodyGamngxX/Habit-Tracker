@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { cn } from '@/lib/utils';
+import iconLogo from '@/public/icon.png';
 
 export const Sidebar: React.FC = () => {
   const { userRole } = useAuth();
@@ -55,7 +56,7 @@ export const Sidebar: React.FC = () => {
           className="flex items-center gap-3 p-5 border-b border-border/60 hover:opacity-90 transition-opacity"
         >
           <img
-            src="/icon.png"
+            src={iconLogo}
             alt="Mornigami Logo"
             className="w-10 h-10 object-contain shrink-0 rounded-xl"
           />

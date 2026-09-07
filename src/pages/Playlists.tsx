@@ -50,6 +50,7 @@ import type {
 import { toast } from 'sonner';
 import { useConfirm } from '@/context/ConfirmContext';
 import { cn } from '@/lib/utils';
+import iconLogo from '@/public/icon.png';
 
 const YOUTUBE_API_KEY = 'AIzaSyDOpHgt8xrp_SlMs0rWT8YDxeQsyeB3kvc';
 
@@ -824,7 +825,7 @@ pause
                   {/* Left: Thumbnail & Details */}
                   <div className="flex items-start sm:items-center gap-4 flex-1 min-w-0">
                     <img
-                      src={playlist.thumbnail || '/icon.png'}
+                      src={playlist.thumbnail || iconLogo}
                       alt=""
                       className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl object-cover border border-border shrink-0 bg-background"
                     />

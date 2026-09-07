@@ -19,6 +19,7 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { toast } from 'sonner';
+import iconLogo from '@/public/icon.png';
 
 export const Login: React.FC = () => {
   const { user, loading, signIn, signUp, resetPassword } = useAuth();
@@ -171,7 +172,7 @@ export const Login: React.FC = () => {
       <header className="h-16 px-6 sm:px-12 flex items-center justify-between relative z-10">
         <div className="flex items-center gap-2.5">
           <img
-            src="/icon.png"
+            src={iconLogo}
             alt="Mornigami Logo"
             className="w-8 h-8 object-contain rounded-xl shadow-xs"
           />

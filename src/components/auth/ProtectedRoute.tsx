@@ -1,6 +1,7 @@
 import React from 'react';
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
+import iconLogo from '@/public/icon.png';
 
 export const ProtectedRoute: React.FC = () => {
   const { user, loading } = useAuth();
@@ -11,7 +12,7 @@ export const ProtectedRoute: React.FC = () => {
       <div className="min-h-screen flex flex-col items-center justify-center bg-background text-foreground space-y-4">
         <div className="relative flex items-center justify-center">
           <img
-            src="/icon.png"
+            src={iconLogo}
             alt="Mornigami"
             className="w-16 h-16 object-contain animate-pulse rounded-2xl shadow-md"
           />
