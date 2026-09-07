@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import { Sidebar } from './Sidebar';
 import { TopBar } from './TopBar';
+import { MobileNav } from './MobileNav';
 import { FocusAudioPlayer } from './FocusAudioPlayer';
 import { AuthModal } from '@/components/auth/AuthModal';
 import { LevelUpModal } from '@/components/gamification/LevelUpModal';
@@ -10,24 +11,35 @@ import { ErrorBoundary } from '@/components/ErrorBoundary';
 
 export const MainLayout: React.FC = () => {
   const [authModalOpen, setAuthModalOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
     <div className="min-h-screen flex bg-background text-foreground selection:bg-primary selection:text-primary-foreground">
-      {/* Navigation Sidebar */}
+      {/* Navigation Sidebar (Desktop) */}
       <Sidebar />
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Top Header Bar */}
-        <TopBar onOpenAuth={() => setAuthModalOpen(true)} />
+        <TopBar
+          onOpenAuth={() => setAuthModalOpen(true)}
+          onOpenMobileMenu={() => setMobileMenuOpen(true)}
+        />
 
         {/* Dynamic Routed Content */}
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 w-full overflow-y-auto">
+        <main className="flex-1 p-3 sm:p-6 lg:p-8 w-full overflow-y-auto pb-24 md:pb-8">
           <ErrorBoundary>
             <Outlet />
           </ErrorBoundary>
         </main>
       </div>
+
+      {/* Mobile Bottom Navigation & Slide Drawer */}
+      <MobileNav
+        isOpen={mobileMenuOpen}
+        onOpenChange={setMobileMenuOpen}
+        onOpenAuth={() => setAuthModalOpen(true)}
+      />
 
       {/* Floating Ambient Focus Audio Controller */}
       <FocusAudioPlayer />

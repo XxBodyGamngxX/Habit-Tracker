@@ -1,5 +1,5 @@
 import React from 'react';
-import { Sun, Moon, Palette, LogIn, User as UserIcon, Shield, ShoppingBag, LogOut } from 'lucide-react';
+import { Sun, Moon, Palette, LogIn, User as UserIcon, Shield, ShoppingBag, LogOut, Menu } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { useGamification, STORE_ITEMS } from '@/context/GamificationContext';
 import { useTheme } from '@/context/ThemeContext';
@@ -15,12 +15,14 @@ import {
 } from '@/components/ui/DropdownMenu';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
+import iconLogo from '@/public/icon.png';
 
 interface TopBarProps {
   onOpenAuth?: () => void;
+  onOpenMobileMenu?: () => void;
 }
 
-export const TopBar: React.FC<TopBarProps> = ({ onOpenAuth }) => {
+export const TopBar: React.FC<TopBarProps> = ({ onOpenAuth, onOpenMobileMenu }) => {
   const { user, userDoc, userRole, userNumber, signOut } = useAuth();
   const { userLevel, userXP, xpNeeded, progressPercent, activeAvatar, activeBorder, unlockedItems } = useGamification();
   const { theme, toggleTheme, accentColor, setAccentColor } = useTheme();
@@ -43,18 +45,44 @@ export const TopBar: React.FC<TopBarProps> = ({ onOpenAuth }) => {
   const safeProgress = Math.max(0, Math.min(100, progressPercent || 0));
 
   return (
-    <header className="h-16 px-6 border-b border-border bg-surface flex items-center justify-end sticky top-0 z-20 shadow-sm">
-      <div className="flex items-center gap-3 flex-wrap justify-end">
+    <header className="h-16 px-3 sm:px-6 border-b border-border bg-surface flex items-center justify-between md:justify-end sticky top-0 z-20 shadow-xs">
+      {/* Mobile Menu Trigger & Brand Logo */}
+      <div className="flex items-center gap-1.5 md:hidden">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={onOpenMobileMenu}
+          className="w-9 h-9 rounded-xl text-text-secondary hover:text-text-primary active:scale-95"
+          aria-label="Open navigation menu"
+        >
+          <Menu className="w-5 h-5" />
+        </Button>
+        <button
+          onClick={() => navigate('/')}
+          className="flex items-center gap-2 hover:opacity-90 transition-opacity"
+        >
+          <img
+            src={iconLogo}
+            alt="Mornigami"
+            className="w-7 h-7 object-contain rounded-lg shrink-0"
+          />
+          <span className="font-display font-black text-lg text-primary tracking-tight">
+            Mornigami
+          </span>
+        </button>
+      </div>
+
+      <div className="flex items-center gap-2 sm:gap-3 justify-end ml-auto">
         {/* 1. Accent Color Picker Dropdown */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
               variant="outline"
               size="icon"
-              className="rounded-xl w-9 h-9"
+              className="rounded-xl w-8 h-8 sm:w-9 sm:h-9 shrink-0"
               title="Change Accent Color"
             >
-              <Palette className="w-4 h-4 text-text-secondary" />
+              <Palette className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-text-secondary" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-48">
@@ -95,18 +123,19 @@ export const TopBar: React.FC<TopBarProps> = ({ onOpenAuth }) => {
           variant="outline"
           size="icon"
           onClick={toggleTheme}
-          className="rounded-xl w-9 h-9"
+          className="rounded-xl w-8 h-8 sm:w-9 sm:h-9 shrink-0"
           title={`Switch to ${theme === 'dark' ? 'Light' : 'Dark'} Mode`}
         >
           {theme === 'dark' ? (
-            <Sun className="w-4 h-4 text-warning" />
+            <Sun className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-warning" />
           ) : (
-            <Moon className="w-4 h-4 text-text-secondary" />
+            <Moon className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-text-secondary" />
           )}
         </Button>
 
         {/* 3. XP Progression Bar Widget */}
-        <div className="flex items-center gap-3 bg-background px-3.5 py-1.5 rounded-2xl border border-border w-56 sm:w-64 md:w-72 shadow-xs shrink-0">
+        {/* Desktop / Tablet Full Bar (sm:flex) */}
+        <div className="hidden sm:flex items-center gap-3 bg-background px-3.5 py-1.5 rounded-2xl border border-border sm:w-56 md:w-64 lg:w-72 shadow-xs shrink-0">
           {/* Level Badge */}
           <div className="bg-primary text-primary-foreground text-xs font-black px-2 py-0.5 rounded-lg shadow-xs shrink-0">
             L{safeLevel}
@@ -133,6 +162,19 @@ export const TopBar: React.FC<TopBarProps> = ({ onOpenAuth }) => {
             </div>
             <Progress value={safeProgress} className="h-1.5" />
           </div>
+        </div>
+
+        {/* Mobile Compact Pill (sm:hidden) */}
+        <div
+          onClick={() => navigate('/store')}
+          className="flex sm:hidden items-center gap-1.5 bg-background px-2 py-1 rounded-xl border border-border shadow-xs shrink-0 cursor-pointer active:scale-95 transition-all"
+          title={`Level ${safeLevel} • ${safeXP} / ${safeXPNeeded} XP (${safeProgress}%)`}
+        >
+          <div className="bg-primary text-primary-foreground text-[10px] font-black px-1.5 py-0.5 rounded-md">
+            L{safeLevel}
+          </div>
+          <span className="text-xs leading-none">{activeAvatar || '🌱'}</span>
+          <span className="text-[10px] font-bold text-primary">{safeProgress}%</span>
         </div>
 
         {/* 4. User Profile / Login */}

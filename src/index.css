@@ -121,3 +121,17 @@
   box-shadow: 0 0 10px rgba(56, 189, 248, 0.5) !important;
   animation: rainbowBorder 3s linear infinite;
 }
+
+/* Mobile Safe Area & Touch Manipulation */
+.safe-area-pb {
+  padding-bottom: max(0.375rem, env(safe-area-inset-bottom, 0.375rem));
+}
+
+.safe-area-pt {
+  padding-top: max(0.375rem, env(safe-area-inset-top, 0.375rem));
+}
+
+button, a, input, select, textarea {
+  touch-action: manipulation;
+}
+

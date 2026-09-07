@@ -116,7 +116,7 @@ export const ConfirmProvider: React.FC<{ children: React.ReactNode }> = ({ child
       {children}
 
       <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose(false)}>
-        <DialogContent className="max-w-md w-full p-6 bg-surface border border-border rounded-2xl shadow-2xl">
+        <DialogContent className="max-w-md w-[calc(100vw-28px)] sm:w-full p-5 sm:p-6 bg-surface border border-border rounded-2xl shadow-2xl">
           <div className="flex items-start gap-4">
             <div className={cn('p-3 rounded-2xl shrink-0 flex items-center justify-center', styles.iconBg)}>
               {styles.icon}
