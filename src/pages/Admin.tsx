@@ -19,7 +19,6 @@ import { Switch } from '@/components/ui/Switch';
 import {
   Shield,
   Search,
-  Megaphone,
   RotateCcw,
   ArrowLeft,
   BarChart3,
@@ -36,9 +35,9 @@ import {
   KeyRound,
   FileText,
   Target,
-  CheckCircle2,
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { useConfirm } from '@/context/ConfirmContext';
 import { cn } from '@/lib/utils';
 import type {
   UserDoc,
@@ -47,7 +46,7 @@ import type {
   XPScalingConfig,
 } from '@/types';
 
-type AdminTab = 'analytics' | 'users' | 'gamification' | 'finance' | 'communications';
+type AdminTab = 'analytics' | 'users' | 'gamification' | 'finance';
 
 interface UserRowState {
   role: 'admin' | 'user';
@@ -92,6 +91,7 @@ const DEFAULT_BOUNTIES_FALLBACK: GlobalBountyTemplate[] = [
 export const Admin: React.FC = () => {
   const { user, userRole } = useAuth();
   const navigate = useNavigate();
+  const confirm = useConfirm();
 
   // Active sub-tab
   const [activeTab, setActiveTab] = useState<AdminTab>('analytics');
@@ -155,10 +155,6 @@ export const Admin: React.FC = () => {
   const [overrideGoalTarget, setOverrideGoalTarget] = useState<number>(0);
   const [overrideGoalDuration, setOverrideGoalDuration] = useState<number>(6);
 
-  // Announcement state
-  const [announcementText, setAnnouncementText] = useState('');
-  const [announcementStyle, setAnnouncementStyle] = useState<'info' | 'success' | 'warning' | 'danger'>('info');
-  const [announcementActive, setAnnouncementActive] = useState(false);
 
   // 1. Fetch All Users
   const fetchAllUsers = async () => {
@@ -242,27 +238,10 @@ export const Admin: React.FC = () => {
     }
   };
 
-  // 3. Fetch Global Announcement
-  const fetchAnnouncement = async () => {
-    if (!db) return;
-    try {
-      const annSnap = await getDoc(doc(db, 'settings', 'announcements'));
-      if (annSnap.exists()) {
-        const d = annSnap.data();
-        setAnnouncementText(d.text || '');
-        setAnnouncementStyle(d.type || 'info');
-        setAnnouncementActive(d.active === true);
-      }
-    } catch (err) {
-      console.error('Error fetching announcement:', err);
-    }
-  };
-
   // Master refresh
   const handleRefreshAll = () => {
     fetchAllUsers();
     fetchGamificationData();
-    fetchAnnouncement();
     toast.info('Dashboard refreshed');
   };
 
@@ -270,7 +249,6 @@ export const Admin: React.FC = () => {
     if (userRole === 'admin') {
       fetchAllUsers();
       fetchGamificationData();
-      fetchAnnouncement();
     }
   }, [userRole]);
 
@@ -486,13 +464,14 @@ export const Admin: React.FC = () => {
   };
 
   const handleDeleteUserAccount = async (uid: string, displayName?: string) => {
-    if (
-      !confirm(
-        '⚠️ WARNING: Are you sure you want to delete this user account? The user will be banned, their username freed, and personal details removed.'
-      )
-    ) {
-      return;
-    }
+    const ok = await confirm({
+      title: 'Permanently Delete User',
+      message:
+        '⚠️ WARNING: Are you sure you want to delete this user account? The user will be banned, their username freed, and personal details removed.',
+      confirmText: 'Delete User Account',
+      variant: 'danger',
+    });
+    if (!ok) return;
     if (!db) return;
 
     try {
@@ -568,7 +547,13 @@ export const Admin: React.FC = () => {
   };
 
   const handleDeleteChallenge = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this global challenge?')) return;
+    const ok = await confirm({
+      title: 'Delete Global Challenge',
+      message: 'Are you sure you want to delete this global challenge?',
+      confirmText: 'Delete Challenge',
+      variant: 'danger',
+    });
+    if (!ok) return;
     if (!db) return;
     try {
       await deleteDoc(doc(db, 'globalChallenges', id));
@@ -641,7 +626,13 @@ export const Admin: React.FC = () => {
   };
 
   const handleDeleteBounty = async (index: number) => {
-    if (!confirm('Are you sure you want to delete this daily bounty template?')) return;
+    const ok = await confirm({
+      title: 'Delete Bounty Template',
+      message: 'Are you sure you want to delete this daily bounty template?',
+      confirmText: 'Delete Template',
+      variant: 'danger',
+    });
+    if (!ok) return;
     const copy = bounties.filter((_, i) => i !== index);
     await saveBountiesToDb(copy);
     handleCancelBountyEdit();
@@ -784,7 +775,13 @@ export const Admin: React.FC = () => {
   };
 
   const handleClearUserGoal = async () => {
-    if (!confirm("Are you sure you want to clear this user's active savings goal?")) return;
+    const ok = await confirm({
+      title: 'Clear Active Savings Goal',
+      message: "Are you sure you want to clear this user's active savings goal?",
+      confirmText: 'Clear Goal',
+      variant: 'warning',
+    });
+    if (!ok) return;
     if (!inspectedUser || !db) return;
 
     try {
@@ -811,7 +808,13 @@ export const Admin: React.FC = () => {
   };
 
   const handleDeleteUserExpense = async (expenseId: string) => {
-    if (!confirm('Are you sure you want to delete this user transaction log?')) return;
+    const ok = await confirm({
+      title: 'Delete Transaction Log',
+      message: 'Are you sure you want to delete this user transaction log?',
+      confirmText: 'Delete Transaction',
+      variant: 'danger',
+    });
+    if (!ok) return;
     if (!inspectedUser || !db) return;
 
     try {
@@ -838,27 +841,6 @@ export const Admin: React.FC = () => {
     }
   };
 
-  // Announcement Handlers
-  const handlePublishAnnouncement = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!db) return;
-    try {
-      await setDoc(
-        doc(db, 'settings', 'announcements'),
-        {
-          text: announcementText.trim(),
-          type: announcementStyle,
-          active: announcementActive,
-          publishedAt: new Date().toISOString(),
-        },
-        { merge: true }
-      );
-      toast.success('System announcement published globally');
-    } catch (err) {
-      console.error('Error publishing announcement:', err);
-      toast.error('Failed to publish announcement');
-    }
-  };
 
   // ============================================
   // ACCESS RESTRICTION CHECK
@@ -890,7 +872,7 @@ export const Admin: React.FC = () => {
             <span>Admin Dashboard</span>
           </h1>
           <p className="text-xs sm:text-sm font-medium text-text-secondary mt-1">
-            Manage platform metrics, users, gamification, and broadcaster system
+            Manage platform metrics, users, and gamification system
           </p>
         </div>
 
@@ -972,18 +954,6 @@ export const Admin: React.FC = () => {
           <span>Finance Manager</span>
         </button>
 
-        <button
-          onClick={() => setActiveTab('communications')}
-          className={cn(
-            'px-4 py-2 rounded-xl text-xs font-bold transition-all shrink-0 flex items-center gap-2',
-            activeTab === 'communications'
-              ? 'bg-primary text-primary-foreground shadow-xs'
-              : 'text-text-secondary hover:text-text-primary hover:bg-background'
-          )}
-        >
-          <Megaphone className="w-4 h-4" />
-          <span>Global Broadcaster</span>
-        </button>
       </div>
 
       {/* ========================================================= */}
@@ -2254,65 +2224,7 @@ export const Admin: React.FC = () => {
         </div>
       )}
 
-      {/* ========================================================= */}
-      {/* TAB 5: GLOBAL BROADCASTER                                 */}
-      {/* ========================================================= */}
-      {activeTab === 'communications' && (
-        <Card className="p-6 max-w-xl mx-auto border-border bg-surface shadow-xs space-y-4">
-          <h3 className="font-display text-base font-bold text-text-primary flex items-center gap-2">
-            <Megaphone className="w-5 h-5 text-primary" />
-            <span>System-Wide Announcements Broadcaster</span>
-          </h3>
 
-          <form onSubmit={handlePublishAnnouncement} className="space-y-4 text-xs">
-            <div>
-              <label className="text-[11px] font-semibold text-text-secondary">
-                Announcement Banner Message
-              </label>
-              <textarea
-                value={announcementText}
-                onChange={(e) => setAnnouncementText(e.target.value)}
-                placeholder="Type system-wide banner text here... (e.g., Server maintenance scheduled for 11PM today)"
-                required
-                className="w-full h-24 p-3 mt-1 text-xs rounded-xl border border-border bg-background text-text-primary outline-hidden resize-none font-sans"
-              />
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="text-[11px] font-semibold text-text-secondary">
-                  Banner Styling Level
-                </label>
-                <select
-                  value={announcementStyle}
-                  onChange={(e) => setAnnouncementStyle(e.target.value as any)}
-                  className="w-full h-10 px-3 text-xs rounded-xl border border-border bg-surface text-text-primary font-semibold mt-1"
-                >
-                  <option value="info">💡 Information (Info Primary)</option>
-                  <option value="success">✅ Achievements Boost (Success Green)</option>
-                  <option value="warning">⚠️ Warning Alert (Warning Yellow)</option>
-                  <option value="danger">🚨 Severe Announcement (Danger Red)</option>
-                </select>
-              </div>
-
-              <div className="flex items-center gap-3 pt-6">
-                <Switch
-                  checked={announcementActive}
-                  onCheckedChange={setAnnouncementActive}
-                />
-                <span className="font-semibold text-text-primary select-none">
-                  Active Broadcast
-                </span>
-              </div>
-            </div>
-
-            <Button type="submit" className="w-full h-10 font-bold text-xs gap-2">
-              <CheckCircle2 className="w-4 h-4" />
-              <span>Broadcast Announcement Banner</span>
-            </Button>
-          </form>
-        </Card>
-      )}
     </div>
   );
 };

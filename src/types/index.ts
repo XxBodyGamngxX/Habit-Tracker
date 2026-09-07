@@ -214,10 +214,3 @@ export interface XPScalingConfig {
   bountiesEnabled: boolean;
 }
 
-export interface GlobalAnnouncement {
-  text: string;
-  type: 'info' | 'success' | 'warning' | 'danger';
-  active: boolean;
-  publishedAt?: string;
-}
-

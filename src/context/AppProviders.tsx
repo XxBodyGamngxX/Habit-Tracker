@@ -7,23 +7,26 @@ import { HabitsProvider } from './HabitsContext';
 import { TasksProvider } from './TasksContext';
 import { FinanceProvider } from './FinanceContext';
 import { BountiesProvider } from './BountiesContext';
+import { ConfirmProvider } from './ConfirmContext';
 
 export const AppProviders: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return (
     <ThemeProvider>
-      <AuthProvider>
-        <GamificationProvider>
-          <PomodoroProvider>
-            <HabitsProvider>
-              <TasksProvider>
-                <FinanceProvider>
-                  <BountiesProvider>{children}</BountiesProvider>
-                </FinanceProvider>
-              </TasksProvider>
-            </HabitsProvider>
-          </PomodoroProvider>
-        </GamificationProvider>
-      </AuthProvider>
+      <ConfirmProvider>
+        <AuthProvider>
+          <GamificationProvider>
+            <PomodoroProvider>
+              <HabitsProvider>
+                <TasksProvider>
+                  <FinanceProvider>
+                    <BountiesProvider>{children}</BountiesProvider>
+                  </FinanceProvider>
+                </TasksProvider>
+              </HabitsProvider>
+            </PomodoroProvider>
+          </GamificationProvider>
+        </AuthProvider>
+      </ConfirmProvider>
     </ThemeProvider>
   );
 };

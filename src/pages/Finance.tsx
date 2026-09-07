@@ -26,6 +26,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+import { useConfirm } from '@/context/ConfirmContext';
 
 export const Finance: React.FC = () => {
   const {
@@ -47,6 +48,8 @@ export const Finance: React.FC = () => {
     totalSpentThisCycle,
     remainingBalance,
   } = useFinance();
+
+  const confirm = useConfirm();
 
   // Modals
   const [setupModalOpen, setSetupModalOpen] = useState(false);
@@ -394,7 +397,15 @@ export const Finance: React.FC = () => {
                 <Button
                   size="sm"
                   variant="ghost"
-                  onClick={deleteActiveGoal}
+                  onClick={async () => {
+                    const ok = await confirm({
+                      title: 'Clear Active Savings Goal',
+                      message: 'Are you sure you want to clear your active savings goal?',
+                      confirmText: 'Clear Goal',
+                      variant: 'warning',
+                    });
+                    if (ok) deleteActiveGoal();
+                  }}
                   className="h-8 text-xs text-danger hover:bg-danger-bg font-bold"
                 >
                   Clear Goal
@@ -540,7 +551,16 @@ export const Finance: React.FC = () => {
                     </td>
                     <td className="p-3 text-center pr-4">
                       <button
-                        onClick={() => deleteExpense(exp.id)}
+                        type="button"
+                        onClick={async () => {
+                          const ok = await confirm({
+                            title: 'Delete Expense Log',
+                            message: `Are you sure you want to delete this ${currency} ${exp.amount.toFixed(2)} (${exp.category}) expense?`,
+                            confirmText: 'Delete Expense',
+                            variant: 'danger',
+                          });
+                          if (ok) deleteExpense(exp.id);
+                        }}
                         className="text-text-tertiary hover:text-danger transition-colors p-1"
                         title="Delete log"
                       >
@@ -924,7 +944,15 @@ export const Finance: React.FC = () => {
                       </button>
                       <button
                         type="button"
-                        onClick={() => removeCategory(cat)}
+                        onClick={async () => {
+                          const ok = await confirm({
+                            title: 'Remove Category',
+                            message: `Are you sure you want to remove the category "${cat}"?`,
+                            confirmText: 'Remove Category',
+                            variant: 'danger',
+                          });
+                          if (ok) removeCategory(cat);
+                        }}
                         className="text-text-tertiary hover:text-danger p-1"
                         title="Remove category"
                       >

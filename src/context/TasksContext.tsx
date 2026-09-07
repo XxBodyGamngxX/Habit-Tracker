@@ -10,6 +10,7 @@ interface TasksContextType {
   updateTask: (id: string, updates: Partial<Task>) => void;
   deleteTask: (id: string) => void;
   toggleTask: (id: string) => void;
+  reorderTasks: (newTasks: Task[]) => void;
   filter: 'all' | 'pending' | 'completed';
   setFilter: (f: 'all' | 'pending' | 'completed') => void;
 }
@@ -78,6 +79,10 @@ export const TasksProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
   };
 
+  const reorderTasks = (newTasks: Task[]) => {
+    saveTasks(newTasks);
+  };
+
   return (
     <TasksContext.Provider
       value={{
@@ -86,6 +91,7 @@ export const TasksProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         updateTask,
         deleteTask,
         toggleTask,
+        reorderTasks,
         filter,
         setFilter,
       }}

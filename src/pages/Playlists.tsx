@@ -48,6 +48,7 @@ import type {
   MotivationalSettings,
 } from '@/types';
 import { toast } from 'sonner';
+import { useConfirm } from '@/context/ConfirmContext';
 import { cn } from '@/lib/utils';
 
 const YOUTUBE_API_KEY = 'AIzaSyDOpHgt8xrp_SlMs0rWT8YDxeQsyeB3kvc';
@@ -132,6 +133,7 @@ const parseRangeSpecification = (inputString: string): { start: number; end: num
 export const Playlists: React.FC = () => {
   const { user, userDoc } = useAuth();
   const { gainXP } = useGamification();
+  const confirm = useConfirm();
 
   // Playlists State
   const [playlists, setPlaylists] = useState<Playlist[]>(() => {
@@ -410,8 +412,14 @@ export const Playlists: React.FC = () => {
   };
 
   // Delete Playlist
-  const handleDeletePlaylist = (playlistId: string) => {
-    if (confirm('Are you sure you want to delete this course playlist?')) {
+  const handleDeletePlaylist = async (playlistId: string) => {
+    const ok = await confirm({
+      title: 'Delete Course Playlist',
+      message: 'Are you sure you want to delete this course playlist?',
+      confirmText: 'Delete Playlist',
+      variant: 'danger',
+    });
+    if (ok) {
       const updated = playlists.filter((p) => p.id !== playlistId);
       savePlaylistsData(updated);
       toast.info('Playlist removed');
@@ -679,8 +687,14 @@ pause
   };
 
   // Clear All Groups
-  const clearAllGroups = (playlistId: string) => {
-    if (confirm('Are you sure you want to delete all learning groups for this playlist?')) {
+  const clearAllGroups = async (playlistId: string) => {
+    const ok = await confirm({
+      title: 'Clear Learning Groups',
+      message: 'Are you sure you want to delete all learning groups for this playlist?',
+      confirmText: 'Delete All Groups',
+      variant: 'danger',
+    });
+    if (ok) {
       const updated = playlists.map((p) =>
         p.id === playlistId ? { ...p, groups: [] } : p
       );

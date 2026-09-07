@@ -7,11 +7,13 @@ import { Card } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
 import { KeyRound, Palette, LogOut, Camera, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { useConfirm } from '@/context/ConfirmContext';
 
 export const Settings: React.FC = () => {
   const { user, userDoc, userRole, userNumber, updateUserProfile, resetPassword, signOut } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
+  const confirm = useConfirm();
 
   const [displayName, setDisplayName] = useState(user?.displayName || '');
   const [saving, setSaving] = useState(false);
@@ -87,7 +89,13 @@ export const Settings: React.FC = () => {
   };
 
   const handleRemovePicture = async () => {
-    if (!confirm('Are you sure you want to remove your profile picture?')) return;
+    const ok = await confirm({
+      title: 'Remove Profile Picture',
+      message: 'Are you sure you want to remove your profile picture?',
+      confirmText: 'Remove Picture',
+      variant: 'danger',
+    });
+    if (!ok) return;
     setUploadingPic(true);
     try {
       await updateUserProfile(displayName || user?.displayName || 'User', '');

@@ -12,6 +12,7 @@ import {
 import { Input } from '@/components/ui/Input';
 import { Plus, Check, Flame, Trash2, Edit2, Calendar } from 'lucide-react';
 import type { Habit } from '@/types';
+import { useConfirm } from '@/context/ConfirmContext';
 import { cn } from '@/lib/utils';
 
 export const Habits: React.FC = () => {
@@ -23,6 +24,7 @@ export const Habits: React.FC = () => {
     toggleHabitToday,
     isHabitCompletedToday,
   } = useHabits();
+  const confirm = useConfirm();
 
   const [modalOpen, setModalOpen] = useState(false);
   const [editingHabit, setEditingHabit] = useState<Habit | null>(null);
@@ -226,7 +228,17 @@ export const Habits: React.FC = () => {
                     <Button
                       variant="ghost"
                       size="icon"
-                      onClick={() => deleteHabit(habit.id)}
+                      onClick={async () => {
+                        const ok = await confirm({
+                          title: 'Delete Habit',
+                          message: `Are you sure you want to delete "${habit.title}"?`,
+                          confirmText: 'Delete Habit',
+                          variant: 'danger',
+                        });
+                        if (ok) {
+                          deleteHabit(habit.id);
+                        }
+                      }}
                       className="w-10 h-10 rounded-xl text-danger hover:bg-danger-bg hover:text-danger"
                       title="Delete Habit"
                     >
