@@ -45,7 +45,7 @@ export const Sidebar: React.FC = () => {
   return (
     <aside
       className={cn(
-        'relative flex flex-col justify-between border-r border-border bg-surface transition-all duration-300 z-30 h-screen sticky top-0',
+        'relative flex flex-col justify-between border-r border-border bg-surface transition-all duration-300 z-30 h-screen top-0',
         minimized ? 'w-[78px]' : 'w-[250px]'
       )}
     >
