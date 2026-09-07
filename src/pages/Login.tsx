@@ -57,6 +57,9 @@ export const Login: React.FC = () => {
     setSuccess('');
     setPassword('');
     setConfirmPassword('');
+    if (newMode !== 'signin' && !email.includes('@')) {
+      setEmail('');
+    }
   };
 
   const handleSignIn = async (e: React.FormEvent) => {
@@ -65,7 +68,7 @@ export const Login: React.FC = () => {
     setSuccess('');
 
     if (!email.trim() || !password) {
-      setError('Please provide both your email and password.');
+      setError('Please provide your username or email, and password.');
       return;
     }
 
@@ -76,9 +79,9 @@ export const Login: React.FC = () => {
       navigate(from, { replace: true });
     } catch (err: any) {
       console.error('Sign in error:', err);
-      let msg = 'Failed to sign in. Please verify your email and password.';
+      let msg = 'Failed to sign in. Please verify your credentials.';
       if (err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') {
-        msg = 'Invalid email or password. Please check your credentials.';
+        msg = 'Invalid username/email or password. Please check your credentials.';
       } else if (err.code === 'auth/too-many-requests') {
         msg = 'Too many failed login attempts. Please try again later or reset your password.';
       } else if (err.message) {
@@ -237,18 +240,18 @@ export const Login: React.FC = () => {
               <form onSubmit={handleSignIn} className="space-y-4">
                 <div className="space-y-1.5">
                   <label className="text-xs font-bold text-text-secondary">
-                    Email Address
+                    Email or Username
                   </label>
                   <div className="relative">
-                    <Mail className="w-4 h-4 text-text-tertiary absolute left-3 top-1/2 -translate-y-1/2" />
+                    <User className="w-4 h-4 text-text-tertiary absolute left-3 top-1/2 -translate-y-1/2" />
                     <Input
-                      type="email"
+                      type="text"
                       required
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      placeholder="you@example.com"
+                      placeholder="Username or you@example.com"
                       className="pl-9 h-11 text-xs"
-                      autoComplete="email"
+                      autoComplete="username"
                     />
                   </div>
                 </div>

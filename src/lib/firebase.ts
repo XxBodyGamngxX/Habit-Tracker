@@ -17,6 +17,8 @@ import {
   deleteDoc,
   collection,
   getDocs,
+  query,
+  where,
   runTransaction,
 } from 'firebase/firestore';
 
@@ -47,6 +49,8 @@ export {
   deleteDoc,
   collection,
   getDocs,
+  query,
+  where,
   runTransaction,
   type User,
 };

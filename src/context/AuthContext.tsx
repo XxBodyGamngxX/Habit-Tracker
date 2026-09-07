@@ -11,6 +11,10 @@ import {
   doc,
   getDoc,
   setDoc,
+  collection,
+  getDocs,
+  query,
+  where,
   runTransaction,
   type User,
 } from '@/lib/firebase';
@@ -22,7 +26,7 @@ interface AuthContextType {
   userRole: UserRole;
   userNumber: number | null;
   loading: boolean;
-  signIn: (email: string, pass: string) => Promise<void>;
+  signIn: (emailOrUsername: string, pass: string) => Promise<void>;
   signUp: (username: string, email: string, pass: string) => Promise<void>;
   signOut: () => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
@@ -164,14 +168,67 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const signIn = async (email: string, pass: string) => {
-    await signInWithEmailAndPassword(auth, email, pass);
+  const signIn = async (emailOrUsername: string, pass: string) => {
+    const trimmed = emailOrUsername.trim();
+    let targetEmail = trimmed;
+
+    // If input does not contain '@', look up email by displayName/username in Firestore
+    if (!trimmed.includes('@')) {
+      if (!db) {
+        throw new Error('Database is unavailable. Please log in using your email address.');
+      }
+      const usersRef = collection(db, 'users');
+      const q = query(usersRef, where('displayName', '==', trimmed));
+      const snap = await getDocs(q);
+
+      if (!snap.empty) {
+        const found = snap.docs[0].data()?.email;
+        if (found) {
+          targetEmail = found;
+        }
+      } else {
+        // Fallback: search case-insensitively across registered users
+        const allUsersSnap = await getDocs(usersRef);
+        const matched = allUsersSnap.docs.find((d) => {
+          const data = d.data();
+          const dName = data?.displayName?.toString().toLowerCase();
+          const uName = data?.username?.toString().toLowerCase();
+          const search = trimmed.toLowerCase();
+          return dName === search || uName === search;
+        });
+
+        if (matched && matched.data()?.email) {
+          targetEmail = matched.data().email;
+        } else {
+          throw new Error('No account found with this username. Please verify your username or use your email.');
+        }
+      }
+    }
+
+    await signInWithEmailAndPassword(auth, targetEmail, pass);
   };
 
   const signUp = async (username: string, email: string, pass: string) => {
-    const cred = await createUserWithEmailAndPassword(auth, email, pass);
+    const trimmedUsername = username.trim();
+    const trimmedEmail = email.trim();
+
+    if (db) {
+      const usersRef = collection(db, 'users');
+      const snap = await getDocs(usersRef);
+      const isTaken = snap.docs.some((d) => {
+        const data = d.data();
+        const dName = data?.displayName?.toString().toLowerCase();
+        const uName = data?.username?.toString().toLowerCase();
+        return dName === trimmedUsername.toLowerCase() || uName === trimmedUsername.toLowerCase();
+      });
+      if (isTaken) {
+        throw new Error('This username is already taken. Please choose a different one.');
+      }
+    }
+
+    const cred = await createUserWithEmailAndPassword(auth, trimmedEmail, pass);
     if (cred.user) {
-      await fbUpdateProfile(cred.user, { displayName: username });
+      await fbUpdateProfile(cred.user, { displayName: trimmedUsername });
       await fetchUserData(cred.user);
     }
   };
@@ -210,10 +267,32 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const updateUserProfile = async (displayName: string, photoURL?: string) => {
     if (!user) return;
-    await fbUpdateProfile(user, { displayName, photoURL: photoURL || user.photoURL });
+    const trimmedName = displayName.trim();
+    const isDataUriOrLong = !!photoURL && (photoURL.startsWith('data:') || photoURL.length > 1000);
+
+    // Firebase Auth throws (auth/invalid-profile-attribute) when photoURL is a data URI or >2048 chars.
+    // Data URIs are persisted directly to Firestore userDoc.profilePicUrl. Only valid web URLs are sent to Firebase Auth.
+    try {
+      if (isDataUriOrLong) {
+        await fbUpdateProfile(user, { displayName: trimmedName });
+      } else if (photoURL !== undefined) {
+        await fbUpdateProfile(user, { displayName: trimmedName, photoURL: photoURL || '' });
+      } else {
+        await fbUpdateProfile(user, { displayName: trimmedName });
+      }
+    } catch (authErr) {
+      console.warn('Firebase auth updateProfile warning:', authErr);
+    }
+
     if (db) {
       const userRef = doc(db, 'users', user.uid);
-      await setDoc(userRef, { displayName, profilePicUrl: photoURL || null }, { merge: true });
+      const updateData: { displayName: string; profilePicUrl?: string | null } = {
+        displayName: trimmedName,
+      };
+      if (photoURL !== undefined) {
+        updateData.profilePicUrl = photoURL || null;
+      }
+      await setDoc(userRef, updateData, { merge: true });
     }
     await refreshUserData();
   };

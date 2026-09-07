@@ -40,13 +40,21 @@ export const AuthModal: React.FC<AuthModalProps> = ({ open, onOpenChange }) => {
     e.preventDefault();
     setError('');
     setSuccess('');
+    if (!email.trim() || !password) {
+      setError('Please provide your username or email, and password.');
+      return;
+    }
     setSubmitting(true);
     try {
       await signIn(email.trim(), password);
       onOpenChange(false);
       resetForm();
     } catch (err: any) {
-      setError(err.message || 'Failed to sign in. Please verify your credentials.');
+      if (err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') {
+        setError('Invalid username/email or password. Please check your credentials.');
+      } else {
+        setError(err.message || 'Failed to sign in. Please verify your credentials.');
+      }
     } finally {
       setSubmitting(false);
     }
@@ -143,11 +151,11 @@ export const AuthModal: React.FC<AuthModalProps> = ({ open, onOpenChange }) => {
             <TabsContent value="signin">
               <form onSubmit={handleSignIn} className="space-y-3.5 mt-3">
                 <div className="space-y-1">
-                  <label className="text-xs font-bold text-text-secondary">Email Address</label>
+                  <label className="text-xs font-bold text-text-secondary">Email or Username</label>
                   <Input
-                    type="email"
+                    type="text"
                     required
-                    placeholder="name@example.com"
+                    placeholder="Username or name@example.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                   />

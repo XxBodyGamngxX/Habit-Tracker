@@ -50,7 +50,7 @@ export const Settings: React.FC = () => {
             return;
           }
           ctx.drawImage(img, 0, 0, width, height);
-          resolve(canvas.toDataURL('image/jpeg', 0.85));
+          resolve(canvas.toDataURL('image/jpeg', 0.8));
         };
         img.onerror = reject;
         img.src = e.target?.result as string;
@@ -76,7 +76,7 @@ export const Settings: React.FC = () => {
 
     setUploadingPic(true);
     try {
-      const base64 = await resizeImageToBase64(file, 200);
+      const base64 = await resizeImageToBase64(file, 160);
       await updateUserProfile(displayName || user?.displayName || 'User', base64);
       toast.success('Profile picture updated!');
     } catch (err: unknown) {
